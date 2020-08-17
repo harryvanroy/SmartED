@@ -30,7 +30,7 @@ and on Windows use
 
 Virtualenv allows us to keep track of our dependencies throughout the build. If
 we add python libraries during development, simply running 
-`pip3 freeze ` requirements.txt` saves the changes for everyone.
+`pip3 freeze > requirements.txt` saves the changes for everyone.
 
 To install the necessary dependencies begin with
 
