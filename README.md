@@ -34,7 +34,7 @@ we add python libraries during development, simply running
 
 To install the necessary dependencies begin with
 
-`pip3 install requirements.txt`
+`pip3 install -r requirements.txt`
 
 Now enter into the project directory `cd SmartEducation` and run the webserver 
 `python manage.py runserver`.
