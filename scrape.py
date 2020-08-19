@@ -27,8 +27,8 @@ headers = {
 }
 
 data = {
-  'username': 's4529386',
-  'password': 'ghjdfkfhABC123',
+  'username': '',
+  'password': '',
   'submit': 'LOGIN',
   'AuthState': '_a863803000be7315d10f754b3072b6b2b87ba9aab2^%^3Ahttps^%^3A^%^2F^%^2Fauth.uq.edu.au^%^2Fidp^%^2Fmodule.php^%^2Fcore^%^2Fas_login.php^%^3FAuthId^%^3Duq^%^26ReturnTo^%^3Dhttps^%^253A^%^252F^%^252Fauth.uq.edu.au^%^252Fidp^%^252Fmodule.php^%^252Fcore^%^252Fauthenticate.php^%^253Fas^%^253Duq'
 }
