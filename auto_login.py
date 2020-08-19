@@ -4,8 +4,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 # Variables
-studentNumber = "s4529386"
-UQPassword = "ghjdfkfhABC123"
+studentNumber = ""
+UQPassword = ""
 friendName = "Paul Smenis"
 sendDelay = 1
 
