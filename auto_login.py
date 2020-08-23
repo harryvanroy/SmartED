@@ -4,9 +4,11 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 # Variables
-studentNumber = ""
-UQPassword = ""
-friendName = "Paul Smenis"
+f = open("auth.txt","r")
+lines = f.readlines()
+studentNumber = lines[0]
+UQPassword = lines[1]
+f.close()
 sendDelay = 1
 
 # Opens UQ auth
