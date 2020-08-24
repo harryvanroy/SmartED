@@ -23,7 +23,7 @@ def parse_questions(filename):
 #asks user questions and records responses
 def quiz(questions):
     answers = []
-    intro_message = 'This quiz will evalulate your learning style. Answer questions by typing the response/s you agree with, eg if you only agree with A, type "A", and if you agree with both B and C, type "BC"\n©2019 VARK-Learn Limited http://vark-learn.com'
+    intro_message = 'This quiz will evalulate your learning style. Answer questions by typing the response/s you agree with, eg if you only agree with A, type "A", and if you agree with both B and C, type "BC"'
     print(intro_message, '\n')
 
     for question in range(16):
