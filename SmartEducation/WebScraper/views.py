@@ -1,5 +1,8 @@
 from django.http import HttpResponse
+from rest_framework import viewsets
+from .models import Course
+from .serializers import CourseSerializer
 
-
-def index(request):
-    return HttpResponse("Hello, world. You're at the WebScraper index.")
+class CourseView(viewsets.ModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
