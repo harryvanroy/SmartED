@@ -21,12 +21,11 @@ driver.find_element_by_xpath('//*[@id="username"]').send_keys(studentNumber)
 driver.find_element_by_xpath('//*[@id="password"]').send_keys(UQPassword)
 driver.find_element_by_xpath('//*[@name="submit"]').click()
 
-# Find recent courses
-courses = driver.find_elements_by_xpath("//a[contains(text(), 'Semester 2, 2020')]")
-
-# Click on each course (broken)
-for course in courses:
+for course in range(4):
+    course = driver.find_elements_by_xpath("//a[contains(text(), 'Semester 2, 2020')]")[course]
     course.click()
-    # Dies here, whoops
+    time.sleep(2)
+    driver.back()
+    time.sleep(2)
 
 time.sleep(20)
