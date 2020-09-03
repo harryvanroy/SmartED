@@ -2,13 +2,14 @@ import bs4 as bs
 import urllib.request
 
 
-def get_course_assessment(course_code, semester=None, delivery_mode=None):
+def get_course_assessment(course_code, semester=None, year=None, delivery_mode=None):
     """
     A function which takes a uq course code, semester and delivery mode and returns a list of dictionaries
     of assessment pieces for that given course in the given semester and delivery mode
     :param course_code: the uq course code (e.g. coms3200, deco3801)
-    :param semester: todo: implement this
-    :param delivery_mode: todo: implement this.. will be either internal, external or flexy
+    :param semester: an integer of the sem number
+    :param year: an integer of the year
+    :param delivery_mode: a string of either "Internal", "External", or "Flexible Delivery"
     :return: a  list of dictionaries representing assignments, where each assignment has: "name", "date" and "weight"
     """
 
@@ -21,21 +22,36 @@ def get_course_assessment(course_code, semester=None, delivery_mode=None):
     data = response.read()
     soup = bs.BeautifulSoup(data, 'lxml')
 
-    """ todo: this is where semester and delivery mode will play a role, at the moment, the ecp link is found by just
-    selecting the 1th index of the course offerings list, it instead needs to select the course offering
-    which matches the sem and mode.. """
+    if soup.tbody is None:
+        print(f"No table found for course code '{course_code}'...")
+        return False
+
+    # if no semester or year specified, pick 1th index course profile
     ecp_url = soup.tbody.find_all('a')[1].get('href')
+
+    if semester is not None and year is not None and delivery_mode is not None:
+        found = False
+        for course_offering in soup.tbody.find_all('tr'):
+            course_mode = course_offering.find("td", {"class": "course-offering-mode"}).text
+            course_time = course_offering.find("a", {"class": "course-offering-year"}).text
+
+            if (course_time == f"Semester {semester}, {year}") and (course_mode == delivery_mode):
+                ecp_url = course_offering.find("td", {"class": "course-offering-profile"}).find("a").get('href')
+                found = True
+
+        if not found:
+            print("could not find matching course year/semester/mode, using default..")
 
     request = urllib.request.Request(ecp_url, headers={"User-agent": "Mozilla/5.0"})
     data = urllib.request.urlopen(request).read()
     soup = bs.BeautifulSoup(data, 'lxml')
 
-    """ todo: this assumes that the Assessment link is always the 4th indexed list item, however it might not be. 
-    Instead it should check for which list item has the text "assessment" and navigate to that href..
-    """
-    assessment_url = soup.find("ul", {"class": "toc-node"}).find_all("li")[4].find("a").get('href')
+    ecp_links = soup.find("ul", {"class": "toc-node"}).find_all("li")
+    assessment_url = [i.a.get('href') for i in ecp_links if ". Assessment" in i.text][0]
+    # old backup method below
+    # assessment_url = soup.find("ul", {"class": "toc-node"}).find_all("li")[4].find("a").get('href')
 
-    request = urllib.request.Request(assessment_url, headers= {"User-agent": "Mozilla/5.0"})
+    request = urllib.request.Request(assessment_url, headers={"User-agent": "Mozilla/5.0"})
     data = urllib.request.urlopen(request).read()
     soup = bs.BeautifulSoup(data, 'lxml')
 
@@ -53,9 +69,14 @@ def get_course_assessment(course_code, semester=None, delivery_mode=None):
 
 if __name__ == "__main__":
     print("test mode!")
-    course_code = input("enter a course code: ")
+    course = input("enter a course code: ")
+    year = input("enter a year: ")
+    semester = input("enter a semester number: ")
+    mode = input("enter a delivery mode ('Internal', 'External' or 'Flexible Delivery'): ")
     print("loading data...\n")
-    ass_list = get_course_assessment(course_code)
-    print(f"Assessment list for {course_code}:")
-    for ass in ass_list:
-        print(ass)
+    ass_list = get_course_assessment(course, semester, year, mode)
+
+    if ass_list is not False:
+        print(f"Assessment list for {course} {year} {semester} {mode}:")
+        for ass in ass_list:
+            print(ass)
