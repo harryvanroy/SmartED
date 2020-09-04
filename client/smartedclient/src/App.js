@@ -17,7 +17,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import FeedbackIcon from '@material-ui/icons/Feedback';
-import SortIcon from '@material-ui/icons/Sort';
+import SubjectIcon from '@material-ui/icons/Sort';
 import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -121,7 +121,7 @@ const useStyles = makeStyles((theme) => ({
                       0: <AssessmentIcon />,
                       1: <EmojiEmotionsIcon />,
                       2: <SchoolIcon />,
-                      3: <SortIcon />,
+                      3: <SubjectIcon />,
                       4: <FeedbackIcon />
                     }[index]
                   }
