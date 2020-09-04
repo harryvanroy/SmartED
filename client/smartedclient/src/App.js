@@ -22,7 +22,14 @@ import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Link, NavLink } from 'react-router-dom';
+import Assessment from './components/Assessment';
+import Feedback from './components/Feedback';
+import Goals from './components/Goals';
+import Grades from './components/Grades';
+import Resources from './components/Resources';
+import Home from './components/Home';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -68,8 +75,10 @@ const useStyles = makeStyles((theme) => ({
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h4" noWrap style={{ flex: 1 }}>
-            SmartED
+          <Typography variant="h4" noWrap style={{flexGrow: 1}}>
+            <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
+              SmartED
+            </Link>
           </Typography>
           <AccountCircleIcon/>
         </Toolbar>
@@ -91,6 +100,7 @@ const useStyles = makeStyles((theme) => ({
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
+                {/* Hard coded course codes */}
                 {['DECO3801', 'COMP3301', 'MATH3204', 'STAT2004'].map((text, index) => (
                   <ListItem button className={classes.nested}>
                     <ListItemText primary={text} classes={{primary:classes.listItemText}}/>
@@ -99,7 +109,12 @@ const useStyles = makeStyles((theme) => ({
               </List>
             </Collapse>
               {['Assessment', 'Course Goals', 'My Grades', 'Resources', 'Personal Feedback'].map((text, index) => (
-                <ListItem button key={text}>
+                <ListItem 
+                  focusRippleColor="" touchRippleColor="red"
+                  button key={text} component={NavLink} 
+                  to={['/assessment', '/goals', '/grades', '/resources', '/feedback'][index]} 
+                  activeStyle={{ background: 'rgb(0, 0, 0, 0.1)'}}
+                >
                   <ListItemIcon>
                   {
                     { 
@@ -114,54 +129,31 @@ const useStyles = makeStyles((theme) => ({
                   <ListItemText primary={text} />
                 </ListItem>
               ))}
-{/*             <ListItem button>
-              <ListItemIcon><AssessmentIcon /></ListItemIcon>
-              <ListItemText primary="Assessment" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon><EmojiEmotionsIcon /></ListItemIcon>
-              <ListItemText primary="Course Goals" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon><SchoolIcon /></ListItemIcon>
-              <ListItemText primary="My Grades" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon><SortIcon /></ListItemIcon>
-              <ListItemText primary="Resources" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon><FeedbackIcon /></ListItemIcon>
-              <ListItemText primary="Personal Feedback" />
-            </ListItem> */}
           </List>
         </div>
       </Drawer>
       <main className={classes.content}>
         <Toolbar />
-        <Typography paragraph>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
-          facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-          gravida rutrum quisque non tellus. Convallis convallis tellus id interdum velit laoreet id
-          donec ultrices. Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-          Metus vulputate eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo quis
-          imperdiet massa tincidunt. Cras tincidunt lobortis feugiat vivamus at augue. At augue eget
-          arcu dictum varius duis at consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-          donec massa sapien faucibus et molestie ac.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper eget nulla
-          facilisi etiam dignissim diam. Pulvinar elementum integer enim neque volutpat ac
-          tincidunt. Ornare suspendisse sed nisi lacus sed viverra tellus. Purus sit amet volutpat
-          consequat mauris. Elementum eu facilisis sed odio morbi. Euismod lacinia at quis risus sed
-          vulputate odio. Morbi tincidunt ornare massa eget egestas purus viverra accumsan in. In
-          hendrerit gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem et
-          tortor. Habitant morbi tristique senectus et. Adipiscing elit duis tristique sollicitudin
-          nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
-          accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
+        <Switch>
+          <Route path="/assessment">
+            <Assessment />
+          </Route>
+          <Route path="/feedback">
+            <Feedback />
+          </Route>
+          <Route path="/goals">
+            <Goals />
+          </Route>
+          <Route path="/grades">
+            <Grades />
+          </Route>
+          <Route path="/resources">
+            <Resources />
+          </Route>      
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
       </main>
     </div>
   );
