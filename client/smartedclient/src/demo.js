@@ -15,7 +15,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import FeedbackIcon from '@material-ui/icons/Feedback';
-import SortIcon from '@material-ui/icons/Sort';
+import SubjectIcon from '@material-ui/icons/Subject';
 import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
@@ -109,7 +109,7 @@ export default function ClippedDrawer() {
               <ListItemText primary="My Grades" />
             </ListItem>
             <ListItem button>
-              <ListItemIcon><SortIcon /></ListItemIcon>
+              <ListItemIcon><SubjectIcon /></ListItemIcon>
               <ListItemText primary="Resources" />
             </ListItem>
             <ListItem button>
