@@ -30,6 +30,7 @@ import Grades from './components/Grades';
 import Resources from './components/Resources';
 import Home from './components/Home';
 
+import { ReactComponent as Logo } from './logo.svg';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -59,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
   },
   listItemText:{
     fontSize:'0.9em',
-  }
+  },
 }));
 
   function App() {
@@ -75,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h4" noWrap style={{flexGrow: 1}}>
+            <Typography variant="h4" noWrap style={{flexGrow: 1}}>
             <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
               SmartED
             </Link>
