@@ -19,7 +19,7 @@ driver.implicitly_wait(10)
 # Login
 driver.find_element_by_xpath('//*[@id="username"]').send_keys(studentNumber)
 driver.find_element_by_xpath('//*[@id="password"]').send_keys(UQPassword)
-driver.find_element_by_xpath('//*[@name="submit"]').click()
+#driver.find_element_by_xpath('//*[@name="submit"]').click()
 
 # Find recent courses
 courses = driver.find_elements_by_xpath("//a[contains(text(), 'Semester 2, 2020')]")
