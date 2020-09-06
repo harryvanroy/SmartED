@@ -29,6 +29,7 @@ import Goals from './components/Goals';
 import Grades from './components/Grades';
 import Resources from './components/Resources';
 import Home from './components/Home';
+import Vark from './components/Vark';
 
 const drawerWidth = 240;
 
@@ -148,7 +149,7 @@ const useStyles = makeStyles((theme) => ({
             <Grades />
           </Route>
           <Route path="/resources">
-            <Resources />
+            <Vark />
           </Route>      
           <Route path="/">
             <Home />
