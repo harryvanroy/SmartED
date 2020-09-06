@@ -26,9 +26,13 @@ function Home() {
                 <div className = {classes.paperTitle}>
                   Announcements
                 </div>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl elit, pretium ut sem eget, maximus porta sapien. Nulla mollis rutrum varius. Morbi mauris erat, semper a ullamcorper vel, rhoncus consequat ligula. Nullam tristique felis vitae pellentesque ornare. Suspendisse justo est, laoreet eu malesuada accumsan, semper eget urna. Nullam blandit tempor dolor quis sagittis. Nam eleifend id elit eu fermentum. Maecenas in gravida purus, ac laoreet sem. Pellentesque metus nulla, varius vitae arcu eget, tristique porttitor libero.
-                Phasellus sodales viverra mattis. Sed ac lacinia justo, et pellentesque justo. Quisque massa massa, tempor sit amet gravida euismod, luctus in neque. Nam in placerat nunc, vel tempor augue. Vivamus tempus pulvinar felis sit amet dictum. Quisque ac neque a leo elementum iaculis. Praesent aliquam nunc gravida imperdiet interdum. In eu finibus orci. Suspendisse potenti. Donec lacinia risus commodo ornare posuere.
-                Aliquam hendrerit felis sit amet magna sodales consectetur.
+                Students who have still not found a team should send an email to
+                the head tutor as well as the professor. Teams that have less than
+                6 people should also write an email to the head tutor.
+                Teams should send topic and timing preferences by this Friday.
+                Students enrolled in Flexible Delivery need to maintain 1.5 m
+                distance at all times during class.
+
               </Paper>
             </Grid>
             <Grid item xs={12}>
