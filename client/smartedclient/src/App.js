@@ -150,6 +150,9 @@ const useStyles = makeStyles((theme) => ({
             <Grades />
           </Route>
           <Route path="/resources">
+            <Resources />
+          </Route> 
+          <Route path="/vark">
             <Vark />
           </Route>      
           <Route path="/">
