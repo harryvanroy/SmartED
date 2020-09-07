@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from .ecp_scrape import get_course_assessment
 from .models import Course, Institution, Assessment
+from .serializers import AssessmentSerializer
+from django.core import serializers
 import json
 
 
@@ -15,7 +17,11 @@ def course_assessment(request):
     for saved_course in Course.objects.all():
         if saved_course.name == course:  # check sem, year, mode
             database_course_obj = saved_course
-            return HttpResponse('return database assessment here')
+
+            saved_assessment = [saved_ass for saved_ass in Assessment.objects.all()
+                                if saved_ass.course == database_course_obj]
+
+            return HttpResponse(serializers.serialize('json', saved_assessment))
 
     UQ = [institution for institution in Institution.objects.all()
           if institution.name == 'University of Queensland'][0]
