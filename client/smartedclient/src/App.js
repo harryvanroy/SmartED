@@ -63,9 +63,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-  function App() {
+function App() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const [vark, setVark] = React.useState([]);
 
   const handleClick = () => {
     setOpen(!open);
@@ -81,7 +82,8 @@ const useStyles = makeStyles((theme) => ({
               SmartED
             </Link>
           </Typography>
-          <AccountCircleIcon/>
+          {vark.length == 0 ? <div>Vark quiz score:</div>: <div>Please complete vark quiz</div>}
+          <AccountCircleIcon style={{paddingLeft: 5}}/>
         </Toolbar>
       </AppBar>
       <Drawer
