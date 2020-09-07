@@ -15,7 +15,7 @@ def course_assessment(request):
     # search database for course
     database_course_obj = None
     for saved_course in Course.objects.all():
-        if saved_course.name == course:  # check sem, year, mode
+        if saved_course.name == course:  # check sem, year, mode too!
             database_course_obj = saved_course
 
             saved_assessment = [saved_ass for saved_ass in Assessment.objects.all()
