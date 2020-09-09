@@ -21,32 +21,23 @@ driver.find_element_by_xpath('//*[@id="username"]').send_keys(studentNumber)
 driver.find_element_by_xpath('//*[@id="password"]').send_keys(UQPassword)
 driver.find_element_by_xpath('//*[@name="submit"]').click()
 
-# Transfer the selenium cookies to a requests session
-url = "https://learn.uq.edu.au/"
-s = requests.Session()
-c = [s.cookies.set(c['name'], c['value']) for c in driver.get_cookies()]
+# Use selenium to browse page and steal resources
+url = "https://learn.uq.edu.au/webapps/portal/execute/tabs/tabAction?tab_tab_group_id=_1_1"
+driver.get(url)
 
-data = {
-  'username': lines[0],
-  'password': lines[1]
-}
+driver.implicitly_wait(10)
+current_courses = driver.find_elements_by_xpath('//*[@id="module:_122_1"]/div[2]/nav/div[1]/ul/li')
+course_links = []
 
-# Response 200 means we're in and it's working :) 
-response = s.post(url, data)
-if response.status_code != 200:
-    print("FAILED TO PASS AUTHENTICATION")
-    exit()
-print(response)
+for course in current_courses:
+    link = course.find_element_by_xpath(".//a")
+    course_id = link.get_attribute('href').split("%")[-3].split("_")[1]
+    course_links.append(link.text)
+    print(link.text)
+    print(course_id)
 
-# NO CAPTCHAS!!!
-response = s.get(url)
-print(response)
-# We can now proceed with scraping :)
-
-# close chrome
 driver.close()
 driver.quit()
-
 
 
 
