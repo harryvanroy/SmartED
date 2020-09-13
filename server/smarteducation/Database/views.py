@@ -9,8 +9,8 @@ import json
 def course_assessment(request):
     course = request.GET.get('code')
     sem = request.GET.get('sem')
-    year = 2020
-    mode = 'Flexible Delivery'
+    year = 2020  # todo: get
+    mode = 'FLEXIBLE'  # todo: get
 
     # search database for course
     database_course_obj = None
