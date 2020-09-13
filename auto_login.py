@@ -40,12 +40,10 @@ print(response)
 
 # NO CAPTCHAS!!!
 response = s.get(url)
-print(response)
+print(response.text)
 # We can now proceed with scraping :)
 
 # close chrome
-driver.close()
-driver.quit()
 
 
 
