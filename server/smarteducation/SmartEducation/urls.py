@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('WebScraper/', include('WebScraper.urls')),
+    # path('WebScraper/', include('WebScraper.urls')),
     path('Database/', include('Database.urls')),
     path('admin/', admin.site.urls),
 ]

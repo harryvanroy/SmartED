@@ -1,6 +1,8 @@
-from .models import User, Resource, File, Institution, Course, Assessment
+from .models import User, Student, Resource, File, Institution, Course, Assessment, Staff, StudentCourse, StaffCourse
 from rest_framework import viewsets, permissions
-from .serializers import UserSerializer, ResourceSerializer, FileSerializer, InstitutionSerializer, CourseSerializer, AssessmentSerializer
+from .serializers import UserSerializer, ResourceSerializer, FileSerializer, InstitutionSerializer, \
+    CourseSerializer, AssessmentSerializer, StudentSerializer, StaffSerializer, StaffCourseSerializer, \
+    StudentCourseSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -9,6 +11,22 @@ class UserViewSet(viewsets.ModelViewSet):
         permissions.AllowAny
     }
     serializer_class = UserSerializer
+
+
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+    serializer_class = StudentSerializer
+
+
+class StaffViewSet(viewsets.ModelViewSet):
+    queryset = Staff.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+    serializer_class = StaffSerializer
 
 
 class ResourceViewSet(viewsets.ModelViewSet):
@@ -41,6 +59,22 @@ class CourseViewSet(viewsets.ModelViewSet):
         permissions.AllowAny
     }
     serializer_class = CourseSerializer
+
+
+class StudentCourseViewSet(viewsets.ModelViewSet):
+    queryset = StudentCourse.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+    serializer_class = StudentCourseSerializer
+
+
+class StaffCourseViewSet(viewsets.ModelViewSet):
+    queryset = StaffCourse.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+    serializer_class = StaffCourseSerializer
 
 
 class AssessmentViewSet(viewsets.ModelViewSet):

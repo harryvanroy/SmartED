@@ -1,10 +1,36 @@
 from django.db import models
 
+# Create your models here.
+
+from django.db import models
+import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator
+
+
+################ VALIDATORS ################
+
+def max_value_current_year(value):
+    return MaxValueValidator(datetime.datetime.now().year)(value)
+
+
+################ Models ################
 
 class User(models.Model):
-    id = models.CharField(primary_key=True, max_length=10)
-    firstName = models.CharField(max_length=255)
-    lastName = models.CharField(max_length=255)
+    username = models.CharField(max_length=8, primary_key=True)
+    firstName = models.CharField(max_length=255, null=False)
+    lastName = models.CharField(max_length=255, null=False)
+
+
+class Student(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    varkV = models.DecimalField(max_digits=5, decimal_places=4)
+    varkA = models.DecimalField(max_digits=5, decimal_places=4)
+    varkR = models.DecimalField(max_digits=5, decimal_places=4)
+    varkK = models.DecimalField(max_digits=5, decimal_places=4)
+
+
+class Staff(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class Resource(models.Model):
@@ -28,20 +54,37 @@ class File(models.Model):
 class Institution(models.Model):
     name = models.CharField(max_length=200)
 
-    def __str__(self):
-        return f"{self.name}"
-
 
 class Course(models.Model):
-    id = models.AutoField(primary_key=True)
+    EXTERNAL = 'E'
+    INTERNAL = 'I'
+    FLEXIBLE = 'F'
+    Course_Modes = [
+        (EXTERNAL, 'EXTERNAL'),
+        (INTERNAL, 'INTERNAL'),
+        (FLEXIBLE, 'FLEXIBLE')
+    ]
+
+    id = models.CharField(max_length=50, primary_key=True)
     name = models.CharField(max_length=200)
-    semester = models.IntegerField(default=2)
-    year = models.IntegerField(default=2020)
-    mode = models.CharField(max_length=20, default='Internal')  # preferably only allow the 3 options
+    mode = models.CharField(max_length=8, choices=Course_Modes, default=FLEXIBLE)
+    semester = models.PositiveSmallIntegerField(default=2, validators=[MinValueValidator(1), MaxValueValidator(2)])
+    year = models.PositiveSmallIntegerField(default=datetime.date.today().year,
+                                            validators=[MinValueValidator(1909), max_value_current_year])
     institution = models.ForeignKey(Institution, on_delete=models.SET_NULL, blank=True, null=True)
 
-    def __str__(self):
-        return f"{self.name}. Semester {self.semester}, {self.year}. {self.mode}"
+    class Meta:
+        unique_together = ('name', 'mode', 'semester', 'year')
+
+
+class StudentCourse(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+
+
+class StaffCourse(models.Model):
+    student = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class Assessment(models.Model):
