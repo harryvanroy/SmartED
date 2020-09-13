@@ -1,7 +1,8 @@
 from rest_framework import routers
 from django.urls import path
 from . import views
-from .api import UserViewSet, ResourceViewSet, FileViewSet, InstitutionViewSet, CourseViewSet, AssessmentViewSet
+from .api import UserViewSet, ResourceViewSet, FileViewSet, InstitutionViewSet, CourseViewSet, AssessmentViewSet, \
+        StaffCourseViewSet, StudentCourseViewSet, StudentViewSet, StaffViewSet
 
 router = routers.DefaultRouter()
 router.register('users', UserViewSet, 'users')
@@ -10,6 +11,10 @@ router.register('files', FileViewSet, 'files')
 router.register('institutions', InstitutionViewSet, 'institutions')
 router.register('courses', CourseViewSet, 'courses')
 router.register('assessment', AssessmentViewSet, 'assessment')
+router.register('staffCourse', StaffCourseViewSet, 'staffCourse')
+router.register('studentCourse', StudentCourseViewSet, 'studentCourse')
+router.register('student', StudentViewSet, 'student')
+router.register('staff', StaffViewSet, 'staff')
 urlpatterns = router.urls
 
 urlpatterns += [
