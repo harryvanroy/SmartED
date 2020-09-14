@@ -21,7 +21,9 @@ def course_assessment(request):
             saved_assessment = [saved_ass for saved_ass in Assessment.objects.all()
                                 if saved_ass.course == database_course_obj]
 
-            return HttpResponse(serializers.serialize('json', saved_assessment))
+            json_assessment = [x["fields"] for x in json.loads(serializers.serialize('json', saved_assessment))]
+            print("loaded course assessment from database")
+            return HttpResponse(json.dumps(json_assessment))
 
     UQ = [institution for institution in Institution.objects.all()
           if institution.name == 'University of Queensland'][0]
@@ -42,4 +44,14 @@ def course_assessment(request):
                               course=database_course_obj)
         ass_item.save()
     print('saved assessment to database')
-    return HttpResponse(json.dumps(assessment))
+
+    for saved_course in Course.objects.all():
+        if saved_course.name == course:  # check sem, year, mode too!
+            database_course_obj = saved_course
+
+            saved_assessment = [saved_ass for saved_ass in Assessment.objects.all()
+                                if saved_ass.course == database_course_obj]
+
+            json_assessment = [x["fields"] for x in json.loads(serializers.serialize('json', saved_assessment))]
+
+            return HttpResponse(json.dumps(json_assessment))
