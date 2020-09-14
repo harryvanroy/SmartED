@@ -2,7 +2,7 @@ from rest_framework import routers
 from django.urls import path
 from . import views
 from .api import UserViewSet, ResourceViewSet, FileViewSet, InstitutionViewSet, CourseViewSet, AssessmentViewSet, \
-        StaffCourseViewSet, StudentCourseViewSet, StudentViewSet, StaffViewSet
+    StaffCourseViewSet, StudentCourseViewSet, StudentViewSet, StaffViewSet
 
 router = routers.DefaultRouter()
 router.register('users', UserViewSet, 'users')
@@ -18,5 +18,6 @@ router.register('staff', StaffViewSet, 'staff')
 urlpatterns = router.urls
 
 urlpatterns += [
-    path('course-assessment/', views.course_assessment, name='course-assessment')
+    path('course-assessment/', views.course_assessment, name='course-assessment'),
+    path('login-post/', views.log_in, name='login')
 ]
