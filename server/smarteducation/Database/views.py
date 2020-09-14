@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from .ecp_scrape import get_course_assessment
-from .models import Course, Institution, Assessment
+from .models import Course, Institution, Assessment, StudentCourse
 from .serializers import AssessmentSerializer
 from django.core import serializers
 import json
@@ -12,13 +12,68 @@ user_keys = []
 
 
 def course_assessment(request):
-    course = request.GET.get('code')
-    sem = request.GET.get('sem')
-    year = 2020  # todo: get
-    mode = 'FLEXIBLE'  # todo: get
+    json_body = json.loads(request.body)
+
+    id = json_body.get("id")
+    if id is None:
+        HttpResponse("failed query... specify the course ID pls..")
+
+    course = Course.objects.get(id=id)
+
+    if course is None:
+        return HttpResponse("load error... course ID not in database")
+
+    name = course.name
+    semester = course.semester
+    mode = course.mode
+    year = course.year
+
+    saved_assessment = Assessment.objects.filter(course=id)
+
+    # check if assessment in database.. if so, return them.. else, scrape em
+    if len(saved_assessment) != 0:
+        json_assessment = [x["fields"] for x
+                           in json.loads(serializers.serialize('json', saved_assessment))]
+        print("loaded course assessment from database")
+        return HttpResponse(json.dumps(json_assessment))
+    else:
+        scraped_assessment = get_course_assessment(course_code=name,
+                                                   semester=semester,
+                                                   year=year, delivery_mode=mode)
+        if scraped_assessment is False:
+            return HttpResponse("error scraping assessment... contact george?")
+
+        for assignment in scraped_assessment:
+            # todo: fix description
+            ass_item = Assessment(name=assignment.get('name'), description="",
+                                  date=assignment.get('date'),
+                                  weight=assignment.get('weight'),
+                                  course=course)
+            ass_item.save()
+        print("saved assessment to database...")
+
+        saved_assessment = Assessment.objects.filter(course=id)
+        json_assessment = [x["fields"] for x
+                           in json.loads(serializers.serialize('json', saved_assessment))]
+        print("loaded course assessment from database")
+        return HttpResponse(json.dumps(json_assessment))
+
+
+def course_assessment_old(request):
+    json_body = json.loads(request.body)
+
+    # todo: might change this to just get course ID code instead... it depends on implementation
+    course = json_body.get("name")
+    sem = json_body.get("sem")
+    year = json_body.get("year")
+    mode = json_body.get("mode")
+    print(sem)
+    # validate json
+    if course is None or sem is None or year is None or mode is None:
+        return HttpResponse("failed query... "
+                            "check your json format (need name, sem, year, mode)")
 
     # search database for course
-    database_course_obj = None
     for saved_course in Course.objects.all():
         if saved_course.name == course:  # check sem, year, mode too!
             database_course_obj = saved_course
@@ -54,10 +109,13 @@ def course_assessment(request):
         if saved_course.name == course:  # check sem, year, mode too!
             database_course_obj = saved_course
 
-            saved_assessment = [saved_ass for saved_ass in Assessment.objects.all()
+            saved_assessment = [saved_ass for saved_ass
+                                in Assessment.objects.all()
                                 if saved_ass.course == database_course_obj]
 
-            json_assessment = [x["fields"] for x in json.loads(serializers.serialize('json', saved_assessment))]
+            json_assessment = \
+                [x["fields"] for x
+                 in json.loads(serializers.serialize('json', saved_assessment))]
 
             return HttpResponse(json.dumps(json_assessment))
 
@@ -102,12 +160,22 @@ def get_student_courses(request):
     if username is None or key is None:
         return HttpResponse('err')
 
-    # if in sessions (user_keys)
+    # checks auth
     if len([user for user in user_keys
             if user["username"] == username and user["key"] == key]):
         print("auth success for " + username + " " + str(key))
-        # todo: get courses here
+
+        # auth successful - now get courses here
+        course_list = [student_course.course for student_course in StudentCourse.objects.all()
+                       if student_course.student.username == username]
+
+        json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
+                         "semester": x.semester, "year": x.year}
+                        for x in course_list]
+
+        return HttpResponse(json.dumps(json_courses))
+
     else:
-        print("failed auth")
+        return HttpResponse("failed auth")
 
     pass  # todo: finish
