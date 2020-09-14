@@ -67,6 +67,7 @@ def log_in(request):
     if request.method == 'POST':
 
         # extract json from post method
+        # todo: subject to change depending on how we decide to format
         json_post = json.loads(request.body)
         username = json_post.get("username")
         pword = json_post.get("password")
@@ -80,7 +81,6 @@ def log_in(request):
 
             successful_login = True  # todo: changes with scrape
             if successful_login:
-
                 # todo: the following is VERY poor practice, temporary only...
                 random.seed(pword)
                 key = random.randint(0, 1000000)
@@ -95,6 +95,19 @@ def log_in(request):
 
 
 def get_student_courses(request):
-    student = request.GET.get('student')
-    key = request.GET.get('key')
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if username is None or key is None:
+        return HttpResponse('err')
+
+    # if in sessions (user_keys)
+    if len([user for user in user_keys
+            if user["username"] == username and user["key"] == key]):
+        print("auth success for " + username + " " + str(key))
+        # todo: get courses here
+    else:
+        print("failed auth")
+
     pass  # todo: finish
