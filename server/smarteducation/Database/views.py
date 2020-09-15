@@ -10,7 +10,7 @@ import random
 
 user_keys = []
 
-
+@csrf_exempt
 def course_assessment(request):
     json_body = json.loads(request.body)
 
@@ -122,36 +122,35 @@ def course_assessment_old(request):
 
 @csrf_exempt  # warning: might be bad practice?
 def log_in(request):
-    if request.method == 'POST':
 
-        # extract json from post method
-        # todo: subject to change depending on how we decide to format
-        json_post = json.loads(request.body)
-        username = json_post.get("username")
-        pword = json_post.get("password")
+    # extract json from post method
+    # todo: subject to change depending on how we decide to format
+    json_post = json.loads(request.body)
+    username = json_post.get("username")
+    pword = json_post.get("password")
 
-        if username is not None and pword is not None:
-            # todo: this is where the login scrape is called
-            # the scrape should check if their data is in the database already
-            # else it will login and add all relevant data to database.
-            # it should return something that indicates if the log in
-            # was successful
+    if username is not None and pword is not None:
+        # todo: this is where the login scrape is called
+        # the scrape should check if their data is in the database already
+        # else it will login and add all relevant data to database.
+        # it should return something that indicates if the log in
+        # was successful
 
-            successful_login = True  # todo: changes with scrape
-            if successful_login:
-                # todo: the following is VERY poor practice, temporary only...
-                random.seed(pword)
-                key = random.randint(0, 1000000)
-                # save username with key such that the session continues
-                user_keys.append({"username": username, "key": key})
+        successful_login = True  # todo: changes with scrape
+        if successful_login:
+            # todo: the following is VERY poor practice, temporary only...
+            random.seed(pword)
+            key = random.randint(0, 1000000)
+            # save username with key such that the session continues
+            user_keys.append({"username": username, "key": key})
 
-                jsons_response = "{" + \
-                                 f'"key": {key}' + "}"
-                return HttpResponse(jsons_response)
+            jsons_response = "{" + \
+                             f'"key": {key}' + "}"
+            return HttpResponse(jsons_response)
 
-        return HttpResponse('err')
+    return HttpResponse('err')
 
-
+@csrf_exempt
 def get_student_courses(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
