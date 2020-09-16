@@ -29,6 +29,7 @@ import Goals from './components/Goals';
 import Grades from './components/Grades';
 import Resources from './components/Resources';
 import Home from './components/Home';
+import Vark from './components/Vark';
 
 import { ReactComponent as Logo } from './logo.svg';
 const drawerWidth = 240;
@@ -63,9 +64,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-  function App() {
+function App() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
+  const [vark, setVark] = React.useState([]);
 
   const handleClick = () => {
     setOpen(!open);
@@ -81,7 +83,8 @@ const useStyles = makeStyles((theme) => ({
               SmartED
             </Link>
           </Typography>
-          <AccountCircleIcon/>
+          {vark.length == 0 ? <div>Vark quiz score:</div>: <div>Please complete vark quiz</div>}
+          <AccountCircleIcon style={{paddingLeft: 5}}/>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -150,6 +153,9 @@ const useStyles = makeStyles((theme) => ({
           </Route>
           <Route path="/resources">
             <Resources />
+          </Route> 
+          <Route path="/vark">
+            <Vark />
           </Route>      
           <Route path="/">
             <Home />
