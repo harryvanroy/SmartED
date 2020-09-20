@@ -11,7 +11,6 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 def max_value_current_year(value):
     return MaxValueValidator(current_year())(value)
 
-
 ################ Models ################
 
 class User(models.Model):
@@ -74,6 +73,17 @@ class Course(models.Model):
     class Meta:
         unique_together = ('name', 'mode', 'semester', 'year')
 
+class AssessmentItem(models.Model):
+    unique_key = ("name", "course")
+    name = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    ## ECP does not always have dates for assignments in datetime format (E.g. "Examination Period")
+    isDate = models.BooleanField(default=False)
+    date = models.DateTimeField(null=True)
+    dateDescrption = models.CharField(max_length=255)
+    isPassFail = models.BooleanField(default=False)
+    weight = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)]);
+
 
 class StudentCourse(models.Model):
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
@@ -83,3 +93,5 @@ class StudentCourse(models.Model):
 class StaffCourse(models.Model):
     student = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+
+
