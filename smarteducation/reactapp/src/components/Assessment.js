@@ -21,7 +21,7 @@ function Assessment() {
 
     return (
         <div>
-            Assessment page.
+          Assessment page.
         </div>
     );
 };
