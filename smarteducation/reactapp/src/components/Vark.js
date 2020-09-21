@@ -1,9 +1,6 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import MobileStepper from '@material-ui/core/MobileStepper';
 import Button from '@material-ui/core/Button';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -15,7 +12,7 @@ const useStyles = makeStyles({
   root: {
     maxWidth: 1000,
     flexGrow: 1,
-  },
+  }
 });
 
 const questions = [
@@ -147,82 +144,132 @@ const questions = [
     c: 'written instructions that came with the parts for the table.',
     d: 'watching a video of a person assembling a similar table.',
   },
+]; 
+
+const scoring = [
+  ['K', 'A', 'R', 'V'],
+  ['V', 'A', 'R', 'K'],
+  ['K', 'V', 'R', 'A'],
+  ['K', 'A', 'V', 'R'],
+  ['A', 'V', 'K', 'R'],
+  ['K', 'R', 'V', 'A'],
+  ['K', 'A', 'V', 'R'],
+  ['R', 'K', 'A', 'V'],
+  ['R', 'A', 'K', 'V'],
+  ['K', 'V', 'R', 'A'],
+  ['V', 'R', 'A', 'K'],
+  ['A', 'R', 'V', 'K'],
+  ['K', 'A', 'R', 'V'],
+  ['K', 'R', 'A', 'V'],
+  ['K', 'A', 'R', 'V'],
+  ['V', 'A', 'R', 'K'],
 ];
 
 export default function Vark() {
   const classes = useStyles();
   const theme = useTheme();
-  const [activeStep, setActiveStep] = React.useState(0);
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const [state, setState] = React.useState({ 
+    checkedA0 : false, checkedB0 : false, checkedC0 : false, checkedD0 : false,
+    checkedA1 : false, checkedB1 : false, checkedC1 : false, checkedD1 : false,
+    checkedA2 : false, checkedB2 : false, checkedC2 : false, checkedD2 : false,
+    checkedA3 : false, checkedB3 : false, checkedC3 : false, checkedD3 : false,
+    checkedA4 : false, checkedB4 : false, checkedC4 : false, checkedD4 : false,
+    checkedA5 : false, checkedB5 : false, checkedC5 : false, checkedD5 : false,
+    checkedA6 : false, checkedB6 : false, checkedC6 : false, checkedD6 : false,
+    checkedA7 : false, checkedB7 : false, checkedC7 : false, checkedD7 : false,
+    checkedA8 : false, checkedB8 : false, checkedC8 : false, checkedD8 : false,
+    checkedA9 : false, checkedB9 : false, checkedC9 : false, checkedD9 : false,
+    checkedA10 : false, checkedB10 : false, checkedC10 : false, checkedD10 : false,
+    checkedA11 : false, checkedB11 : false, checkedC11 : false, checkedD11 : false,
+    checkedA12 : false, checkedB12 : false, checkedC12 : false, checkedD12 : false,
+    checkedA13 : false, checkedB13 : false, checkedC13 : false, checkedD13 : false,
+    checkedA14 : false, checkedB14 : false, checkedC14 : false, checkedD14 : false,
+    checkedA15 : false, checkedB15 : false, checkedC15 : false, checkedD15 : false,
+  });
+
+  const handleChange = (event, key) => {
+    setState({ ...state, [event.target.name+String(key)] : event.target.checked});
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  const scores = {
+    'V' : 0,
+    'A' : 0,
+    'R' : 0,
+    'K' : 0,
+  };
+
+  const saveResults = () => {
+    for (var i = 0; i < 16; i++) {
+      for (var j = 0; j < 4; j++) {
+        if (state["checked"+String.fromCharCode(j+65)+String(i)] == true) {
+          scores[scoring[i][j]] += 1;
+        }
+      }
+    }
+    var total_answers = scores['V']+scores['A']+scores['R']+scores['K'];
+    if (total_answers > 0) {
+      console.log("V: ", scores['V']/total_answers);
+      console.log("A: ", scores['A']/total_answers);
+      console.log("R: ", scores['R']/total_answers);
+      console.log("K: ", scores['K']/total_answers);
+    }
   };
 
   return (
-    <Box width="70%" m={5}>
-      <FormControl component="fieldset">
-      <Typography variant="h6">
-        {"Question " + String(activeStep+1) + "\n"}
-      </Typography>
-      <Typography variant="h5">
-        {questions[activeStep].text}
-      </Typography>
-      <FormGroup aria-label="position" row>
-        <FormControlLabel
-          value="end"
-          control={<Checkbox color="primary" />}
-          label={questions[activeStep].a}
-          labelPlacement="end"
-        />
-      </FormGroup>
-      <FormGroup aria-label="position" row>
-        <FormControlLabel
-          value="end"
-          control={<Checkbox color="primary" />}
-          label={questions[activeStep].b}
-          labelPlacement="end"
-        />
-      </FormGroup>
-      <FormGroup aria-label="position" row>
-        <FormControlLabel
-          value="end"
-          control={<Checkbox color="primary" />}
-          label={questions[activeStep].c}
-          labelPlacement="end"
-        />
-      </FormGroup>
-      <FormGroup aria-label="position" row>
-        <FormControlLabel
-          value="end"
-          control={<Checkbox color="primary" />}
-          label={questions[activeStep].d}
-          labelPlacement="end"
-        />
-      </FormGroup>
-    </FormControl>
-      <MobileStepper
-      variant="progress"
-      steps={16}
-      position="static"
-      activeStep={activeStep}
-      className={classes.root}
-      nextButton={
-        <Button size="small" onClick={handleNext} disabled={activeStep === 15}>
-          Next
-          {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+    <Box width="80%">
+      {questions.map((question, index) => ( 
+        <Box m={5} key={index}>
+          <FormControl component="fieldset">
+            <Typography variant="h6">
+              {"Question " + String(index+1) + "\n"}
+            </Typography>
+            <Typography variant="h5">
+              {question.text}
+            </Typography>
+            <FormGroup aria-label="position" row>
+              <FormControlLabel
+                value="end"
+                control={<Checkbox color="primary" onChange={(e)=>handleChange(e, index)} name="checkedA" />}
+                label={question.a}
+                labelPlacement="end"
+              />
+            </FormGroup>
+            <FormGroup aria-label="position" row>
+              <FormControlLabel
+                value="end"
+                control={<Checkbox color="primary" onChange={(e)=>handleChange(e, index)} name="checkedB" />}
+                label={question.b}
+                labelPlacement="end"
+              />
+            </FormGroup>
+            <FormGroup aria-label="position" row>
+              <FormControlLabel
+                value="end"
+                control={<Checkbox color="primary" onChange={(e)=>handleChange(e, index)} name="checkedC" />}
+                label={question.c}
+                labelPlacement="end"
+              />
+            </FormGroup>
+            <FormGroup aria-label="position" row>
+              <FormControlLabel
+                value="end"
+                control={<Checkbox color="primary" onChange={(e)=>handleChange(e, index)} name="checkedD"/>}
+                label={question.d}
+                labelPlacement="end"
+              />
+            </FormGroup>
+            <Typography>
+              
+            </Typography>
+          </FormControl>
+        </Box>
+      ))}
+      <Box m={5}>
+        <Button variant="contained" color="primary" size="large" onClick={saveResults}>
+          Save
         </Button>
-      }
-      backButton={
-        <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
-          {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-          Back
-        </Button>
-      }
-    />
+      </Box>
     </Box>
   );
 }
