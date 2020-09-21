@@ -59,7 +59,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'smartedclient/build'),
+            os.path.join(BASE_DIR, 'reactapp/build'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -128,5 +128,5 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_ALLOW_ALL =True
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'smartedclient/build/static'),
+    os.path.join(BASE_DIR, 'reactapp/build/static'),
 ]
