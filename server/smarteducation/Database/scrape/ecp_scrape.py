@@ -14,11 +14,11 @@ def get_course_assessment(course_code, semester=None, year=None, delivery_mode=N
     """
 
     # format delivery mode correctly
-    if delivery_mode == "INTERNAL" or "I":
+    if delivery_mode == "INTERNAL" or delivery_mode == "I":
         delivery_mode = "Internal"
-    elif delivery_mode == "EXTERNAL" or "E":
+    elif delivery_mode == "EXTERNAL" or delivery_mode == "E":
         delivery_mode = "External"
-    elif delivery_mode == "FLEXIBLE" or "F":
+    elif delivery_mode == "FLEXIBLE" or delivery_mode == "F":
         delivery_mode = "Flexible Delivery"
 
     # todo: formatting of course code for certain user error entries
@@ -34,15 +34,15 @@ def get_course_assessment(course_code, semester=None, year=None, delivery_mode=N
         print(f"No table found for course code '{course_code}'...")
         return False
 
-    # if no semester or year specified, pick 1th index course profile
-    ecp_url = soup.tbody.find_all('a')[1].get('href')
+    # if no semester or year specified, pick first index course profile
+    ecp_url = soup.tbody.find("a", {"class": "profile-available"}).get('href')
 
     if semester is not None and year is not None and delivery_mode is not None:
         found = False
         for course_offering in soup.tbody.find_all('tr'):
             course_mode = course_offering.find("td", {"class": "course-offering-mode"}).text
             course_time = course_offering.find("a", {"class": "course-offering-year"}).text
-
+            # print(course_time, f"Semester {semester}, {year}", course_mode, delivery_mode)
             if (course_time == f"Semester {semester}, {year}") and (course_mode == delivery_mode):
                 ecp_url = course_offering.find("td", {"class": "course-offering-profile"}).find("a").get('href')
                 found = True
