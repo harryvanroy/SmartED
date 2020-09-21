@@ -28,7 +28,6 @@ function Home() {
                   <Typography variant="h5">
                     Announcements
                   </Typography>
-
                 </div>
                 <Typography variant="h6">
                   DECO3801:

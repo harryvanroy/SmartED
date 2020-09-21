@@ -9,9 +9,17 @@ def get_course_assessment(course_code, semester=None, year=None, delivery_mode=N
     :param course_code: the uq course code (e.g. coms3200, deco3801)
     :param semester: an integer of the sem number
     :param year: an integer of the year
-    :param delivery_mode: a string of either "Internal", "External", or "Flexible Delivery"
+    :param delivery_mode: a string of either "INTERNAL", "EXTERNAL", or "FLEXIBLE"
     :return: a  list of dictionaries representing assignments, where each assignment has: "name", "date" and "weight"
     """
+
+    # format delivery mode correctly
+    if delivery_mode == "INTERNAL" or "I":
+        delivery_mode = "Internal"
+    elif delivery_mode == "EXTERNAL" or "E":
+        delivery_mode = "External"
+    elif delivery_mode == "FLEXIBLE" or "F":
+        delivery_mode = "Flexible Delivery"
 
     # todo: formatting of course code for certain user error entries
     course_url = f"https://my.uq.edu.au/programs-courses/course.html?course_code={course_code}"
