@@ -123,7 +123,6 @@ def course_assessment_old(request):
 
 
 def blackboard_scrape(username, pword):
-
     print("logging in...")
     scraper = UQBlackboardScraper(username, pword)
 
@@ -156,16 +155,23 @@ def blackboard_scrape(username, pword):
         sem = int(course['semester'].split()[1])
         year = int(course['year'])
 
-        UQ = Institution.objects.get(name="University of Queensland")
+        if len(Course.objects.filter(name=code, mode=mode,
+                                     semester=sem, year=year)) == 0:
+            # course not already in database
+            print("saving course...")
+            UQ = Institution.objects.get(name="University of Queensland")
+            course_obj = Course(name=code, mode=mode, semester=sem,
+                                year=year, institution=UQ)
+            course_obj.save()
 
-        print("saving course...")
-        course_obj = Course(name=code, mode=mode, semester=sem,
-                            year=year, institution=UQ)
-        course_obj.save()
+        course_obj = Course.objects.filter(name=code, mode=mode,
+                                           semester=sem, year=year)[0]
 
-        print("saving studentCourse...")
-        stu_course = StudentCourse(student=user, course=course_obj)
-        stu_course.save()
+        if len(StudentCourse.objects
+                .filter(student=user, course=course_obj)) == 0:
+            print("saving studentCourse...")
+            stu_course = StudentCourse(student=user, course=course_obj)
+            stu_course.save()
 
     # add resources to database and whatever else here
 
