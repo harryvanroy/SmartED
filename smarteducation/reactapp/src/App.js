@@ -30,8 +30,6 @@ import Grades from './components/Grades';
 import Resources from './components/Resources';
 import Home from './components/Home';
 import Vark from './components/Vark';
-
-import { ReactComponent as Logo } from './logo.svg';
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
