@@ -165,9 +165,10 @@ const scoring = [
   ['V', 'A', 'R', 'K'],
 ];
 
-export default function Vark() {
+export default function Vark(parentVarkScore) {
   const classes = useStyles();
   const theme = useTheme();
+  const [varkScore, setVarkScore] = React.useState({parentVarkScore});
 
   const [state, setState] = React.useState({ 
     checkedA0 : false, checkedB0 : false, checkedC0 : false, checkedD0 : false,
@@ -213,11 +214,22 @@ export default function Vark() {
       console.log("A: ", scores['A']/total_answers);
       console.log("R: ", scores['R']/total_answers);
       console.log("K: ", scores['K']/total_answers);
+      setVarkScore(scores);
     }
   };
 
+
   return (
     <Box width="80%">
+      <Box m={5}>
+        <Typography variant="h4">
+          VARK quiz
+        </Typography>
+        <Typography variant="h6">
+          Choose the responses you most align with (you can select multiple options for each question)
+        </Typography>
+      </Box>
+
       {questions.map((question, index) => ( 
         <Box m={5} key={index}>
           <FormControl component="fieldset">
