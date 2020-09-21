@@ -1,14 +1,16 @@
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from .ecp_scrape import get_course_assessment
-from .models import Course, Institution, Assessment, StudentCourse
+from .scrape.ecp_scrape import get_course_assessment
+from .scrape.scrape import *
+from .models import Course, Institution, Assessment, StudentCourse, User
 from .serializers import AssessmentSerializer
 from django.core import serializers
 import json
 import random
 
 user_keys = []
+
 
 @csrf_exempt
 def course_assessment(request):
@@ -120,9 +122,56 @@ def course_assessment_old(request):
             return HttpResponse(json.dumps(json_assessment))
 
 
+def blackboard_scrape(username, pword):
+
+    print("logging in...")
+    scraper = UQBlackboardScraper(username, pword)
+
+    if len(User.objects.filter(username=username)) > 0:
+        print("user already exists...")
+        return
+
+    print("getting courses...")
+    # get courses
+    raw_dict = scraper.get_current_courses()
+
+    if len(raw_dict) == 0:
+        return False
+
+    user = User(username=username, firstName="todo", lastName="todo")
+    user.save()
+
+    raw_courses = [raw_dict.get(key) for key in raw_dict.keys()]
+
+    for course in raw_courses:
+        code = course['code'].split('/')[0]
+        mode = course['delivery']
+
+        # note: below needs testing
+        if 'internal' in mode:
+            mode = 'INTERNAL'
+        elif 'external' in mode:
+            mode = 'EXTERNAL'
+
+        sem = int(course['semester'].split()[1])
+        year = int(course['year'])
+
+        UQ = Institution.objects.get(name="University of Queensland")
+
+        print("saving course...")
+        course_obj = Course(name=code, mode=mode, semester=sem,
+                            year=year, institution=UQ)
+        course_obj.save()
+
+        print("saving studentCourse...")
+        stu_course = StudentCourse(student=user, course=course_obj)
+        stu_course.save()
+
+    # add resources to database and whatever else here
+
+
 @csrf_exempt  # warning: might be bad practice?
 def log_in(request):
-
     # extract json from post method
     # todo: subject to change depending on how we decide to format
     json_post = json.loads(request.body)
@@ -130,11 +179,13 @@ def log_in(request):
     pword = json_post.get("password")
 
     if username is not None and pword is not None:
-        # todo: this is where the login scrape is called
+        # this is where the login scrape is called
         # the scrape should check if their data is in the database already
         # else it will login and add all relevant data to database.
         # it should return something that indicates if the log in
         # was successful
+
+        blackboard_scrape(username, pword)
 
         successful_login = True  # todo: changes with scrape
         if successful_login:
@@ -149,6 +200,7 @@ def log_in(request):
             return HttpResponse(jsons_response)
 
     return HttpResponse('err')
+
 
 @csrf_exempt
 def get_student_courses(request):
