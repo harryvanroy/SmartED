@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
-  const [vark, setVark] = React.useState([]);
+  const [vark, setVark] = React.useState({'V':0.25, 'A':0.25, 'R':0.25, 'K':0.25, });
 
   const handleClick = () => {
     setOpen(!open);
@@ -83,8 +83,8 @@ function App() {
               SmartED
             </Link>
           </Typography>
-          {vark.length == 0 ? <div>Vark quiz score:</div>: <div>Please complete vark quiz</div>}
-          <AccountCircleIcon style={{paddingLeft: 5}}/>
+          {vark.length === 0 ? <div> vark score </div>: <div> complete quiz </div>}
+          <AccountCircleIcon style={{marginLeft: 5}}/>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -106,17 +106,16 @@ function App() {
               <List component="div" disablePadding>
                 {/* Hard coded course codes */}
                 {['DECO3801', 'COMP3301', 'MATH3204', 'STAT2004'].map((text, index) => (
-                  <ListItem button className={classes.nested}>
+                  <ListItem key ={index} button className={classes.nested}>
                     <ListItemText primary={text} classes={{primary:classes.listItemText}}/>
                   </ListItem>
                 ))}
               </List>
             </Collapse>
-              {['Assessment', 'Course Goals', 'My Grades', 'Resources', 'Personal Feedback'].map((text, index) => (
+              {['Assessment', 'Course Goals', 'My Grades', 'Resources', 'Personal Feedback', 'Vark'].map((text, index) => (
                 <ListItem 
-                  focusRippleColor="" touchRippleColor="red"
                   button key={text} component={NavLink} 
-                  to={['/assessment', '/goals', '/grades', '/resources', '/feedback'][index]} 
+                  to={['/assessment', '/goals', '/grades', '/resources', '/feedback', '/vark'][index]} 
                   activeStyle={{ background: 'rgb(0, 0, 0, 0.1)'}}
                 >
                   <ListItemIcon>
