@@ -2,7 +2,7 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -83,6 +83,39 @@ function Home() {
               <Paper className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
+                    Daily goals
+                  </Typography>
+                </div>
+                <Typography variant="h6">
+                  COMP4500:
+                </Typography>
+                <Typography>
+                  ---
+                </Typography>
+                <Typography variant="h6">
+                  DECO3801:
+                </Typography>
+                <Typography>
+                  ---
+                </Typography>
+                <Typography variant="h6">
+                  MATH3204:
+                </Typography>
+                <Typography>
+                  ---
+                </Typography>
+                <Typography variant="h6">
+                  STAT2004:
+                </Typography>
+                <Typography>
+                  ---
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>
+                <div className = {classes.paperTitle}>
+                  <Typography variant="h5">
                     Class Attendance
                   </Typography>
                 </div>
@@ -91,9 +124,7 @@ function Home() {
                   Monday:
                 </Typography>
                 <Typography>
-                  <div>
                   - DECO3801 Studio 01: Monday 8am-10am (49-301)
-                  </div>
                   - CSSE1001 Lecture 01: Monday 12pm-1pm (49-200)
                 </Typography>
                 
