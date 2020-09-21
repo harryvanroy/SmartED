@@ -6,3 +6,4 @@ __pycache__
 auth.txt
 node_modules
 smartedenv
+.env

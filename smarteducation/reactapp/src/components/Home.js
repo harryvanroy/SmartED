@@ -15,8 +15,22 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Home() {
+function Home({ assessment, courses }) {
   const classes = useStyles();
+
+    function checkDate(dateString) {
+    if (dateString == 'Examination period') {
+      return new Date(8640000000000000);
+    }
+
+    let months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    let splitStr = dateString.split(' ');
+    let day = parseInt(splitStr[0]);
+    let month = months.indexOf(splitStr[1]);
+    let year = parseInt('20' + splitStr[2]);
+    return new Date(year, month, day);
+  }
+
   return (
     <div>
       <Grid container justify="center" spacing={3}>
@@ -64,8 +78,25 @@ function Home() {
                     Upcoming assessment
                   </Typography>
                 </div>
-
-                <Typography variant="h6">
+                {
+                  courses.map(course =>  
+                    <div key={course.id}>
+                      <Typography variant="h6">
+                        {course.name + ':'}
+                      </Typography>
+                      {
+                        assessment
+                        .filter(allAssess => allAssess.course === course.id)
+                        .map(assessCourse => (
+                          <Typography align='center'>
+                            {assessCourse.name}
+                          </Typography>
+                        ))
+                      }
+                    </div>
+                  )
+                }
+                {/* <Typography variant="h6">
                   DECO3801:
                 </Typography>
                 <Typography>
@@ -76,7 +107,7 @@ function Home() {
                 </Typography>
                 <Typography>
                   - HW2 (14/09/2020)
-                </Typography>
+                </Typography> */}
               </Paper>
             </Grid>
             <Grid item xs={12}>
