@@ -76,7 +76,7 @@ function App() {
 
   const data = {
     'username': 's4531213',
-    'key': 'replace with key'
+    'key': 442147
   }
 
   useEffect(() => {
@@ -132,7 +132,6 @@ function App() {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {/* Hard coded course codes */}
                 {courses.map(a => a.name).map((text, index) => (
                   <ListItem key ={index} button className={classes.nested}>
                     <ListItemText primary={text} classes={{primary:classes.listItemText}}/>

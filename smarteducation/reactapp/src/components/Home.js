@@ -88,7 +88,7 @@ function Home({ assessment, courses }) {
                         assessment
                         .filter(allAssess => allAssess.course === course.id)
                         .map(assessCourse => (
-                          <Typography align='center'>
+                          <Typography key ={assessCourse.name} align='center'>
                             {assessCourse.name}
                           </Typography>
                         ))

@@ -7,7 +7,7 @@ function Assessment() {
     /** Below is an example, delete later (soon) */
 
     let data = {
-        'id': 1
+      'id': 1
     }
 
     console.log("posting...")
