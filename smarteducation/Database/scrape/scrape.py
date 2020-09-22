@@ -98,7 +98,10 @@ class UQBlackboardScraper:
         courses = {}
 
         for course in current_courses:
-            link = course.find_element_by_xpath(".//a")
+            try:
+                link = course.find_element_by_xpath(".//a")
+            except:
+                continue
             course_id = link.get_attribute('href').split("%")[-3].split("_")[1]
 
             # Unique identifier
@@ -108,6 +111,9 @@ class UQBlackboardScraper:
             # [COURSE_CODE] COURSE_NAME (St Lucia & external).
             # Semester 2, 2020, Flexible Delivery
             course_info = courses[int(course_id)]
+            # temporary defaults for safety (bcus can glitch on some course lists)
+            course_info['year'] = "2020"
+
             last_break = 1
             for i in range(len(link.text)):
                 if link.text[i] == ']':
