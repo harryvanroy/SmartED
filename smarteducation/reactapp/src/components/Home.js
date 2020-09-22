@@ -19,15 +19,21 @@ function Home({ assessment, courses }) {
   const classes = useStyles();
 
     function checkDate(dateString) {
-    if (dateString == 'Examination period') {
+    if (isNaN(parseInt(dateString[0]))) {
       return new Date(8640000000000000);
     }
 
-    let months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-    let splitStr = dateString.split(' ');
+    let splitStr = dateString.indexOf("-") != -1 
+      ? dateString.substr(dateString.indexOf("-") + 2).split(' ')
+      : dateString.split(' ');
+
+    let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     let day = parseInt(splitStr[0]);
     let month = months.indexOf(splitStr[1]);
     let year = parseInt('20' + splitStr[2]);
+    console.log(dateString)
+    console.log(day, month, year);
+    console.log(new Date(year, month, day))
     return new Date(year, month, day);
   }
 
@@ -77,21 +83,38 @@ function Home({ assessment, courses }) {
                   <Typography variant="h5">
                     Upcoming assessment
                   </Typography>
+                  <div style ={{fontSize: '12px', color: 'rgb(255, 77, 77)'}}>Assessment highlighted red are due in the next week</div>
                 </div>
                 {
                   courses.map(course =>  
                     <div key={course.id}>
                       <Typography variant="h6">
                         {course.name + ':'}
+                        {console.log(course.name)}
                       </Typography>
                       {
                         assessment
-                        .filter(allAssess => allAssess.course === course.id)
-                        .map(assessCourse => (
-                          <Typography key ={assessCourse.name} align='center'>
-                            {assessCourse.name}
-                          </Typography>
-                        ))
+                        .filter(allAssess => allAssess.course === course.id && new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth(),
+                          new Date().getDate()
+                        ) < checkDate(allAssess.date))
+                        .map(assessCourse => {
+                          let currentDate = new Date(
+                            new Date().getFullYear(),
+                            new Date().getMonth(),
+                            new Date().getDate()
+                          );
+                          return (
+                            checkDate(assessCourse.date) < currentDate.setDate(currentDate.getDate() + 7)
+                            ? <div style={{color: 'rgb(255, 77, 77)'}}>
+                                {'-' + assessCourse.name}
+                              </div>
+                            : <div style={{}}>
+                                {'-' + assessCourse.name}
+                              </div>
+                          )
+                        })
                       }
                     </div>
                   )
