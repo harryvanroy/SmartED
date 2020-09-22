@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -30,9 +30,8 @@ import Grades from './components/Grades';
 import Resources from './components/Resources';
 import Home from './components/Home';
 import Vark from './components/Vark';
-
-import { ReactComponent as Logo } from './logo.svg';
-const drawerWidth = 240;
+import axios from 'axios';
+const drawerWidth = 200;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,10 +67,39 @@ function App() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const [vark, setVark] = React.useState({'V':0.25, 'A':0.25, 'R':0.25, 'K':0.25, });
+  const [courses, setCourses] = React.useState([]);
+  const [assessment, setAssessment] = React.useState([]);
 
   const handleClick = () => {
     setOpen(!open);
   };
+
+  const data = {
+    'username': 's4531213',
+    'key': 442147
+  }
+
+  useEffect(() => {
+    axios
+      .post('http://localhost:8000/Database/student-courses/', data)
+      .then(res => {
+        setCourses(res.data);
+        let resp = [];
+        let promises = [];
+        res.data.map(course => {
+          promises.push(
+            axios
+            .post('http://localhost:8000/Database/course-assessment/', {'id': course.id})
+            .then(resAss => {
+              resp.push([...new Set(resAss.data
+                .map(o => JSON.stringify(o)))]
+                .map(s => JSON.parse(s)));
+            })
+          );
+        });
+        Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
+      });
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -104,8 +132,7 @@ function App() {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {/* Hard coded course codes */}
-                {['DECO3801', 'COMP3301', 'MATH3204', 'STAT2004'].map((text, index) => (
+                {courses.map(a => a.name).map((text, index) => (
                   <ListItem key ={index} button className={classes.nested}>
                     <ListItemText primary={text} classes={{primary:classes.listItemText}}/>
                   </ListItem>
@@ -157,7 +184,7 @@ function App() {
             <Vark />
           </Route>      
           <Route path="/">
-            <Home />
+            <Home assessment={assessment} courses={courses}/>
           </Route>
         </Switch>
       </main>
