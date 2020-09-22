@@ -82,6 +82,11 @@ def blackboard_scrape(username, pword):
     student = Student(user=user)
     student.save()
 
+    if len(Institution.objects.filter(name="University of Queensland")) == 0:
+        UQ = Institution(name="University of Queensland")
+        UQ.save()
+        print("made uq institution")
+
     raw_courses = [raw_dict.get(key) for key in raw_dict.keys()]
 
     for course in raw_courses:
