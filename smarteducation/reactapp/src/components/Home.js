@@ -15,8 +15,28 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Home() {
+function Home({ assessment, courses }) {
   const classes = useStyles();
+
+    function checkDate(dateString) {
+    if (isNaN(parseInt(dateString[0]))) {
+      return new Date(8640000000000000);
+    }
+
+    let splitStr = dateString.indexOf("-") != -1 
+      ? dateString.substr(dateString.indexOf("-") + 2).split(' ')
+      : dateString.split(' ');
+
+    let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let day = parseInt(splitStr[0]);
+    let month = months.indexOf(splitStr[1]);
+    let year = parseInt('20' + splitStr[2]);
+    console.log(dateString)
+    console.log(day, month, year);
+    console.log(new Date(year, month, day))
+    return new Date(year, month, day);
+  }
+
   return (
     <div>
       <Grid container justify="center" spacing={3}>
@@ -63,9 +83,43 @@ function Home() {
                   <Typography variant="h5">
                     Upcoming assessment
                   </Typography>
+                  <div style ={{fontSize: '12px', color: 'rgb(255, 77, 77)'}}>Assessment highlighted red are due in the next week</div>
                 </div>
-
-                <Typography variant="h6">
+                {
+                  courses.map(course =>  
+                    <div key={course.id}>
+                      <Typography variant="h6">
+                        {course.name + ':'}
+                        {console.log(course.name)}
+                      </Typography>
+                      {
+                        assessment
+                        .filter(allAssess => allAssess.course === course.id && new Date(
+                          new Date().getFullYear(),
+                          new Date().getMonth(),
+                          new Date().getDate()
+                        ) < checkDate(allAssess.date))
+                        .map(assessCourse => {
+                          let currentDate = new Date(
+                            new Date().getFullYear(),
+                            new Date().getMonth(),
+                            new Date().getDate()
+                          );
+                          return (
+                            checkDate(assessCourse.date) < currentDate.setDate(currentDate.getDate() + 7)
+                            ? <div style={{color: 'rgb(255, 77, 77)'}}>
+                                {'-' + assessCourse.name}
+                              </div>
+                            : <div style={{}}>
+                                {'-' + assessCourse.name}
+                              </div>
+                          )
+                        })
+                      }
+                    </div>
+                  )
+                }
+                {/* <Typography variant="h6">
                   DECO3801:
                 </Typography>
                 <Typography>
@@ -76,7 +130,7 @@ function Home() {
                 </Typography>
                 <Typography>
                   - HW2 (14/09/2020)
-                </Typography>
+                </Typography> */}
               </Paper>
             </Grid>
             <Grid item xs={12}>
