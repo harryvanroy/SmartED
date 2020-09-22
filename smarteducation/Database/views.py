@@ -89,6 +89,8 @@ def blackboard_scrape(username, pword):
 
     raw_courses = [raw_dict.get(key) for key in raw_dict.keys()]
 
+    print("deubg: ", raw_courses)
+
     for course in raw_courses:
         code = course['code'].split('/')[0]
         mode = course['delivery']

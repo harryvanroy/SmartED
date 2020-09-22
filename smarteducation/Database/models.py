@@ -25,7 +25,7 @@ class User(models.Model):
 
 
 class Student(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     completedVark = models.BooleanField(default=False)
     varkV = models.DecimalField(max_digits=5, decimal_places=4, null=True)
     varkA = models.DecimalField(max_digits=5, decimal_places=4, null=True)
