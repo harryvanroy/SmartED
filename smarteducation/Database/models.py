@@ -6,12 +6,17 @@ from django.db import models
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+################ VALIDATORS ################
+
+def max_value_current_year(value):
+    return MaxValueValidator(current_year())(value)
+
+################ Models ################
 
 ################ VALIDATORS ################
 
 def max_value_current_year(value):
     return MaxValueValidator(datetime.datetime.now().year)(value)
-
 
 ################ Models ################
 
@@ -33,7 +38,6 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.user} / V:{self.varkV} A:{self.varkA} R:{self.varkR} K:{self.varkK}"
-
 
 class Staff(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
@@ -83,7 +87,6 @@ class Course(models.Model):
         (INTERNAL, 'INTERNAL'),
         (FLEXIBLE, 'FLEXIBLE')
     ]
-
     # id = models.CharField(max_length=50, primary_key=True)  # todo: change back to this
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
@@ -96,35 +99,23 @@ class Course(models.Model):
     class Meta:
         unique_together = ('name', 'mode', 'semester', 'year')
 
-    def __str__(self):
-        return f"{self.id} {self.name} {self.mode} {self.semester} {self.year} {self.institution}"
+class AssessmentItem(models.Model):
+    unique_key = ("name", "course")
+    name = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    ## ECP does not always have dates for assignments in datetime format (E.g. "Examination Period")
+    isDate = models.BooleanField(default=False)
+    date = models.DateTimeField(null=True)
+    dateDescrption = models.CharField(max_length=255)
+    isPassFail = models.BooleanField(default=False)
+    weight = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)]);
 
 
 class StudentCourse(models.Model):
-    # student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True) # todo: change back
-
-    student = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.student} {self.course}"
 
 
 class StaffCourse(models.Model):
-    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
+    student = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.staff} {self.course}"
-
-
-class Assessment(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=100)
-    date = models.CharField(max_length=50)
-    weight = models.CharField(max_length=50)
-    course = models.ForeignKey(Course, related_name='assessment', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.id} {self.name} {self.description} {self.date} {self.weight} {self.course}"
