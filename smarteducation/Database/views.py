@@ -3,8 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import *
-from .models import Course, Institution, Assessment, StudentCourse, User
-from .serializers import AssessmentSerializer
+from .models import Course, Institution, AssessmentItem, StudentCourse, User, Student
 from django.core import serializers
 import json
 import random
@@ -30,7 +29,7 @@ def course_assessment(request):
     mode = course.mode
     year = course.year
 
-    saved_assessment = Assessment.objects.filter(course=id)
+    saved_assessment = AssessmentItem.objects.filter(course=id)
 
     # check if assessment in database.. if so, return them.. else, scrape em
     if len(saved_assessment) != 0:
@@ -47,79 +46,19 @@ def course_assessment(request):
 
         for assignment in scraped_assessment:
             # todo: fix description
-            ass_item = Assessment(name=assignment.get('name'), description="",
-                                  date=assignment.get('date'),
-                                  weight=assignment.get('weight'),
-                                  course=course)
+            ass_item = AssessmentItem(name=assignment.get('name'),
+                                      dateDescription=assignment.get('date'),
+                                      weight=assignment.get('weight'),
+                                      course=course,
+                                      isPassFail=assignment.get('isPassFail'))
             ass_item.save()
         print("saved assessment to database...")
 
-        saved_assessment = Assessment.objects.filter(course=id)
+        saved_assessment = AssessmentItem.objects.filter(course=id)
         json_assessment = [x["fields"] for x
                            in json.loads(serializers.serialize('json', saved_assessment))]
         print("loaded course assessment from database")
         return HttpResponse(json.dumps(json_assessment))
-
-
-def course_assessment_old(request):
-    json_body = json.loads(request.body)
-
-    # todo: might change this to just get course ID code instead... it depends on implementation
-    course = json_body.get("name")
-    sem = json_body.get("sem")
-    year = json_body.get("year")
-    mode = json_body.get("mode")
-    print(sem)
-    # validate json
-    if course is None or sem is None or year is None or mode is None:
-        return HttpResponse("failed query... "
-                            "check your json format (need name, sem, year, mode)")
-
-    # search database for course
-    for saved_course in Course.objects.all():
-        if saved_course.name == course:  # check sem, year, mode too!
-            database_course_obj = saved_course
-
-            saved_assessment = [saved_ass for saved_ass in Assessment.objects.all()
-                                if saved_ass.course == database_course_obj]
-
-            json_assessment = [x["fields"] for x in json.loads(serializers.serialize('json', saved_assessment))]
-            print("loaded course assessment from database")
-            return HttpResponse(json.dumps(json_assessment))
-
-    UQ = [institution for institution in Institution.objects.all()
-          if institution.name == 'University of Queensland'][0]
-
-    database_course_obj = Course(name=course, semester=sem, year=year, mode=mode, institution=UQ)
-    database_course_obj.save()
-    print('saved course to database')
-
-    # mode and year too and put into function
-    assessment = get_course_assessment(course)
-
-    if assessment is False:
-        return HttpResponse('epic fail')
-
-    for assignment in assessment:
-        ass_item = Assessment(name=assignment.get('name'), description="",
-                              date=assignment.get('date'), weight=assignment.get('weight'),
-                              course=database_course_obj)
-        ass_item.save()
-    print('saved assessment to database')
-
-    for saved_course in Course.objects.all():
-        if saved_course.name == course:  # check sem, year, mode too!
-            database_course_obj = saved_course
-
-            saved_assessment = [saved_ass for saved_ass
-                                in Assessment.objects.all()
-                                if saved_ass.course == database_course_obj]
-
-            json_assessment = \
-                [x["fields"] for x
-                 in json.loads(serializers.serialize('json', saved_assessment))]
-
-            return HttpResponse(json.dumps(json_assessment))
 
 
 def blackboard_scrape(username, pword):
@@ -139,6 +78,9 @@ def blackboard_scrape(username, pword):
 
     user = User(username=username, firstName="todo", lastName="todo")
     user.save()
+
+    student = Student(user=user)
+    student.save()
 
     raw_courses = [raw_dict.get(key) for key in raw_dict.keys()]
 
@@ -168,9 +110,9 @@ def blackboard_scrape(username, pword):
                                            semester=sem, year=year)[0]
 
         if len(StudentCourse.objects
-                .filter(student=user, course=course_obj)) == 0:
+                       .filter(student=student, course=course_obj)) == 0:
             print("saving studentCourse...")
-            stu_course = StudentCourse(student=user, course=course_obj)
+            stu_course = StudentCourse(student=student, course=course_obj)
             stu_course.save()
 
     # add resources to database and whatever else here
@@ -224,7 +166,7 @@ def get_student_courses(request):
 
         # auth successful - now get courses here
         course_list = [student_course.course for student_course in StudentCourse.objects.all()
-                       if student_course.student.username == username]
+                       if student_course.student.user.username == username]
 
         json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
                          "semester": x.semester, "year": x.year}
