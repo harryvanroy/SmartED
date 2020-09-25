@@ -8,10 +8,64 @@ from django.core import serializers
 import json
 import random
 
-user_keys = []
+student_keys = []
+teacher_keys = []
+
+# TEACHERS #####
+
+def teacher_auth(username, password):
+    # note, this should be a real method, but i have no idea how
+    # we'd verify teachers
+
+    # could maybe just add to database manually and assume that smartEd
+    # admins will manually verify/add teachers
+    return True
+
+@csrf_exempt
+def teacher_login(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    password = json_body.get("password")
+
+    if username is not None and password is not None:
+
+        successful_login = teacher_auth(username, password)
+
+        if successful_login:
+            # todo: the following is poor practice, temporary only...
+            random.seed(password)
+            key = random.randint(0, 1000000)
+            # save username with key such that the session continues
+            teacher_keys.append({"username": username, "key": key})
+
+            jsons_response = "{" + \
+                             f'"key": {key}' + "}"
+            return HttpResponse(jsons_response)
+
+    return HttpResponse('err')
+
+@csrf_exempt
+def students_in_course(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in teacher_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    course = Course.objects.get(id=json_body.get("courseID"))
+
+    students = [stu_course.student for stu_course in
+                StudentCourse.objects.filter(course=course)]
+
+    json_students = [{"username": student.user.username for student in students}]
+
+    return HttpResponse(json.dumps(json_students))
 
 
 # ##### VARK #####
+# todo: can probably condense these into 1 method, ngl
 
 @csrf_exempt
 def post_vark(request):
@@ -19,7 +73,7 @@ def post_vark(request):
     username = json_body.get("username")
     key = json_body.get("key")
 
-    if len([user for user in user_keys
+    if len([user for user in student_keys
             if user["username"] == username and user["key"] == key]) == 0:
         return HttpResponse("auth failed..")
 
@@ -39,7 +93,7 @@ def get_vark(request):
     username = json_body.get("username")
     key = json_body.get("key")
 
-    if len([user for user in user_keys
+    if len([user for user in student_keys
             if user["username"] == username and user["key"] == key]) == 0:
         return HttpResponse("auth failed..")
     user = User.objects.get(username=username)
@@ -176,7 +230,7 @@ def log_in(request):
 
     if username is not None and pword is not None:
         # this is where the login scrape is called
-        # the scrape should check if their data is in the database already
+        # the scrape checks if their data is in the database already
         # else it will login and add all relevant data to database.
         # it should return something that indicates if the log in
         # was successful
@@ -189,7 +243,7 @@ def log_in(request):
             random.seed(pword)
             key = random.randint(0, 1000000)
             # save username with key such that the session continues
-            user_keys.append({"username": username, "key": key})
+            student_keys.append({"username": username, "key": key})
 
             jsons_response = "{" + \
                              f'"key": {key}' + "}"
@@ -208,7 +262,7 @@ def get_student_courses(request):
         return HttpResponse('err')
 
     # checks auth
-    if len([user for user in user_keys
+    if len([user for user in student_keys
             if user["username"] == username and user["key"] == key]):
         print("auth success for " + username + " " + str(key))
 
