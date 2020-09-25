@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Resource, File, Institution, Course, Assessment, StaffCourse, Student, StudentCourse, Staff
+from .models import User, Resource, File, Institution, Course, AssessmentItem, StaffCourse, Student, StudentCourse, Staff
 
 
 
@@ -59,5 +59,5 @@ class StaffCourseSerializer(serializers.ModelSerializer):
 
 class AssessmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Assessment
+        model = AssessmentItem
         fields = '__all__'
