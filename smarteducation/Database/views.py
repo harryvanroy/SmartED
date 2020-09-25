@@ -321,6 +321,11 @@ def get_student_grades(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
     key = json_body.get("key")
+    course_filter = True
+    try:
+        course = Course.objects.get(id=json_body.get("courseID"))
+    except:
+        course_filter = False
 
     if username is None or key is None:
         return HttpResponse('err')
@@ -332,13 +337,17 @@ def get_student_grades(request):
 
     student = Student.objects.get(user=User.objects.get(username=username))
 
-    grades = [grade for grade in StudentAssessment.objects.filter(student=student)]
+    if course_filter:
+        grades = [grade for grade in StudentAssessment.objects.all()
+                  if grade.student == student and grade.assessment.course == course]
+    else:
+        grades = [grade for grade in StudentAssessment.objects.filter(student=student)]
 
     json_grades = [{"assessment":
-                    {"name": grade.assessment.name,
-                        "courseName": grade.assessment.course.name,
-                        "dateDescription": grade.assessment.dateDescription,
-                        "weight": grade.assessment.weight},
+                        {"name": grade.assessment.name,
+                         "courseName": grade.assessment.course.name,
+                         "dateDescription": grade.assessment.dateDescription,
+                         "weight": grade.assessment.weight},
                     "grade": str(grade.value)}
                    for grade in grades]
 
