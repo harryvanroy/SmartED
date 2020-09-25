@@ -11,6 +11,47 @@ import random
 user_keys = []
 
 
+# ##### VARK #####
+
+@csrf_exempt
+def post_vark(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in user_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    V, A, R, K = json_body.get("V"), json_body.get("A"), json_body.get("R"), \
+                 json_body.get("K")
+
+    user = User.objects.get(username=username)
+    stu = Student.objects.get(user=user)
+    stu.V, stu.A, stu.R, stu.K = V, A, R, K
+    stu.save()
+    return HttpResponse("")
+
+
+@csrf_exempt
+def get_vark(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in user_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+    user = User.objects.get(username=username)
+    stu = Student.objects.get(user=user)
+    json_response = {"V": str(stu.V), "A": str(stu.A),
+                     "R": str(stu.R), "K": str(stu.K)}
+    return HttpResponse(json.dumps(json_response))
+
+
+# ##### END VARK #####
+
+
 @csrf_exempt
 def course_assessment(request):
     json_body = json.loads(request.body)

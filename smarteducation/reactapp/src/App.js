@@ -76,8 +76,8 @@ function App() {
   };
 
   const data = {
-    'username': 's4482701',
-    'key': 396046
+    'username': 's4532094',
+    'key': 500913
   }
 
   function setParentVarkScore(score) {

@@ -27,10 +27,10 @@ class User(models.Model):
 class Student(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     completedVark = models.BooleanField(default=False)
-    varkV = models.DecimalField(max_digits=5, decimal_places=4, null=True)
-    varkA = models.DecimalField(max_digits=5, decimal_places=4, null=True)
-    varkR = models.DecimalField(max_digits=5, decimal_places=4, null=True)
-    varkK = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    V = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    A = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    R = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    K = models.DecimalField(max_digits=5, decimal_places=4, null=True)
 
     def __str__(self):
         return f"{self.user} / V:{self.varkV} A:{self.varkA} R:{self.varkR} K:{self.varkK}"
