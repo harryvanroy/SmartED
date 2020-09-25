@@ -3,7 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import *
-from .models import Course, Institution, AssessmentItem, StudentCourse, User, Student
+from .models import Course, Institution, AssessmentItem, StudentCourse, \
+    User, Student, Staff, StaffCourse, StudentAssessment
 from django.core import serializers
 import json
 import random
@@ -11,7 +12,8 @@ import random
 student_keys = []
 teacher_keys = []
 
-# TEACHERS #####
+
+# ##### TEACHERS #########################################################
 
 def teacher_auth(username, password):
     # note, this should be a real method, but i have no idea how
@@ -20,6 +22,7 @@ def teacher_auth(username, password):
     # could maybe just add to database manually and assume that smartEd
     # admins will manually verify/add teachers
     return True
+
 
 @csrf_exempt
 def teacher_login(request):
@@ -44,6 +47,7 @@ def teacher_login(request):
 
     return HttpResponse('err')
 
+
 @csrf_exempt
 def students_in_course(request):
     json_body = json.loads(request.body)
@@ -64,7 +68,37 @@ def students_in_course(request):
     return HttpResponse(json.dumps(json_students))
 
 
-# ##### VARK #####
+@csrf_exempt
+def student_assessment_grade(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in teacher_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    ass_item = AssessmentItem.objects.get(id=json_body.get("assID"))
+
+    # todo: check staff can actually modify course here (i.e. is in courseStaff)
+
+    stu_user = User.objects.get(username=json_body.get("studentID"))
+    student = Student.objects.get(user=stu_user)
+
+    grade = json_body.get("grade")
+    # pass_fail = json_body.get("passed")
+
+    student_ass = StudentAssessment(student=student, assessment=ass_item,
+                                    value=grade)
+    student_ass.save()
+
+    return HttpResponse("")
+
+
+# ### END TEACHER ###################################################
+
+
+# ##### VARK #########################################################
 # todo: can probably condense these into 1 method, ngl
 
 @csrf_exempt
@@ -103,7 +137,7 @@ def get_vark(request):
     return HttpResponse(json.dumps(json_response))
 
 
-# ##### END VARK #####
+# ##### END VARK ##############################################################
 
 
 @csrf_exempt
@@ -280,3 +314,32 @@ def get_student_courses(request):
         return HttpResponse("failed auth")
 
     pass  # todo: finish
+
+
+@csrf_exempt
+def get_student_grades(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if username is None or key is None:
+        return HttpResponse('err')
+
+    # check auth
+    if len([user for user in student_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    student = Student.objects.get(user=User.objects.get(username=username))
+
+    grades = [grade for grade in StudentAssessment.objects.filter(student=student)]
+
+    json_grades = [{"assessment":
+                    {"name": grade.assessment.name,
+                        "courseName": grade.assessment.course.name,
+                        "dateDescription": grade.assessment.dateDescription,
+                        "weight": grade.assessment.weight},
+                    "grade": str(grade.value)}
+                   for grade in grades]
+
+    return HttpResponse(json.dumps(json_grades))
