@@ -166,10 +166,6 @@ const scoring = [
 ];
 
 export default function Vark(props) {
-  const classes = useStyles();
-  const theme = useTheme();
-  const [varkScore, setVarkScore] = React.useState({});
-
   const [state, setState] = React.useState({ 
     checkedA0 : false, checkedB0 : false, checkedC0 : false, checkedD0 : false,
     checkedA1 : false, checkedB1 : false, checkedC1 : false, checkedD1 : false,
@@ -210,16 +206,15 @@ export default function Vark(props) {
     }
     var total_answers = scores['V']+scores['A']+scores['R']+scores['K'];
     if (total_answers > 0) {
-      setVarkScore({'V': scores['V']/total_answers, 'A': scores['A']/total_answers, 'R': scores['R']/total_answers, 'K': scores['K']/total_answers});
+      props.setParentVarkScore({'V': scores['V']/total_answers, 'A': scores['A']/total_answers, 'R': scores['R']/total_answers, 'K': scores['K']/total_answers});
     } else {
-      setVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25});
+      props.setParentVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25});
     }
-    props.setParentVarkScore(varkScore);
   }
 
   return (
     <Box width="80%">
-      <Box m={5}>
+      <Box m={3}>
         <Typography variant="h4">
           VARK quiz
         </Typography>

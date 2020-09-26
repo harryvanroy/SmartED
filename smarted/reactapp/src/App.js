@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   nested: {
     paddingLeft: theme.spacing(9),
   },
-  listItemText:{
+  listItemText: {
     fontSize:'0.9em',
   },
 }));
@@ -70,41 +70,68 @@ function App() {
   const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
   const [assessment, setAssessment] = React.useState([]);
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [key, setKey] = React.useState(null);
 
   const handleClick = () => {
     setOpen(!open);
   };
 
-  const data = {
-    'username': 's4532094',
-    'key': 500913
-  }
-
   function setParentVarkScore(score) {
     setVark(score);
   }
 
-  useEffect(() => {
+  const handleSubmit = (event) => {
     axios
-      .post('http://localhost:8000/Database/student-courses/', data)
+      .post('http://localhost:8000/Database/login-post/', {
+        "username": username,
+        "password": password
+      })
       .then(res => {
-        setCourses(res.data);
-        let resp = [];
-        let promises = [];
-        res.data.map(course => {
-          promises.push(
-            axios
-            .post('http://localhost:8000/Database/course-assessment/', {'id': course.id})
-            .then(resAss => {
-              resp.push([...new Set(resAss.data
-                .map(o => JSON.stringify(o)))]
-                .map(s => JSON.parse(s)));
-            })
-          );
-        });
-        Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
+        setKey(res.data.key);
+        console.log(res.data.key);
+      }).then(res => {
+        setUsername('');
+        setPassword('');
       });
-  }, []);
+    event.preventDefault();
+  }
+
+  const handleChangeUsername = (event) => {
+    setUsername(event.target.value);
+  }
+
+  const handleChangePassword = (event) => {
+    setPassword(event.target.value);
+  }
+
+  useEffect(() => {
+    if (key != null) {
+      axios
+        .post('http://localhost:8000/Database/student-courses/', {
+          "username": username, 
+          "key": key
+        })
+        .then(res => {
+          setCourses(res.data);
+          let resp = [];
+          let promises = [];
+          res.data.map(course => {
+            promises.push(
+              axios
+              .post('http://localhost:8000/Database/course-assessment/', {'id': course.id})
+              .then(resAss => {
+                resp.push([...new Set(resAss.data
+                  .map(o => JSON.stringify(o)))]
+                  .map(s => JSON.parse(s)));
+              })
+            );
+          });
+          Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
+        });
+    }
+  }, [key]);
 
   return (
     <div className={classes.root}>
@@ -116,8 +143,18 @@ function App() {
               SmartED
             </Link>
           </Typography>
+          <form onSubmit={handleSubmit}>
+            <label style={{margin: '5px'}}>
+              Username:
+              <input style={{width: '100px'}} value={username} type="text" onChange={handleChangeUsername} />
+            </label>
+            <label style={{margin: '5px'}}>
+              Password:
+              <input style={{width: '100px'}} value={password} type="password" onChange={handleChangePassword} />
+            </label>
+            <input type="submit" value="Submit" />
+          </form>
             {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
-          <AccountCircleIcon style={{marginLeft: 5}}/>
         </Toolbar>
       </AppBar>
       <Drawer
