@@ -90,19 +90,19 @@ function App() {
       })
       .then(res => {
         setKey(res.data.key);
+        console.log(res.data.key);
+      }).then(res => {
+        setUsername('');
+        setPassword('');
       });
-    setUsername('');
-    setPassword('');
     event.preventDefault();
   }
 
   const handleChangeUsername = (event) => {
-    console.log(event.target.value)
     setUsername(event.target.value);
   }
 
   const handleChangePassword = (event) => {
-    console.log(event.target.value)
     setPassword(event.target.value);
   }
 
