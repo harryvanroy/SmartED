@@ -216,7 +216,7 @@ export default function Vark(props) {
 
   return (
     <Box width="80%">
-      <Box m={5}>
+      <Box m={3}>
         <Typography variant="h4">
           VARK quiz
         </Typography>

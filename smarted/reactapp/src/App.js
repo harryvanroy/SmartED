@@ -146,16 +146,15 @@ function App() {
           <form onSubmit={handleSubmit}>
             <label style={{margin: '5px'}}>
               Username:
-              <input style={{width: '100px'}} type="text" onChange={handleChangeUsername} />
+              <input style={{width: '100px'}} value={username} type="text" onChange={handleChangeUsername} />
             </label>
             <label style={{margin: '5px'}}>
               Password:
-              <input style={{width: '100px'}} type="password" onChange={handleChangePassword} />
+              <input style={{width: '100px'}} value={password} type="password" onChange={handleChangePassword} />
             </label>
             <input type="submit" value="Submit" />
           </form>
             {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
-          <AccountCircleIcon style={{marginLeft: 5}}/>
         </Toolbar>
       </AppBar>
       <Drawer
