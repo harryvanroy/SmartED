@@ -20,5 +20,7 @@ urlpatterns = router.urls
 urlpatterns += [
     path('course-assessment/', views.course_assessment, name='course-assessment'),
     path('login-post/', views.log_in, name='login'),
-    path('student-courses/', views.get_student_courses, name='student-courses')
+    path('student-courses/', views.get_student_courses, name='student-courses'),
+    path('post-vark/', views.post_vark, name='post-vark'),
+    path('get-vark/', views.get_vark, name='get-vark')
 ]
