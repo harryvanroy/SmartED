@@ -5,8 +5,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import { Container, Box, Typography } from '@material-ui/core';
+import {  Box, Typography } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -165,10 +165,10 @@ const scoring = [
   ['V', 'A', 'R', 'K'],
 ];
 
-export default function Vark(parentVarkScore) {
+export default function Vark(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const [varkScore, setVarkScore] = React.useState({parentVarkScore});
+  const [varkScore, setVarkScore] = React.useState({});
 
   const [state, setState] = React.useState({ 
     checkedA0 : false, checkedB0 : false, checkedC0 : false, checkedD0 : false,
@@ -210,14 +210,12 @@ export default function Vark(parentVarkScore) {
     }
     var total_answers = scores['V']+scores['A']+scores['R']+scores['K'];
     if (total_answers > 0) {
-      console.log("V: ", scores['V']/total_answers);
-      console.log("A: ", scores['A']/total_answers);
-      console.log("R: ", scores['R']/total_answers);
-      console.log("K: ", scores['K']/total_answers);
-      setVarkScore(scores);
+      setVarkScore({'V': scores['V']/total_answers, 'A': scores['A']/total_answers, 'R': scores['R']/total_answers, 'K': scores['K']/total_answers});
+    } else {
+      setVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25});
     }
-  };
-
+    props.setParentVarkScore(varkScore);
+  }
 
   return (
     <Box width="80%">
@@ -278,9 +276,14 @@ export default function Vark(parentVarkScore) {
         </Box>
       ))}
       <Box m={5}>
-        <Button variant="contained" color="primary" size="large" onClick={saveResults}>
-          Save
+        <Button variant="contained" color="primary" size="large" onClick={saveResults} >
+            Save
         </Button>
+        <Link to="/">
+          <Button color="primary" size="large"> 
+            Back
+          </Button>
+        </Link>
       </Box>
     </Box>
   );

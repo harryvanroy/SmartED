@@ -69,7 +69,19 @@ def get_course_assessment(course_code, semester=None, year=None, delivery_mode=N
     for row in rows:
         cols = row.find_all("td")
         text = [i.text.replace("  ", "").replace('\n\n', ' ') for i in cols]
-        assessment = {"name": text[0], "date": text[1].replace('\n', ''), "weight": text[2].replace('\n', '')}
+
+        weight_txt = text[2].replace('\n', '')
+        isPassFail = False
+        if "Pass" in weight_txt or "pass" in weight_txt:
+            isPassFail = True
+            weight = 0
+        elif "%" in weight_txt:
+            weight = int(weight_txt.split("%")[0])
+        else:
+            weight = None
+
+        assessment = {"name": text[0], "date": text[1].replace('\n', ''),
+                      "weight": weight, "isPassFail": isPassFail}
         course_assessment_list.append(assessment)
 
     return course_assessment_list

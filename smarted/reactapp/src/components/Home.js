@@ -94,7 +94,7 @@ function Home({ assessment, courses }) {
                           new Date().getFullYear(),
                           new Date().getMonth(),
                           new Date().getDate()
-                        ) < checkDate(allAssess.date))
+                        ) < checkDate(allAssess.dateDescription))
                         .map(assessCourse => {
                           let currentDate = new Date(
                             new Date().getFullYear(),
@@ -102,7 +102,7 @@ function Home({ assessment, courses }) {
                             new Date().getDate()
                           );
                           return (
-                            checkDate(assessCourse.date) < currentDate.setDate(currentDate.getDate() + 7)
+                            checkDate(assessCourse.dateDescription) < currentDate.setDate(currentDate.getDate() + 7)
                             ? <div style={{color: 'rgb(255, 77, 77)'}}>
                                 {'-' + assessCourse.name}
                               </div>

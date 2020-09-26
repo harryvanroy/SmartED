@@ -25,11 +25,12 @@ class User(models.Model):
 
 
 class Student(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    varkV = models.DecimalField(max_digits=5, decimal_places=4)
-    varkA = models.DecimalField(max_digits=5, decimal_places=4)
-    varkR = models.DecimalField(max_digits=5, decimal_places=4)
-    varkK = models.DecimalField(max_digits=5, decimal_places=4)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    completedVark = models.BooleanField(default=False)
+    varkV = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    varkA = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    varkR = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    varkK = models.DecimalField(max_digits=5, decimal_places=4, null=True)
 
     def __str__(self):
         return f"{self.user} / V:{self.varkV} A:{self.varkA} R:{self.varkR} K:{self.varkK}"
@@ -83,8 +84,7 @@ class Course(models.Model):
         (INTERNAL, 'INTERNAL'),
         (FLEXIBLE, 'FLEXIBLE')
     ]
-
-    # id = models.CharField(max_length=50, primary_key=True)  # todo: change back to this
+    # id = models.CharField(max_length=50, primary_key=True)  # todo: maybe change back to this
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     mode = models.CharField(max_length=8, choices=Course_Modes, default=FLEXIBLE)
@@ -97,34 +97,25 @@ class Course(models.Model):
         unique_together = ('name', 'mode', 'semester', 'year')
 
     def __str__(self):
-        return f"{self.id} {self.name} {self.mode} {self.semester} {self.year} {self.institution}"
+        return f"{self.name}. {self.year}, Semester {self.semester}. {self.mode} "
+
+class AssessmentItem(models.Model):
+    unique_key = ("name", "course")
+    name = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    ## ECP does not always have dates for assignments in datetime format (E.g. "Examination Period")
+    isDate = models.BooleanField(default=False)
+    date = models.DateTimeField(null=True)
+    dateDescription = models.CharField(max_length=255)
+    isPassFail = models.BooleanField(default=False)
+    weight = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)]);
 
 
 class StudentCourse(models.Model):
-    # student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True) # todo: change back
-
-    student = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.student} {self.course}"
 
 
 class StaffCourse(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.staff} {self.course}"
-
-
-class Assessment(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50)
-    description = models.CharField(max_length=100)
-    date = models.CharField(max_length=50)
-    weight = models.CharField(max_length=50)
-    course = models.ForeignKey(Course, related_name='assessment', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.id} {self.name} {self.description} {self.date} {self.weight} {self.course}"

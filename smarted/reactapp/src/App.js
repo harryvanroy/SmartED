@@ -21,6 +21,7 @@ import SubjectIcon from '@material-ui/icons/Sort';
 import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import FingerprintIcon from '@material-ui/icons/Fingerprint';
 
 import { Switch, Route, Link, NavLink } from 'react-router-dom';
 import Assessment from './components/Assessment';
@@ -66,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
-  const [vark, setVark] = React.useState({'V':0.25, 'A':0.25, 'R':0.25, 'K':0.25, });
+  const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
   const [assessment, setAssessment] = React.useState([]);
   const [username, setUsername] = React.useState('');
@@ -149,6 +150,7 @@ function App() {
             </label>
             <input type="submit" value="Submit" />
           </form>
+            {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
           <AccountCircleIcon style={{marginLeft: 5}}/>
         </Toolbar>
       </AppBar>
@@ -176,7 +178,7 @@ function App() {
                 ))}
               </List>
             </Collapse>
-              {['Assessment', 'Course Goals', 'My Grades', 'Resources', 'Personal Feedback', 'Vark'].map((text, index) => (
+              {['Assessment', 'Course Goals', 'My Grades', 'Resources', 'Personal Feedback', 'VARK'].map((text, index) => (
                 <ListItem 
                   button key={text} component={NavLink} 
                   to={['/assessment', '/goals', '/grades', '/resources', '/feedback', '/vark'][index]} 
@@ -189,7 +191,8 @@ function App() {
                       1: <EmojiEmotionsIcon />,
                       2: <SchoolIcon />,
                       3: <SubjectIcon />,
-                      4: <FeedbackIcon />
+                      4: <FeedbackIcon />,
+                      5: <FingerprintIcon />
                     }[index]
                   }
                   </ListItemIcon>
@@ -218,7 +221,7 @@ function App() {
             <Resources />
           </Route> 
           <Route path="/vark">
-            <Vark />
+            <Vark parentVark={vark} setParentVarkScore={setParentVarkScore}/>
           </Route>      
           <Route path="/">
             <Home assessment={assessment} courses={courses}/>
