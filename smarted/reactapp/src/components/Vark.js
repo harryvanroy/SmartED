@@ -166,8 +166,6 @@ const scoring = [
 ];
 
 export default function Vark(props) {
-  const classes = useStyles();
-  const theme = useTheme();
   const [varkScore, setVarkScore] = React.useState({});
 
   const [state, setState] = React.useState({ 
@@ -210,11 +208,10 @@ export default function Vark(props) {
     }
     var total_answers = scores['V']+scores['A']+scores['R']+scores['K'];
     if (total_answers > 0) {
-      setVarkScore({'V': scores['V']/total_answers, 'A': scores['A']/total_answers, 'R': scores['R']/total_answers, 'K': scores['K']/total_answers});
+      setVarkScore({'V': scores['V']/total_answers, 'A': scores['A']/total_answers, 'R': scores['R']/total_answers, 'K': scores['K']/total_answers}, props.setParentVarkScore(varkScore));
     } else {
-      setVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25});
+      setVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25}, props.setParentVarkScore(varkScore));
     }
-    props.setParentVarkScore(varkScore);
   }
 
   return (
