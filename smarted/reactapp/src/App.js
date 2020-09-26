@@ -78,6 +78,10 @@ function App() {
     setOpen(!open);
   };
 
+  function setParentVarkScore(score) {
+    setVark(score);
+  }
+
   const handleSubmit = (event) => {
     axios
       .post('http://localhost:8000/Database/login-post/', {
