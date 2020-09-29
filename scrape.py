@@ -10,15 +10,12 @@ class UQBlackboardScraper:
     COURSE_URL = 'https://learn.uq.edu.au/webapps/blackboard/execute/announcement?method=search&context=course_entry&course_id=%d'
     RESOURCE_URL = 'https://learn.uq.edu.au/webapps/blackboard/content/listContent.jsp?course_id=%d&content_id=%d'
 
-    def __init__(self, username, password):
-
+    def __init__(self, username, password, verbose=False):
+        self.verbose = verbose
         options = webdriver.ChromeOptions()
 
-        # profile = {"plugins.plugins_list": [{"enabled": False, "name": "Chrome PDF Viewer"}], # Disable Chrome's PDF Viewer
-        #             "download.default_directory": 'pdfs', "download.extensions_to_open": "applications/pdf"}
-        # options.add_experimental_option("prefs", profile)
         options.add_experimental_option('prefs', {
-            "download.default_directory": "/Users/mBurton/Documents/University/2020Semester2/DECO3801/", #Change default directory for downloads
+            "download.default_directory": "D:\garbage", #Change default directory for downloads
             "download.prompt_for_download": False, #To auto download the file
             "download.directory_upgrade": True,
             "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
@@ -34,13 +31,13 @@ class UQBlackboardScraper:
             .send_keys(username)
         self.driver.find_element_by_xpath('//*[@id="password"]') \
             .send_keys(password)
-        # self.driver.find_element_by_xpath('//*[@name="submit"]') \
-        #     .click()
+        self.driver.find_element_by_xpath('//*[@name="submit"]') \
+            .click()
 
     def get_learning_resources(self, course_id):
         self.driver.get(self.COURSE_URL % course_id)
-        self.driver.find_element_by_xpath('//*[@id="menuPuller"]') \
-            .click()
+        # self.driver.find_element_by_xpath('//*[@id="menuPuller"]') \
+        #     .click()
         self.driver.find_element_by_xpath('//*[@title="Learning Resources"]') \
             .click()
 
@@ -50,6 +47,12 @@ class UQBlackboardScraper:
         resources = {}
 
         for post in resource_list.find_all('li', class_="clearfix read"):
+            # TODO: add checks for valid folders. Include search for links on LR page
+            folder = post.find('img', class_="item_icon") # potentially useful
+            name = post.find('a').get_text()
+            
+            # Execute system commend to create this directory and move files here.
+
             resource_id = int(post.attrs['id'].split(':')[1].split('_')[1])
             self.driver.get(self.RESOURCE_URL % (course_id, resource_id))
             
@@ -59,12 +62,17 @@ class UQBlackboardScraper:
             pdfs = soup.find_all("span", class_="contextMenuContainer")
             for pdf in pdfs:
                 link = pdf.parent.find('a').attrs['href']
+                links.append(link)
                 try:
+                    self.driver.back()
                     self.driver.get(link)
-                    links.append(link)
                 except InvalidArgumentException:
                     pass
-                
+
+            if self.verbose:
+                print("type: ", folder)
+                print("name: ", name)
+                print("Links found: ", links)
 
         return resources
         
@@ -135,7 +143,7 @@ if __name__ == "__main__":
     studentNumber = lines[0]
     UQPassword = lines[1]
     f.close()
-    scraper = UQBlackboardScraper(studentNumber, UQPassword)
+    scraper = UQBlackboardScraper(studentNumber, UQPassword, verbose=True)
     courses = scraper.get_learning_resources(131678)
     print(courses)
 
