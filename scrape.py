@@ -1,9 +1,11 @@
 from selenium import webdriver
-from selenium.common.exceptions import InvalidArgumentException
+from selenium.common.exceptions import InvalidArgumentException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
 from bs4 import BeautifulSoup
+
+from fake_useragent import UserAgent
 
 class UQBlackboardScraper:
     BLACKBOARD_URL = 'https://learn.uq.edu.au/'
@@ -12,21 +14,53 @@ class UQBlackboardScraper:
 
     def __init__(self, username, password, verbose=False):
         self.verbose = verbose
-        options = webdriver.ChromeOptions()
+        # options = webdriver.ChromeOptions()
+        # options.add_argument("--headless")
+        # options.add_experimental_option('prefs', {
+        #     "download.default_directory": "D:\garbage", #Change default directory for downloads
+        #     "download.prompt_for_download": False, #To auto download the file
+        #     "download.directory_upgrade": True,
+        #     "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
+        #     }
+        # )
+        # self.driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
 
-        options.add_experimental_option('prefs', {
-            "download.default_directory": "D:\garbage", #Change default directory for downloads
-            "download.prompt_for_download": False, #To auto download the file
-            "download.directory_upgrade": True,
-            "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
-            }
-        )
-        self.driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference('browser.download.folderList', 2)
+        # profile.set_preference('browser.download.manager.showWhenStarting', True)
+        profile.set_preference('browser.download.dir', "D:\garbage")
+        mime_types = "application/pdf,application/vnd.adobe.xfdf,application/vnd.fdf,application/vnd.adobe.xdp+xml"
+        profile.set_preference('browser.helperApps.neverAsk.saveToDisk', mime_types)
+        # profile.set_preference("plugin.disable_full_page_plugin_for_types", mime_types)
+
+        profile.set_preference("browser.helperApps.alwaysAsk.force", False);
+        profile.set_preference("browser.download.manager.useWindow", False);
+        profile.set_preference("browser.download.manager.focusWhenStarting", False);
+        profile.set_preference("browser.helperApps.neverAsk.openFile", "");
+        profile.set_preference("browser.download.manager.alertOnEXEOpen", False);
+        profile.set_preference("browser.download.manager.showAlertOnComplete", True);
+        profile.set_preference("browser.download.manager.closeWhenDone", True);
+        profile.set_preference("pdfjs.disabled", True)
+        profile.update_preferences()
+
+        options = webdriver.FirefoxOptions()
+        #options.add_argument("--headless")
+
+        ua = UserAgent()
+        userAgent = ua.random
+        print(userAgent)
+        options.add_argument('user-agent={}'.format(userAgent))
+        path=r"D:/University/2020Semester2/DECO3801/SmartED/geckodriver.exe"
+
+        self.driver = webdriver.Firefox(firefox_profile=profile, options=options)
+
         self.driver.get(self.BLACKBOARD_URL)
 
         # Load
         self.driver.implicitly_wait(10)
         # Login
+        #     <input type="submit" id="postLoginSubmitButton">
+
         self.driver.find_element_by_xpath('//*[@id="username"]') \
             .send_keys(username)
         self.driver.find_element_by_xpath('//*[@id="password"]') \
@@ -63,11 +97,12 @@ class UQBlackboardScraper:
             for pdf in pdfs:
                 link = pdf.parent.find('a').attrs['href']
                 links.append(link)
-                try:
-                    self.driver.back()
-                    self.driver.get(link)
-                except InvalidArgumentException:
-                    pass
+                # Hangs the program... Not sure how to fix
+                # try:
+                #     self.driver.get(link)
+                #     self.driver.back()
+                # except InvalidArgumentException:
+                #     pass
 
             if self.verbose:
                 print("type: ", folder)
@@ -99,7 +134,6 @@ class UQBlackboardScraper:
 
     def get_current_courses(self):
         self.driver.get(self.BLACKBOARD_URL)
-        self.driver.implicitly_wait(10)
 
         current_courses = self.driver.find_elements_by_xpath(
             '//*[@id="module:_122_1"]/div[2]/nav/div[1]/ul/li')
@@ -107,7 +141,11 @@ class UQBlackboardScraper:
         courses = {}
 
         for course in current_courses:
-            link = course.find_element_by_xpath(".//a")
+            try:
+                link = course.find_element_by_xpath(".//a")
+            except NoSuchElementException:
+                continue
+            
             course_id = link.get_attribute('href').split("%")[-3].split("_")[1]
 
             # Unique identifier
@@ -144,6 +182,6 @@ if __name__ == "__main__":
     UQPassword = lines[1]
     f.close()
     scraper = UQBlackboardScraper(studentNumber, UQPassword, verbose=True)
-    courses = scraper.get_learning_resources(131678)
-    print(courses)
+    courses = scraper.get_current_courses()
+    scraper.get_learning_resources(132764)
 
