@@ -18,7 +18,7 @@ class UQBlackboardScraper:
         #             "download.default_directory": 'pdfs', "download.extensions_to_open": "applications/pdf"}
         # options.add_experimental_option("prefs", profile)
         options.add_experimental_option('prefs', {
-            "download.default_directory": "/Users/mBurton/Documents/University/2020Semester2/DECO3801/", #Change default directory for downloads
+            "download.default_directory": "/Users/mBurton/Documents/University/2020Semester2/DECO3801/INFS2200/", #Change default directory for downloads
             "download.prompt_for_download": False, #To auto download the file
             "download.directory_upgrade": True,
             "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
@@ -59,15 +59,20 @@ class UQBlackboardScraper:
             pdfs = soup.find_all("span", class_="contextMenuContainer")
             for pdf in pdfs:
                 link = pdf.parent.find('a').attrs['href']
+                print(link)
                 try:
                     self.driver.get(link)
                     links.append(link)
                 except InvalidArgumentException:
-                    pass
-                
+                    print("stinky")
+                    try:
+                        self.driver.get(self.BLACKBOARD_URL + link)
+                        links.append(link)
+                    except InvalidArgumentException:
+                        print("stinky")
+                        pass
 
         return resources
-        
 
     def get_course_announcements(self, course_id):
         self.driver.get(self.COURSE_URL % course_id)
@@ -136,6 +141,6 @@ if __name__ == "__main__":
     UQPassword = lines[1]
     f.close()
     scraper = UQBlackboardScraper(studentNumber, UQPassword)
-    courses = scraper.get_learning_resources(131678)
+    courses = scraper.get_learning_resources(130985)
     print(courses)
 
