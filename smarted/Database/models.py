@@ -33,7 +33,7 @@ class Student(models.Model):
     K = models.DecimalField(max_digits=5, decimal_places=4, null=True)
 
     def __str__(self):
-        return f"{self.user} / V:{self.varkV} A:{self.varkA} R:{self.varkR} K:{self.varkK}"
+        return f"{self.user} / V:{self.V} A:{self.A} R:{self.R} K:{self.K}"
 
 
 class Staff(models.Model):
