@@ -194,9 +194,10 @@ def blackboard_scrape(username, pword):
     print("logging in...")
     scraper = UQBlackboardScraper(username, pword)
 
+    # todo: need to actual verify the scraper logged in correctly
     if len(User.objects.filter(username=username)) > 0:
         print("user already exists...")
-        return
+        return True
 
     print("getting courses...")
     # get courses
@@ -206,9 +207,9 @@ def blackboard_scrape(username, pword):
         return False
 
     user = User(username=username, firstName="todo", lastName="todo")
-    user.save()
-
     student = Student(user=user)
+
+    user.save()
     student.save()
 
     if len(Institution.objects.filter(name="University of Queensland")) == 0:
@@ -218,7 +219,7 @@ def blackboard_scrape(username, pword):
 
     raw_courses = [raw_dict.get(key) for key in raw_dict.keys()]
 
-    print("deubg: ", raw_courses)
+    print("debug: ", raw_courses)
 
     for course in raw_courses:
         code = course['code'].split('/')[0]
@@ -246,12 +247,14 @@ def blackboard_scrape(username, pword):
                                            semester=sem, year=year)[0]
 
         if len(StudentCourse.objects
-                       .filter(student=student, course=course_obj)) == 0:
+                .filter(student=student, course=course_obj)) == 0:
             print("saving studentCourse...")
             stu_course = StudentCourse(student=student, course=course_obj)
             stu_course.save()
 
     # add resources to database and whatever else here
+
+    return True
 
 
 @csrf_exempt  # warning: might be bad practice?
@@ -269,9 +272,7 @@ def log_in(request):
         # it should return something that indicates if the log in
         # was successful
 
-        blackboard_scrape(username, pword)
-
-        successful_login = True  # todo: changes with scrape
+        successful_login = blackboard_scrape(username, pword)
         if successful_login:
             # todo: the following is VERY poor practice, temporary only...
             random.seed(pword)
@@ -313,7 +314,6 @@ def get_student_courses(request):
     else:
         return HttpResponse("failed auth")
 
-    pass  # todo: finish
 
 
 @csrf_exempt
