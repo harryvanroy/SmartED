@@ -7,3 +7,4 @@ auth.txt
 node_modules
 smartedenv
 .env
+static

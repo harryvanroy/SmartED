@@ -31,9 +31,6 @@ function Home({ assessment, courses }) {
     let day = parseInt(splitStr[0]);
     let month = months.indexOf(splitStr[1]);
     let year = parseInt('20' + splitStr[2]);
-    console.log(dateString)
-    console.log(day, month, year);
-    console.log(new Date(year, month, day))
     return new Date(year, month, day);
   }
 
@@ -90,7 +87,6 @@ function Home({ assessment, courses }) {
                     <div key={course.id}>
                       <Typography variant="h6">
                         {course.name + ':'}
-                        {console.log(course.name)}
                       </Typography>
                       {
                         assessment
