@@ -32,7 +32,12 @@ import Resources from './components/Resources';
 import Home from './components/Home';
 import Vark from './components/Vark';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+
 const drawerWidth = 200;
+//uncomment below depending on whether on website or local
+const url = "http://localhost:8000";
+//const url = "https://deco3801-pogware.uqcloud.net";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,11 +88,15 @@ function App() {
   }
 
   const handleSubmit = (event) => {
-    axios
-      .post('http://localhost:8000/Database/login-post/', {
-        "username": username,
-        "password": password
-      })
+    //const uq_sso = Cookies.get('EAIT_WEB');
+    axios(url+'/Database/login-post/', {
+          method: "post",
+          data: {
+            "username": username,
+            "password": password
+          },
+          withCredentials: true
+        })
       .then(res => {
         setKey(res.data.key);
         console.log(res.data.key);
@@ -109,7 +118,7 @@ function App() {
   useEffect(() => {
     if (key != null) {
       axios
-        .post('http://localhost:8000/Database/student-courses/', {
+        .post(url+'/Database/student-courses/', {
           "username": username, 
           "key": key
         })
@@ -120,7 +129,7 @@ function App() {
           res.data.map(course => {
             promises.push(
               axios
-              .post('http://localhost:8000/Database/course-assessment/', {'id': course.id})
+              .post(url+'/Database/course-assessment/', {'id': course.id})
               .then(resAss => {
                 resp.push([...new Set(resAss.data
                   .map(o => JSON.stringify(o)))]

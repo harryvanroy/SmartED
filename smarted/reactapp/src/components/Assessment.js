@@ -2,6 +2,9 @@ import React from 'react';
 
 import axios from 'axios';
 
+const url = "http://localhost:8000";
+//const url = "https://deco3801-pogware.uqcloud.net";
+
 function Assessment() {
 
     /** Below is an example, delete later (soon) */
@@ -11,8 +14,11 @@ function Assessment() {
     }
 
     console.log("posting...")
-    axios.post('http://localhost:8000/Database/course-assessment/', data)
-        .then(res => {
+    axios(url+'/Database/course-assessment/', {
+          method: "post",
+          data: data,
+          withCredentials: true
+        }).then(res => {
             console.log(res);
             console.log(res.data);
         })
