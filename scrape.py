@@ -14,53 +14,37 @@ class UQBlackboardScraper:
 
     def __init__(self, username, password, verbose=False):
         self.verbose = verbose
-        # options = webdriver.ChromeOptions()
-        # options.add_argument("--headless")
-        # options.add_experimental_option('prefs', {
-        #     "download.default_directory": "D:\garbage", #Change default directory for downloads
-        #     "download.prompt_for_download": False, #To auto download the file
-        #     "download.directory_upgrade": True,
-        #     "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
-        #     }
-        # )
-        # self.driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-
+        
         profile = webdriver.FirefoxProfile()
         profile.set_preference('browser.download.folderList', 2)
-        # profile.set_preference('browser.download.manager.showWhenStarting', True)
         profile.set_preference('browser.download.dir', "D:\garbage")
         mime_types = "application/pdf,application/vnd.adobe.xfdf,application/vnd.fdf,application/vnd.adobe.xdp+xml"
         profile.set_preference('browser.helperApps.neverAsk.saveToDisk', mime_types)
-        # profile.set_preference("plugin.disable_full_page_plugin_for_types", mime_types)
 
-        profile.set_preference("browser.helperApps.alwaysAsk.force", False);
-        profile.set_preference("browser.download.manager.useWindow", False);
-        profile.set_preference("browser.download.manager.focusWhenStarting", False);
-        profile.set_preference("browser.helperApps.neverAsk.openFile", "");
-        profile.set_preference("browser.download.manager.alertOnEXEOpen", False);
-        profile.set_preference("browser.download.manager.showAlertOnComplete", True);
-        profile.set_preference("browser.download.manager.closeWhenDone", True);
+        profile.set_preference("browser.helperApps.alwaysAsk.force", False)
+        profile.set_preference("browser.download.manager.useWindow", False)
+        profile.set_preference("browser.download.manager.focusWhenStarting", False)
+        profile.set_preference("browser.helperApps.neverAsk.openFile", "")
+        profile.set_preference("browser.download.manager.alertOnEXEOpen", False)
+        profile.set_preference("browser.download.manager.showAlertOnComplete", True)
+        profile.set_preference("browser.download.manager.closeWhenDone", True)
         profile.set_preference("pdfjs.disabled", True)
         profile.update_preferences()
 
         options = webdriver.FirefoxOptions()
-        #options.add_argument("--headless")
+        options.add_argument("--headless")
 
         ua = UserAgent()
         userAgent = ua.random
-        print(userAgent)
         options.add_argument('user-agent={}'.format(userAgent))
-        path=r"D:/University/2020Semester2/DECO3801/SmartED/geckodriver.exe"
 
         self.driver = webdriver.Firefox(firefox_profile=profile, options=options)
-
         self.driver.get(self.BLACKBOARD_URL)
 
         # Load
         self.driver.implicitly_wait(10)
+        
         # Login
-        #     <input type="submit" id="postLoginSubmitButton">
-
         self.driver.find_element_by_xpath('//*[@id="username"]') \
             .send_keys(username)
         self.driver.find_element_by_xpath('//*[@id="password"]') \
@@ -70,8 +54,6 @@ class UQBlackboardScraper:
 
     def get_learning_resources(self, course_id):
         self.driver.get(self.COURSE_URL % course_id)
-        # self.driver.find_element_by_xpath('//*[@id="menuPuller"]') \
-        #     .click()
         self.driver.find_element_by_xpath('//*[@title="Learning Resources"]') \
             .click()
 
@@ -132,6 +114,9 @@ class UQBlackboardScraper:
 
 
     def get_current_courses(self):
+        """
+        REPLACE WITH BS parsing instead of selenium (SPEEED)
+        """
         self.driver.get(self.BLACKBOARD_URL)
 
         current_courses = self.driver.find_elements_by_xpath(

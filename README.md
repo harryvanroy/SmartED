@@ -38,3 +38,5 @@ To install the necessary dependencies begin with
 
 Now enter into the project directory `cd SmartEducation` and run the webserver 
 `python manage.py runserver`.
+
+`brew install geckodriver` to run selenium on MacOS
