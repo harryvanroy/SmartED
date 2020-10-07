@@ -131,4 +131,4 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'reactapp/build/static'),
 ]
 
-STATIC_ROOT = '/var/www/uwsgi/smarted/static/'
+STATIC_ROOT = '/var/www/uwsgi/SmartED/static/'
