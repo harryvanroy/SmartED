@@ -12,6 +12,7 @@ cycler==0.10.0
 Django==2.2.3
 django-cors-headers==3.5.0
 djangorestframework==3.11.1
+fake-useragent==0.1.11
 idna==2.8
 isort==4.3.21
 kiwisolver==1.1.0
