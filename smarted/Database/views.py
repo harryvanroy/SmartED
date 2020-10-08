@@ -12,7 +12,6 @@ user_keys = []
 
 
 # ##### VARK #####
-
 @csrf_exempt
 def post_vark(request):
     json_body = json.loads(request.body)
