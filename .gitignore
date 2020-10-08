@@ -10,3 +10,4 @@ smartedenv
 static
 geckodriver.log
 env
+db.sqlite3
