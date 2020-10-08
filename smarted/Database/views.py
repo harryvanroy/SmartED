@@ -419,11 +419,16 @@ def get_student_grades(request):
         total_earnt = sum([(grade.value/100) * int(grade.assessment.weight)
                            for grade in grades])
 
-        #print(total_weight, total_earnt)
+        if total_weight > 0:
+            current_grade = 100*(total_earnt/total_weight)
+        else:
+            current_grade = 100
+
+        print(total_weight, total_earnt)
 
         json_grades = {"items": json_grades, "total_completed": str(total_weight),
                        "total_earnt": str(total_earnt),
-                       "current_grade": str(100*(total_earnt/total_weight))}
+                       "current_grade": str(current_grade)}
 
     print("json request log: ", json_body)
     return HttpResponse(json.dumps(json_grades))
