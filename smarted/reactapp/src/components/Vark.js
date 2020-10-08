@@ -206,7 +206,10 @@ export default function Vark(props) {
     }
     var total_answers = scores['V']+scores['A']+scores['R']+scores['K'];
     if (total_answers > 0) {
-      props.setParentVarkScore({'V': scores['V']/total_answers, 'A': scores['A']/total_answers, 'R': scores['R']/total_answers, 'K': scores['K']/total_answers});
+      props.setParentVarkScore({'V': Math.round((scores['V']/total_answers + Number.EPSILON) * 100) / 100, 
+                                'A': Math.round((scores['A']/total_answers + Number.EPSILON) * 100) / 100,
+                                'R': Math.round((scores['R']/total_answers + Number.EPSILON) * 100) / 100, 
+                                'K': Math.round((scores['K']/total_answers + Number.EPSILON) * 100) / 100});
     } else {
       props.setParentVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25});
     }
