@@ -1,16 +1,26 @@
 import React from 'react';
 
 import axios from 'axios';
+import Cookies from "js-cookie";
 
-const url = "http://localhost:8000";
-//const url = "https://deco3801-pogware.uqcloud.net";
+//DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
 
 function Assessment() {
 
     /** Below is an example, delete later (soon) */
 
     let data = {
-      'id': 1
+      'id': 10
     }
 
     console.log("posting...")

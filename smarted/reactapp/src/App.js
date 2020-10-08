@@ -36,9 +36,19 @@ import Cookies from 'js-cookie';
 import { ContactSupportSharp } from '@material-ui/icons';
 
 const drawerWidth = 200;
-//uncomment below depending on whether on website or local
-const url = "http://localhost:8000";
-//const url = "https://deco3801-pogware.uqcloud.net";
+
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
