@@ -273,7 +273,7 @@ def log_in(request):
 
     try:
         print("ORIGIN : ", json_header['origin'])
-        is_local = 'localhost' in json_header['origin']
+        is_local = 'deco' not in json_header['origin']
     except:
         pass
 
