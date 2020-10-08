@@ -22,7 +22,7 @@ class UQBlackboardScraper:
             ua = UserAgent()
             userAgent = ua.random
             options.add_argument('user-agent={}'.format(userAgent))
-            self.driver = webdriver.Firefox(options=options)
+            self.driver = webdriver.Firefox(options=options, service_log_path="/var/www/uwsgi/geckodriver.log")
         else:
             print("starting driver as chrome")
             chrome_options = webdriver.ChromeOptions()

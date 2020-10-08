@@ -8,3 +8,4 @@ node_modules
 smartedenv
 .env
 static
+geckodriver.log

@@ -17,17 +17,55 @@ is_local = True
 
 # ##### TEACHERS #########################################################
 
+def set_up_demo_teacher():
+    if len(User.objects.filter(username="t123")) == 0:
+        user = User(username="t123", firstName="John", lastName="Smith")
+        user.save()
+        teacher = Staff(user=user)
+        teacher.save()
+
+
 def teacher_auth(username, password):
     # note, this should be a real method, but i have no idea how
     # we'd verify teachers
 
     # could maybe just add to database manually and assume that smartEd
     # admins will manually verify/add teachers
-    return True
+
+    if len(User.objects.filter(username=username)) == 1 and \
+            len(Staff.objects.filter(user=User.objects
+                .get(username=username))) == 1:
+        return True
+
+    return False
+
+
+@csrf_exempt
+def teacher_course(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in teacher_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    teacher = Staff.objects.get(user=User.objects.get(username=username))
+
+    staffCourses = StaffCourse.objects.filter(staff=teacher)
+
+    json_courses = [{"id": x.course.id, "name": x.course.name,
+                     "mode": x.course.mode, "semester": x.course.semester,
+                     "year": x.course.year} for x in staffCourses]
+
+    return HttpResponse(json.dumps(json_courses))
 
 
 @csrf_exempt
 def teacher_login(request):
+    # temp below
+    set_up_demo_teacher()
+
     json_body = json.loads(request.body)
     username = json_body.get("username")
     password = json_body.get("password")
@@ -165,8 +203,15 @@ def course_assessment(request):
 
     # check if assessment in database.. if so, return them.. else, scrape em
     if len(saved_assessment) != 0:
-        json_assessment = [x["fields"] for x
-                           in json.loads(serializers.serialize('json', saved_assessment))]
+
+        json_assessment = [{"id": x.id, "name": x.name, "course": x.course.id,
+                            "isDate": x.isDate, "date": x.date,
+                            "dateDescription": x.dateDescription,
+                            "isPassFail": x.isPassFail, "weight": x.weight}
+                           for x in saved_assessment]
+
+        # json_assessment = [x["fields"] for x
+        #                   in json.loads(serializers.serialize('json', saved_assessment))]
         print("loaded course assessment from database")
         return HttpResponse(json.dumps(json_assessment))
     else:
@@ -187,8 +232,11 @@ def course_assessment(request):
         print("saved assessment to database...")
 
         saved_assessment = AssessmentItem.objects.filter(course=id)
-        json_assessment = [x["fields"] for x
-                           in json.loads(serializers.serialize('json', saved_assessment))]
+        json_assessment = [{"id": x.id, "name": x.name, "course": x.course.id,
+                            "isDate": x.isDate, "date": x.date,
+                            "dateDescription": x.dateDescription,
+                            "isPassFail": x.isPassFail, "weight": x.weight}
+                           for x in saved_assessment]
         print("loaded course assessment from database")
         return HttpResponse(json.dumps(json_assessment))
 
@@ -269,13 +317,16 @@ def log_in(request):
     username = json_post.get("username")
     pword = json_post.get("password")
 
-    json_header = request.headers
+    is_local = True
 
+    json_header = request.headers
+    print(json_header)
     try:
-        print("ORIGIN : ", json_header['origin'])
-        is_local = 'deco' not in json_header['origin']
+        print("Cookie: ", json_header['Cookie'])
+        is_local = 'EAIT_WEB' not in json_header['Cookie']
     except:
         pass
+    print("IS LOCAL: ", is_local)
 
     if username is not None and pword is not None:
         # this is where the login scrape is called
@@ -362,4 +413,22 @@ def get_student_grades(request):
                     "grade": str(grade.value)}
                    for grade in grades]
 
+    # expected grade time
+    if course_filter:
+        total_weight = sum([int(grade.assessment.weight) for grade in grades])
+        total_earnt = sum([(grade.value/100) * int(grade.assessment.weight)
+                           for grade in grades])
+
+        if total_weight > 0:
+            current_grade = 100*(total_earnt/total_weight)
+        else:
+            current_grade = 100
+
+        print(total_weight, total_earnt)
+
+        json_grades = {"items": json_grades, "total_completed": str(total_weight),
+                       "total_earnt": str(total_earnt),
+                       "current_grade": str(current_grade)}
+
+    print("json request log: ", json_body)
     return HttpResponse(json.dumps(json_grades))
