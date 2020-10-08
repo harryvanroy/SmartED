@@ -99,6 +99,7 @@ class Course(models.Model):
     def __str__(self):
         return f"{self.name}. {self.year}, Semester {self.semester}. {self.mode} "
 
+
 class AssessmentItem(models.Model):
     unique_key = ("name", "course")
     name = models.CharField(max_length=255)
@@ -108,7 +109,10 @@ class AssessmentItem(models.Model):
     date = models.DateTimeField(null=True)
     dateDescription = models.CharField(max_length=255)
     isPassFail = models.BooleanField(default=False)
-    weight = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)]);
+    weight = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+
+    def __str__(self):
+        return f"{self.name}. {self.course}. {self.weight}. {self.dateDescription}"
 
 
 class StudentCourse(models.Model):
@@ -119,3 +123,15 @@ class StudentCourse(models.Model):
 class StaffCourse(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+
+
+class StudentAssessment(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
+    assessment = models.ForeignKey(AssessmentItem, on_delete=models.SET_NULL, blank=True, null=True)
+    unique_key = ("student", "assessment")
+    lastModified = models.DateTimeField(null=True)
+    passFail = models.BooleanField(default=False)
+    value = models.DecimalField(max_digits=10, decimal_places=4)
+
+    def __str__(self):
+        return f"{self.student} {self.assessment} {self.lastModified} {self.passFail} {self.value}"
