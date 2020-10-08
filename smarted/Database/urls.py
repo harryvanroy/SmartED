@@ -24,8 +24,10 @@ urlpatterns += [
     path('student-courses/', views.get_student_courses, name='student-courses'),
     path('post-vark/', views.post_vark, name='post-vark'),
     path('get-vark/', views.get_vark, name='get-vark'),
+    path('get-grades/', views.get_student_grades, name='get-grades'),
+
     path('teacher-login/', views.teacher_login, name='teacher-login'),
     path('students-in-course/', views.students_in_course, name='students-in-course'),
     path('student-assessment-grade/', views.student_assessment_grade, name='student-assessment-grade'),
-    path('get-grades/', views.get_student_grades, name='get-grades')
+    path('teacher-courses/', views.teacher_course, name='teacher-courses')
 ]
