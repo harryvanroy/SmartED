@@ -20,7 +20,6 @@ import FeedbackIcon from '@material-ui/icons/Feedback';
 import SubjectIcon from '@material-ui/icons/Sort';
 import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
 
 import { Switch, Route, Link, NavLink } from 'react-router-dom';
@@ -32,8 +31,6 @@ import Resources from './components/Resources';
 import Home from './components/Home';
 import Vark from './components/Vark';
 import axios from 'axios';
-import Cookies from 'js-cookie';
-import { ContactSupportSharp } from '@material-ui/icons';
 
 const drawerWidth = 200;
 //uncomment below depending on whether on website or local
@@ -79,7 +76,8 @@ function App() {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [key, setKey] = React.useState(null);
-
+  const [isAuthenticated, setAuthenticated] = React.useState(false);
+ 
   const handleClick = () => {
     setOpen(!open);
   };
