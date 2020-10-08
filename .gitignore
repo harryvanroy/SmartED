@@ -4,3 +4,7 @@ __pycache__
 *.pyc
 .vscode
 auth.txt
+node_modules
+smartedenv
+.env
+static
