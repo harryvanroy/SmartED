@@ -15,6 +15,13 @@ teacher_keys = []
 
 # ##### TEACHERS #########################################################
 
+def set_up_demo_teacher():
+    if len(User.objects.filter(username="t123")) == 0:
+        user = User(username="t123", firstName="John", lastName="Smith")
+        user.save()
+        teacher = Staff(user=user)
+        teacher.save()
+
 def teacher_auth(username, password):
     # note, this should be a real method, but i have no idea how
     # we'd verify teachers
@@ -23,9 +30,32 @@ def teacher_auth(username, password):
     # admins will manually verify/add teachers
     return True
 
+@csrf_exempt
+def teacher_course(request):
+
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in teacher_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    teacher = Staff.objects.get(user=User.objects.get(username=username))
+
+    staffCourses = StaffCourse.objects.filter(staff=teacher)
+
+    json_courses = [{"id": x.course.id, "name": x.course.name,
+                     "mode": x.course.mode, "semester": x.course.semester,
+                     "year": x.course.year} for x in staffCourses]
+
+    return HttpResponse(json.dumps(json_courses))
 
 @csrf_exempt
 def teacher_login(request):
+    # temp below
+    set_up_demo_teacher()
+
     json_body = json.loads(request.body)
     username = json_body.get("username")
     password = json_body.get("password")
@@ -162,8 +192,15 @@ def course_assessment(request):
 
     # check if assessment in database.. if so, return them.. else, scrape em
     if len(saved_assessment) != 0:
-        json_assessment = [x["fields"] for x
-                           in json.loads(serializers.serialize('json', saved_assessment))]
+
+        json_assessment = [{"id": x.id, "name": x.name, "course": x.course.id,
+                            "isDate": x.isDate, "date": x.date,
+                            "dateDescription": x.dateDescription,
+                            "isPassFail": x.isPassFail, "weight": x.weight}
+                           for x in saved_assessment]
+
+        # json_assessment = [x["fields"] for x
+        #                   in json.loads(serializers.serialize('json', saved_assessment))]
         print("loaded course assessment from database")
         return HttpResponse(json.dumps(json_assessment))
     else:
@@ -184,8 +221,11 @@ def course_assessment(request):
         print("saved assessment to database...")
 
         saved_assessment = AssessmentItem.objects.filter(course=id)
-        json_assessment = [x["fields"] for x
-                           in json.loads(serializers.serialize('json', saved_assessment))]
+        json_assessment = [{"id": x.id, "name": x.name, "course": x.course.id,
+                            "isDate": x.isDate, "date": x.date,
+                            "dateDescription": x.dateDescription,
+                            "isPassFail": x.isPassFail, "weight": x.weight}
+                           for x in saved_assessment]
         print("loaded course assessment from database")
         return HttpResponse(json.dumps(json_assessment))
 
@@ -247,7 +287,7 @@ def blackboard_scrape(username, pword):
                                            semester=sem, year=year)[0]
 
         if len(StudentCourse.objects
-                .filter(student=student, course=course_obj)) == 0:
+                       .filter(student=student, course=course_obj)) == 0:
             print("saving studentCourse...")
             stu_course = StudentCourse(student=student, course=course_obj)
             stu_course.save()
@@ -313,7 +353,6 @@ def get_student_courses(request):
 
     else:
         return HttpResponse("failed auth")
-
 
 
 @csrf_exempt
