@@ -3,22 +3,111 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import *
-from .models import Course, Institution, AssessmentItem, StudentCourse, User, Student
+from .models import Course, Institution, AssessmentItem, StudentCourse, \
+    User, Student, Staff, StaffCourse, StudentAssessment
 from django.core import serializers
 import json
 import random
 
-user_keys = []
+student_keys = []
+teacher_keys = []
 
 
-# ##### VARK #####
+# ##### TEACHERS #########################################################
+
+def teacher_auth(username, password):
+    # note, this should be a real method, but i have no idea how
+    # we'd verify teachers
+
+    # could maybe just add to database manually and assume that smartEd
+    # admins will manually verify/add teachers
+    return True
+
+
+@csrf_exempt
+def teacher_login(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    password = json_body.get("password")
+
+    if username is not None and password is not None:
+
+        successful_login = teacher_auth(username, password)
+
+        if successful_login:
+            # todo: the following is poor practice, temporary only...
+            random.seed(password)
+            key = random.randint(0, 1000000)
+            # save username with key such that the session continues
+            teacher_keys.append({"username": username, "key": key})
+
+            jsons_response = "{" + \
+                             f'"key": {key}' + "}"
+            return HttpResponse(jsons_response)
+
+    return HttpResponse('err')
+
+
+@csrf_exempt
+def students_in_course(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in teacher_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    course = Course.objects.get(id=json_body.get("courseID"))
+
+    students = [stu_course.student for stu_course in
+                StudentCourse.objects.filter(course=course)]
+
+    json_students = [{"username": student.user.username for student in students}]
+
+    return HttpResponse(json.dumps(json_students))
+
+
+@csrf_exempt
+def student_assessment_grade(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+
+    if len([user for user in teacher_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    ass_item = AssessmentItem.objects.get(id=json_body.get("assID"))
+
+    # todo: check staff can actually modify course here (i.e. is in courseStaff)
+
+    stu_user = User.objects.get(username=json_body.get("studentID"))
+    student = Student.objects.get(user=stu_user)
+
+    grade = json_body.get("grade")
+    # pass_fail = json_body.get("passed")
+
+    student_ass = StudentAssessment(student=student, assessment=ass_item,
+                                    value=grade)
+    student_ass.save()
+
+    return HttpResponse("")
+
+
+# ### END TEACHER ###################################################
+
+
+# ##### VARK #########################################################
+# todo: can probably condense these into 1 method, ngl
+
 @csrf_exempt
 def post_vark(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
     key = json_body.get("key")
 
-    if len([user for user in user_keys
+    if len([user for user in student_keys
             if user["username"] == username and user["key"] == key]) == 0:
         return HttpResponse("auth failed..")
 
@@ -38,7 +127,7 @@ def get_vark(request):
     username = json_body.get("username")
     key = json_body.get("key")
 
-    if len([user for user in user_keys
+    if len([user for user in student_keys
             if user["username"] == username and user["key"] == key]) == 0:
         return HttpResponse("auth failed..")
     user = User.objects.get(username=username)
@@ -48,7 +137,7 @@ def get_vark(request):
     return HttpResponse(json.dumps(json_response))
 
 
-# ##### END VARK #####
+# ##### END VARK ##############################################################
 
 
 @csrf_exempt
@@ -105,9 +194,10 @@ def blackboard_scrape(username, pword):
     print("logging in...")
     scraper = UQBlackboardScraper(username, pword)
 
+    # todo: need to actual verify the scraper logged in correctly
     if len(User.objects.filter(username=username)) > 0:
         print("user already exists...")
-        return
+        return True
 
     print("getting courses...")
     # get courses
@@ -117,9 +207,9 @@ def blackboard_scrape(username, pword):
         return False
 
     user = User(username=username, firstName="todo", lastName="todo")
-    user.save()
-
     student = Student(user=user)
+
+    user.save()
     student.save()
 
     if len(Institution.objects.filter(name="University of Queensland")) == 0:
@@ -129,7 +219,7 @@ def blackboard_scrape(username, pword):
 
     raw_courses = [raw_dict.get(key) for key in raw_dict.keys()]
 
-    print("deubg: ", raw_courses)
+    print("debug: ", raw_courses)
 
     for course in raw_courses:
         code = course['code'].split('/')[0]
@@ -157,12 +247,14 @@ def blackboard_scrape(username, pword):
                                            semester=sem, year=year)[0]
 
         if len(StudentCourse.objects
-                       .filter(student=student, course=course_obj)) == 0:
+                .filter(student=student, course=course_obj)) == 0:
             print("saving studentCourse...")
             stu_course = StudentCourse(student=student, course=course_obj)
             stu_course.save()
 
     # add resources to database and whatever else here
+
+    return True
 
 
 @csrf_exempt  # warning: might be bad practice?
@@ -175,20 +267,18 @@ def log_in(request):
 
     if username is not None and pword is not None:
         # this is where the login scrape is called
-        # the scrape should check if their data is in the database already
+        # the scrape checks if their data is in the database already
         # else it will login and add all relevant data to database.
         # it should return something that indicates if the log in
         # was successful
 
-        blackboard_scrape(username, pword)
-
-        successful_login = True  # todo: changes with scrape
+        successful_login = blackboard_scrape(username, pword)
         if successful_login:
             # todo: the following is VERY poor practice, temporary only...
             random.seed(pword)
             key = random.randint(0, 1000000)
             # save username with key such that the session continues
-            user_keys.append({"username": username, "key": key})
+            student_keys.append({"username": username, "key": key})
 
             jsons_response = "{" + \
                              f'"key": {key}' + "}"
@@ -207,7 +297,7 @@ def get_student_courses(request):
         return HttpResponse('err')
 
     # checks auth
-    if len([user for user in user_keys
+    if len([user for user in student_keys
             if user["username"] == username and user["key"] == key]):
         print("auth success for " + username + " " + str(key))
 
@@ -224,4 +314,41 @@ def get_student_courses(request):
     else:
         return HttpResponse("failed auth")
 
-    pass  # todo: finish
+
+
+@csrf_exempt
+def get_student_grades(request):
+    json_body = json.loads(request.body)
+    username = json_body.get("username")
+    key = json_body.get("key")
+    course_filter = True
+    try:
+        course = Course.objects.get(id=json_body.get("courseID"))
+    except:
+        course_filter = False
+
+    if username is None or key is None:
+        return HttpResponse('err')
+
+    # check auth
+    if len([user for user in student_keys
+            if user["username"] == username and user["key"] == key]) == 0:
+        return HttpResponse("auth failed..")
+
+    student = Student.objects.get(user=User.objects.get(username=username))
+
+    if course_filter:
+        grades = [grade for grade in StudentAssessment.objects.all()
+                  if grade.student == student and grade.assessment.course == course]
+    else:
+        grades = [grade for grade in StudentAssessment.objects.filter(student=student)]
+
+    json_grades = [{"assessment":
+                        {"name": grade.assessment.name,
+                         "courseName": grade.assessment.course.name,
+                         "dateDescription": grade.assessment.dateDescription,
+                         "weight": grade.assessment.weight},
+                    "grade": str(grade.value)}
+                   for grade in grades]
+
+    return HttpResponse(json.dumps(json_grades))
