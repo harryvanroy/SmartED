@@ -365,4 +365,5 @@ def get_student_grades(request):
                     "grade": str(grade.value)}
                    for grade in grades]
 
+    print("json request log: ", json_body)
     return HttpResponse(json.dumps(json_grades))
