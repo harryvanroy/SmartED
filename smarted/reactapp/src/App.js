@@ -33,11 +33,22 @@ import Home from './components/Home';
 import Vark from './components/Vark';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { ContactSupportSharp } from '@material-ui/icons';
 
 const drawerWidth = 200;
-//uncomment below depending on whether on website or local
-const url = "http://localhost:8000";
-//const url = "https://deco3801-pogware.uqcloud.net";
+
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -83,9 +94,22 @@ function App() {
     setOpen(!open);
   };
 
-  function setParentVarkScore(score) {
+  const setParentVarkScore = (score) => {
     setVark(score);
-  }
+    console.log(username);
+    console.log(key);
+    console.log(score);
+    axios(url+'/Database/post-vark/', {
+          method: "post",
+          data: {
+            "username": "s4532094",
+            "key": key, 
+            "V": score['V'], "A": score['A'], 
+            "R": score['R'], "K": score['K']
+          },
+          withCredentials: true
+        });
+  };
 
   const handleSubmit = (event) => {
     //const uq_sso = Cookies.get('EAIT_WEB');
@@ -105,15 +129,15 @@ function App() {
         setPassword('');
       });
     event.preventDefault();
-  }
+  };
 
   const handleChangeUsername = (event) => {
     setUsername(event.target.value);
-  }
+  };
 
   const handleChangePassword = (event) => {
     setPassword(event.target.value);
-  }
+  };
 
   useEffect(() => {
     if (key != null) {
@@ -138,6 +162,15 @@ function App() {
             );
           });
           Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
+        });
+      axios 
+        .post(url+'/Database/get-vark/', {
+          "username": username,
+          "key": key
+        })
+        .then(res => {
+          console.log(res.data);
+          setVark({"V": parseFloat(res.data.V), "A": parseFloat(res.data.A), "R": parseFloat(res.data.R), "K": parseFloat(res.data.K)});
         });
     }
   }, [key]);

@@ -12,6 +12,8 @@ import random
 student_keys = []
 teacher_keys = []
 
+is_local = True
+
 
 # ##### TEACHERS #########################################################
 
@@ -151,6 +153,7 @@ def post_vark(request):
 
     V, A, R, K = json_body.get("V"), json_body.get("A"), json_body.get("R"), \
                  json_body.get("K")
+    print(V, A, R, K)
 
     user = User.objects.get(username=username)
     stu = Student.objects.get(user=user)
@@ -238,9 +241,9 @@ def course_assessment(request):
         return HttpResponse(json.dumps(json_assessment))
 
 
-def blackboard_scrape(username, pword):
+def blackboard_scrape(username, pword, chrome=False):
     print("logging in...")
-    scraper = UQBlackboardScraper(username, pword)
+    scraper = UQBlackboardScraper(username, pword, chrome=chrome)
 
     # todo: need to actual verify the scraper logged in correctly
     if len(User.objects.filter(username=username)) > 0:
@@ -307,11 +310,23 @@ def blackboard_scrape(username, pword):
 
 @csrf_exempt  # warning: might be bad practice?
 def log_in(request):
+    global is_local
     # extract json from post method
     # todo: subject to change depending on how we decide to format
     json_post = json.loads(request.body)
     username = json_post.get("username")
     pword = json_post.get("password")
+
+    is_local = True
+
+    json_header = request.headers
+    print(json_header)
+    try:
+        print("Cookie: ", json_header['Cookie'])
+        is_local = 'EAIT_WEB' not in json_header['Cookie']
+    except:
+        pass
+    print("IS LOCAL: ", is_local)
 
     if username is not None and pword is not None:
         # this is where the login scrape is called
@@ -320,7 +335,7 @@ def log_in(request):
         # it should return something that indicates if the log in
         # was successful
 
-        successful_login = blackboard_scrape(username, pword)
+        successful_login = blackboard_scrape(username, pword, chrome=is_local)
         if successful_login:
             # todo: the following is VERY poor practice, temporary only...
             random.seed(pword)
@@ -410,4 +425,5 @@ def get_student_grades(request):
                        "total_earnt": str(total_earnt),
                        "current_grade": str(100*(total_earnt/total_weight))}
 
+    print("json request log: ", json_body)
     return HttpResponse(json.dumps(json_grades))
