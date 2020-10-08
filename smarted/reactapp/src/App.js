@@ -31,6 +31,7 @@ import Resources from './components/Resources';
 import Home from './components/Home';
 import Vark from './components/Vark';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const drawerWidth = 200;
 
