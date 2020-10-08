@@ -269,13 +269,16 @@ def log_in(request):
     username = json_post.get("username")
     pword = json_post.get("password")
 
-    json_header = request.headers
+    is_local = True
 
+    json_header = request.headers
+    print(json_header)
     try:
-        print("ORIGIN : ", json_header['origin'])
-        is_local = 'deco' not in json_header['origin']
+        print("Cookie: ", json_header['Cookie'])
+        is_local = 'EAIT_WEB' not in json_header['Cookie']
     except:
         pass
+    print("IS LOCAL: ", is_local)
 
     if username is not None and pword is not None:
         # this is where the login scrape is called
