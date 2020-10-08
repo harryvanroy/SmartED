@@ -113,6 +113,7 @@ def post_vark(request):
 
     V, A, R, K = json_body.get("V"), json_body.get("A"), json_body.get("R"), \
                  json_body.get("K")
+    print(V,A,R,K)
 
     user = User.objects.get(username=username)
     stu = Student.objects.get(user=user)
