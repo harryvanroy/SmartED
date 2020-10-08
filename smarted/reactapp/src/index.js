@@ -3,10 +3,16 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
+import Login from './components/Login';
+import { Switch, Route, Link, NavLink } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute'
 
 ReactDOM.render(
   <BrowserRouter>
-    <App />
+    <Switch>
+      <Route path='/login' component={Login} />
+      <ProtectedRoute path='/' component={App} />
+    </Switch>
   </BrowserRouter>,
   document.getElementById('root')
 );
