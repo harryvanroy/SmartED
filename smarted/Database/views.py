@@ -191,9 +191,9 @@ def course_assessment(request):
         return HttpResponse(json.dumps(json_assessment))
 
 
-def blackboard_scrape(username, pword):
+def blackboard_scrape(username, pword, chrome=False):
     print("logging in...")
-    scraper = UQBlackboardScraper(username, pword)
+    scraper = UQBlackboardScraper(username, pword, chrome=chrome)
 
     # todo: need to actual verify the scraper logged in correctly
     if len(User.objects.filter(username=username)) > 0:
@@ -273,7 +273,7 @@ def log_in(request):
         # it should return something that indicates if the log in
         # was successful
 
-        successful_login = blackboard_scrape(username, pword)
+        successful_login = blackboard_scrape(username, pword, chrome=True)
         if successful_login:
             # todo: the following is VERY poor practice, temporary only...
             random.seed(pword)

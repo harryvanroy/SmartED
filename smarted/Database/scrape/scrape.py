@@ -12,16 +12,23 @@ class UQBlackboardScraper:
     COURSE_URL = 'https://learn.uq.edu.au/webapps/blackboard/execute/announcement?method=search&context=course_entry&course_id=%d'
     RESOURCE_URL = 'https://learn.uq.edu.au/webapps/blackboard/content/listContent.jsp?course_id=%d&content_id=%d'
 
-    def __init__(self, username, password, verbose=False):
+    def __init__(self, username, password, verbose=False, chrome=False):
         self.verbose = verbose
 
-        options = webdriver.FirefoxOptions()
-        options.add_argument("--headless")
-        ua = UserAgent()
-        userAgent = ua.random
-        options.add_argument('user-agent={}'.format(userAgent))
+        if not chrome:
+            print("starting driver as firefox")
+            options = webdriver.FirefoxOptions()
+            options.add_argument("--headless")
+            ua = UserAgent()
+            userAgent = ua.random
+            options.add_argument('user-agent={}'.format(userAgent))
+            self.driver = webdriver.Firefox(options=options)
+        else:
+            print("starting driver as chrome")
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("--headless")
+            self.driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
 
-        self.driver = webdriver.Firefox(options=options)
         self.driver.get(self.BLACKBOARD_URL)
 
         # Load
