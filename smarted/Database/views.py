@@ -22,17 +22,24 @@ def set_up_demo_teacher():
         teacher = Staff(user=user)
         teacher.save()
 
+
 def teacher_auth(username, password):
     # note, this should be a real method, but i have no idea how
     # we'd verify teachers
 
     # could maybe just add to database manually and assume that smartEd
     # admins will manually verify/add teachers
-    return True
+
+    if len(User.objects.filter(username=username)) == 1 and \
+            len(Staff.objects.filter(user=User.objects
+                .get(username=username))) == 1:
+        return True
+
+    return False
+
 
 @csrf_exempt
 def teacher_course(request):
-
     json_body = json.loads(request.body)
     username = json_body.get("username")
     key = json_body.get("key")
@@ -50,6 +57,7 @@ def teacher_course(request):
                      "year": x.course.year} for x in staffCourses]
 
     return HttpResponse(json.dumps(json_courses))
+
 
 @csrf_exempt
 def teacher_login(request):
@@ -389,5 +397,17 @@ def get_student_grades(request):
                          "weight": grade.assessment.weight},
                     "grade": str(grade.value)}
                    for grade in grades]
+
+    # expected grade time
+    if course_filter:
+        total_weight = sum([int(grade.assessment.weight) for grade in grades])
+        total_earnt = sum([(grade.value/100) * int(grade.assessment.weight)
+                           for grade in grades])
+
+        #print(total_weight, total_earnt)
+
+        json_grades = {"items": json_grades, "total_completed": str(total_weight),
+                       "total_earnt": str(total_earnt),
+                       "current_grade": str(100*(total_earnt/total_weight))}
 
     return HttpResponse(json.dumps(json_grades))
