@@ -5,6 +5,7 @@ from django.db import models
 from django.db import models
 import datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils import timezone
 
 
 ################ VALIDATORS ################
@@ -135,3 +136,15 @@ class StudentAssessment(models.Model):
 
     def __str__(self):
         return f"{self.student} {self.assessment} {self.lastModified} {self.passFail} {self.value}"
+
+
+class CourseGradeGoal(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, blank=True, null=True)
+    grade = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(7)])
+
+    class Meta:
+        unique_together = ('user', 'course', 'grade')
+
+    def __str__(self):
+        return f"{self.user} {self.course} {self.grade}"

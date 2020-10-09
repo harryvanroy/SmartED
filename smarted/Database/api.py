@@ -1,9 +1,6 @@
-from .models import User, Student, Resource, File, Institution, Course, AssessmentItem, Staff, StudentCourse, \
-    StaffCourse, StudentAssessment
+from .models import *
 from rest_framework import viewsets, permissions
-from .serializers import UserSerializer, ResourceSerializer, FileSerializer, InstitutionSerializer, \
-    CourseSerializer, AssessmentSerializer, StudentSerializer, StaffSerializer, StaffCourseSerializer, \
-    StudentCourseSerializer, StudentAssessmentSerializer
+from .serializers import *
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -91,3 +88,11 @@ class StudentAssessmentViewSet(viewsets.ModelViewSet):
         permissions.AllowAny
     }
     serializer_class = StudentAssessmentSerializer
+
+class CourseGradeGoalViewSet(viewsets.ModelViewSet):
+    queryset = CourseGradeGoal.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+
+    serializer_class = CourseGradeGoalSerializer

@@ -3,8 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import *
-from .models import Course, Institution, AssessmentItem, StudentCourse, \
-    User, Student, Staff, StaffCourse, StudentAssessment
+from .models import *
 from django.core import serializers
 import json
 import random
