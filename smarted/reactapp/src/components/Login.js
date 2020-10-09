@@ -13,7 +13,22 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Image from '../images/uq_0.jpg';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { Redirect } from 'react-router';
+import { useHistory } from 'react-router-dom';
 
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -46,10 +61,49 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignInSide() {
+export default function Login() {
   const classes = useStyles();
+  const history = useHistory();
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [key, setKey] = React.useState(null);
 
+
+  const handleSubmit = (event) => {
+    //const uq_sso = Cookies.get('sEAIT_WEB');
+    axios(url+'/Database/login-post/', {
+          method: "post",
+          data: {
+            "username": username,
+            "password": password
+          },
+          withCredentials: true
+        })
+      .then(res => {
+        setKey(res.data.key);
+        localStorage.setItem('key', res.data.key);
+        localStorage.setItem('username', username);
+        console.log(res.data.key);
+      }).then(res => {
+        setUsername('');
+        setPassword('');
+        setLoggedIn(true);
+      });
+    event.preventDefault();
+  };
+  
+  const handleChangeUsername = (event) => {
+    console.log(event.target.value);
+    setUsername(event.target.value);
+  };
+  
+  const handleChangePassword = (event) => {
+    setPassword(event.target.value);
+  };
+  
   return (
+    loggedIn ? <Redirect to='/' /> : <div>
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
@@ -61,16 +115,17 @@ export default function SignInSide() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={classes.form} noValidate>
+          <form onSubmit={handleSubmit} className={classes.form} noValidate>
             <TextField
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              onChange={handleChangeUsername}
               autoFocus
             />
             <TextField
@@ -83,6 +138,7 @@ export default function SignInSide() {
               type="password"
               id="password"
               autoComplete="current-password"
+              onChange={handleChangePassword}
             />
             <Button
               type="submit"
@@ -103,5 +159,6 @@ export default function SignInSide() {
         </div>
       </Grid>
     </Grid>
+  </div>
   );
 }

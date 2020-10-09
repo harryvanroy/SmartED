@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']  # may be insecure, change later - george
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'Database'
+    'Database',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -125,7 +127,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CORS_ORIGIN_ALLOW_ALL =True
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'reactapp/build/static'),

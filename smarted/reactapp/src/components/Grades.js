@@ -19,8 +19,8 @@ function Grades() {
   let user_courses = [9, 10, 11, 12];
   async function get_course_grades(courseID) {
       let data = {
-          "username": "s4532094",
-          "key": 500913,
+          "username": localStorage.getItem('username'),
+          "key": parseInt(localStorage.getItem('key')),
           "courseID": courseID
       };
       let result = {};

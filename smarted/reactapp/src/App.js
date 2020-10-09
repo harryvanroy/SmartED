@@ -84,10 +84,6 @@ function App() {
   const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
   const [assessment, setAssessment] = React.useState([]);
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [key, setKey] = React.useState(null);
-  const [isAuthenticated, setAuthenticated] = React.useState(false);
  
   const handleClick = () => {
     setOpen(!open);
@@ -95,14 +91,11 @@ function App() {
 
   const setParentVarkScore = (score) => {
     setVark(score);
-    console.log(username);
-    console.log(key);
-    console.log(score);
     axios(url+'/Database/post-vark/', {
           method: "post",
           data: {
-            "username": "s4532094",
-            "key": key, 
+            "username": localStorage.getItem('username'),
+            "key": parseInt(localStorage.getItem('key')), 
             "V": score['V'], "A": score['A'], 
             "R": score['R'], "K": score['K']
           },
@@ -110,49 +103,32 @@ function App() {
         });
   };
 
-  const handleSubmit = (event) => {
-    //const uq_sso = Cookies.get('EAIT_WEB');
-    axios(url+'/Database/login-post/', {
-          method: "post",
-          data: {
-            "username": username,
-            "password": password
-          },
-          withCredentials: true
-        })
-      .then(res => {
-        setKey(res.data.key);
-        console.log(res.data.key);
-      }).then(res => {
-        setUsername('');
-        setPassword('');
-      });
-    event.preventDefault();
-  };
-
-  const handleChangeUsername = (event) => {
-    setUsername(event.target.value);
-  };
-
-  const handleChangePassword = (event) => {
-    setPassword(event.target.value);
-  };
-
   useEffect(() => {
-    if (key != null) {
-      axios
-        .post(url+'/Database/student-courses/', {
-          "username": username, 
-          "key": key
+      console.log(localStorage.getItem('username'));
+      console.log(localStorage.getItem('key'));
+      console.log('test');
+      axios(url+'/Database/student-courses/', {
+        method: "post",
+        data: {
+          "username": localStorage.getItem('username'), 
+          "key": parseInt(localStorage.getItem('key'))
+        },
+        withCredentials: true
         })
         .then(res => {
+          console.log(res.data);
           setCourses(res.data);
           let resp = [];
           let promises = [];
           res.data.map(course => {
             promises.push(
-              axios
-              .post(url+'/Database/course-assessment/', {'id': course.id})
+              axios(url+'/Database/course-assessment/', {
+                method: "post",
+                data: {
+                  'id': course.id
+                },
+                withCredentials: true
+              })
               .then(resAss => {
                 resp.push([...new Set(resAss.data
                   .map(o => JSON.stringify(o)))]
@@ -162,17 +138,19 @@ function App() {
           });
           Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
         });
-      axios 
-        .post(url+'/Database/get-vark/', {
-          "username": username,
-          "key": key
+      axios(url+'/Database/get-vark/', {
+          method: "post",
+          data: {
+            "username": localStorage.getItem('username'),
+            "key": parseInt(localStorage.getItem('key'))
+          },
+          withCredentials: true
         })
         .then(res => {
           console.log(res.data);
           setVark({"V": parseFloat(res.data.V), "A": parseFloat(res.data.A), "R": parseFloat(res.data.R), "K": parseFloat(res.data.K)});
         });
-    }
-  }, [key]);
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -184,17 +162,6 @@ function App() {
               SmartED
             </Link>
           </Typography>
-          <form onSubmit={handleSubmit}>
-            <label style={{margin: '5px'}}>
-              Username:
-              <input style={{width: '100px'}} value={username} type="text" onChange={handleChangeUsername} />
-            </label>
-            <label style={{margin: '5px'}}>
-              Password:
-              <input style={{width: '100px'}} value={password} type="password" onChange={handleChangePassword} />
-            </label>
-            <input type="submit" value="Submit" />
-          </form>
             {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
         </Toolbar>
       </AppBar>
