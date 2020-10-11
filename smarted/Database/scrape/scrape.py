@@ -25,9 +25,6 @@ class UQBlackboardScraper:
             print("starting driver as firefox")
             options = webdriver.FirefoxOptions()
             options.add_argument("--headless")
-            #ua = UserAgent()
-            #userAgent = ua.random
-            #options.add_argument('user-agent={}'.format(userAgent))
             self.driver = webdriver.Firefox(options=options, service_log_path="/var/www/uwsgi/geckodriver.log")
         else:
             print("starting driver as chrome")
@@ -142,15 +139,7 @@ class UQBlackboardScraper:
                 elif link.text[i] == ')':
                     course_info['delivery'] = link.get_text()[last_break: i]
                     last_break = i + 3
-                ## NOTE: BELOW DOES NOT WORK FOR SOME COURSES SO IS TEMPORARILY REPLACED WITH DEFAULTS..
-                ## NEEDS FIXING!!
-                #elif link.text[i] == ',' and course_info.get("semester", None) is None:
-                #    course_info['semester'] = link.get_text()[last_break: i]
-                #    last_break = i + 2
-                #elif link.text[i] == ',':
-                #    print(link.get_text()[last_break: i])
-                #    course_info['year'] = link.get_text()[last_break: i]
-
+                    
         return courses
 
 
