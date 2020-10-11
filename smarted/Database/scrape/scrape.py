@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 
 from fake_useragent import UserAgent
 
+import os
+
 class UQBlackboardScraper:
     BLACKBOARD_URL = 'https://learn.uq.edu.au/'
     COURSE_URL = 'https://learn.uq.edu.au/webapps/blackboard/execute/announcement?method=search&context=course_entry&course_id=%d'
@@ -14,14 +16,19 @@ class UQBlackboardScraper:
 
     def __init__(self, username, password, verbose=False, chrome=False):
         self.verbose = verbose
+        try:
+            os.mkdir("/tmp/www_fake_home/")
+        except FileExistsError:
+            pass
+        os.environ["HOME"] = "/tmp/www_fake_home/"
 
         if not chrome:
             print("starting driver as firefox")
             options = webdriver.FirefoxOptions()
             options.add_argument("--headless")
-            ua = UserAgent()
-            userAgent = ua.random
-            options.add_argument('user-agent={}'.format(userAgent))
+            #ua = UserAgent()
+            #userAgent = ua.random
+            #options.add_argument('user-agent={}'.format(userAgent))
             self.driver = webdriver.Firefox(options=options, service_log_path="/var/www/uwsgi/geckodriver.log")
         else:
             print("starting driver as chrome")
