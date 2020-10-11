@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 from selenium.common.exceptions import InvalidArgumentException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -7,11 +8,6 @@ from bs4 import BeautifulSoup
 
 from fake_useragent import UserAgent
 
-<<<<<<< HEAD
-import os
-=======
->>>>>>> e3966cdf1dae0431c746b16450d27da74a82c672
-
 class UQBlackboardScraper:
     BLACKBOARD_URL = 'https://learn.uq.edu.au/'
     COURSE_URL = 'https://learn.uq.edu.au/webapps/blackboard/execute/announcement?method=search&context=course_entry&course_id=%d'
@@ -19,13 +15,13 @@ class UQBlackboardScraper:
 
     def __init__(self, username, password, verbose=False, chrome=False):
         self.verbose = verbose
-        try:
-            os.mkdir("/tmp/www_fake_home/")
-        except FileExistsError:
-            pass
-        os.environ["HOME"] = "/tmp/www_fake_home/"
 
         if not chrome:
+            try:
+                os.mkdir("/tmp/www_fake_home/")
+            except FileExistsError:
+                pass
+            os.environ["HOME"] = "/tmp/www_fake_home/"
             print("starting driver as firefox")
             options = webdriver.FirefoxOptions()
             options.add_argument("--headless")
