@@ -118,11 +118,14 @@ class AssessmentItem(models.Model):
 class StudentCourse(models.Model):
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    weeklyGoal = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(168)])
+    unique_key = ("student", "course")
 
 
 class StaffCourse(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    unique_key = ("staff", "course")
 
 
 class StudentAssessment(models.Model):
@@ -164,7 +167,6 @@ class CourseGradeGoal(models.Model):
 
 
 class ResourceFeedback(models.Model):
-    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, blank=True, null=True)
     lastUpdated = models.DateTimeField(auto_now=True)
@@ -175,7 +177,6 @@ class ResourceFeedback(models.Model):
 
 
 class CourseFeedback(models.Model):
-    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
     lastUpdated = models.DateTimeField(auto_now=True)
@@ -183,3 +184,8 @@ class CourseFeedback(models.Model):
 
     def __str__(self):
         return f"{self.id} {self.user} {self.course} {self.lastUpdated} {self.feedback}"
+
+class DailyGoals(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    lastUpdated = models.DateField(auto_now_add=True)
+    complete = models.BooleanField(null=False, default=False)
