@@ -252,7 +252,7 @@ def initialize_course(header, stu):
         for g in groups:
             match = re.search(r'[a-zA-Z]{4}[0-9]{4}_*_*', g)
             if match:
-                print(match.string.split("uq:")[1].split("_")[0])
+                courses.append(match.string.split("uq:")[1].split("_")[0])
     except:
         courses = ['comp3301', "deco3801", "comp3710", "coms4200"]
 
