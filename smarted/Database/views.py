@@ -235,7 +235,7 @@ def initialize_course(header, stu):
 
     courses = []
     try:
-        groups = header['X-Kvd-Payload']['groups']
+        groups = json.loads(header['X-Kvd-Payload'])['groups']
         [courses.append(x.split('-')[0].split('labs:')[1])
          for x in groups if ("2020-2" in x)]
     except:
