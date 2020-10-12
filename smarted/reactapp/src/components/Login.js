@@ -3,11 +3,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
@@ -68,29 +64,51 @@ export default function Login() {
   const [password, setPassword] = React.useState('');
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [key, setKey] = React.useState(null);
+  const [isTeacher, setIsTeacher] = React.useState(false);
 
 
   const handleSubmit = (event) => {
-    //const uq_sso = Cookies.get('sEAIT_WEB');
-    axios(url+'/Database/login-post/', {
-          method: "post",
-          data: {
-            "username": username,
-            "password": password
-          },
-          withCredentials: true
-        })
+    if (username.startsWith('uq')) {
+      axios(url+'/Database/teacher-login/', {
+        method: "post",
+        data: {
+          "username": username,
+          "password": password
+        },
+        withCredentials: true
+      })
       .then(res => {
-        setKey(res.data.key);
-        localStorage.setItem('key', res.data.key);
-        localStorage.setItem('username', username);
-        console.log(res.data.key);
+      setKey(res.data.key);
+      localStorage.setItem('key', res.data.key);
+      localStorage.setItem('username', username);
+      console.log(res.data.key);
       }).then(res => {
-        setUsername('');
-        setPassword('');
-        setLoggedIn(true);
+      setUsername('');
+      setPassword('');
+      setLoggedIn(true);
       });
-    event.preventDefault();
+      event.preventDefault();
+    } else {
+      axios(url+'/Database/login-post/', {
+        method: "post",
+        data: {
+          "username": username,
+          "password": password
+        },
+        withCredentials: true
+      })
+      .then(res => {
+      setKey(res.data.key);
+      localStorage.setItem('key', res.data.key);
+      localStorage.setItem('username', username);
+      console.log(res.data.key);
+      }).then(res => {
+      setUsername('');
+      setPassword('');
+      setLoggedIn(true);
+      });
+      event.preventDefault();
+    }
   };
   
   const handleChangeUsername = (event) => {
@@ -101,9 +119,12 @@ export default function Login() {
   const handleChangePassword = (event) => {
     setPassword(event.target.value);
   };
-  
   return (
-    loggedIn ? <Redirect to='/' /> : <div>
+    loggedIn ? <Redirect to={{
+      pathname: '/',
+      state: { teacher: localStorage.getItem('username').startsWith('uq') }
+    }} /> : 
+    <div>
     <Grid container component="main" className={classes.root}>
       <CssBaseline />
       <Grid item xs={false} sm={4} md={7} className={classes.image} />

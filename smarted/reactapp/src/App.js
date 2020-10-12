@@ -78,7 +78,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function App() {
+function App(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const [vark, setVark] = React.useState({});
@@ -151,6 +151,9 @@ function App() {
           setVark({"V": parseFloat(res.data.V), "A": parseFloat(res.data.A), "R": parseFloat(res.data.R), "K": parseFloat(res.data.K)});
         });
   }, []);
+  if (props.location.state.teacher) {
+    return <div>teacher</div>
+  }
 
   return (
     <div className={classes.root}>
