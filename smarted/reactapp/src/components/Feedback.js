@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(0),
-    minWidth: 200,
+    minWidth: 120,
   }
 }));
 
@@ -51,7 +51,7 @@ function Feedback({ courses }) {
       </Typography>
       
       <Box m={2}>
-        <FormControl variant="outlined" className={classes.formControl}>
+        <FormControl style={{marginBottom: 12}} variant="outlined" className={classes.formControl}>
           <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
           <Select
             labelId="demo-simple-select-outlined-label"
@@ -64,9 +64,6 @@ function Feedback({ courses }) {
             ))}
           </Select>
         </FormControl>
-        <div>
-
-        </div>
         <FormControl fullWidth>
           <TextField
             id="outlined-multiline-static"
@@ -89,8 +86,9 @@ function Feedback({ courses }) {
             />
           </FormGroup>
         </FormControl>
+        <br />
         <Button variant="contained" color="primary" size="large" onClick={handleSubmit}>
-          SEND TO COORDINATOR
+          SEND TO COURSE STAFF
         </Button>
         <Link to="/">
           <Button color="primary" size="large"> 
