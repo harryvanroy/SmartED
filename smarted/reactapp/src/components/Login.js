@@ -134,7 +134,7 @@ export default function Login() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Please sign in with your UQ credentials to access resources available to you.
           </Typography>
           <form onSubmit={handleSubmit} className={classes.form} noValidate>
             <TextField
