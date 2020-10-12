@@ -18,8 +18,8 @@ is_local = True
 # ##### TEACHERS #########################################################
 
 def set_up_demo_teacher():
-    if len(User.objects.filter(username="t123")) == 0:
-        user = User(username="t123", firstName="John", lastName="Smith")
+    if len(User.objects.filter(username="uq123")) == 0:
+        user = User(username="uq123", firstName="John", lastName="Smith")
         user.save()
         teacher = Staff(user=user)
         teacher.save()
