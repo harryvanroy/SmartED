@@ -11,8 +11,10 @@ from django.core import serializers
 
 is_local = True
 
+
 def check_valid_key(key):
     return True
+
 
 def students_in_course(request):
     json_body = json.loads(request.body)
@@ -29,6 +31,7 @@ def students_in_course(request):
     json_students = [{"username": student.user.username for student in students}]
 
     return HttpResponse(json.dumps(json_students))
+
 
 def student_assessment_grade(request):
     json_body = json.loads(request.body)
@@ -49,6 +52,7 @@ def student_assessment_grade(request):
 
     return HttpResponse("")
 
+
 @csrf_exempt
 def post_vark(request):
     json_body = json.loads(request.body)
@@ -65,6 +69,7 @@ def post_vark(request):
     stu.save()
     return HttpResponse("")
 
+
 def get_vark(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
@@ -75,6 +80,7 @@ def get_vark(request):
     json_response = {"V": str(stu.V), "A": str(stu.A),
                      "R": str(stu.R), "K": str(stu.K)}
     return HttpResponse(json.dumps(json_response))
+
 
 def course_assessment(request):
     json_body = json.loads(request.body)
@@ -107,8 +113,8 @@ def course_assessment(request):
         print("loaded course assessment from database")
         return HttpResponse(json.dumps(json_assessment))
     else:
-        scraped_assessment = get_course_assessment(course_code=name, 
-            semester=semester, year=year, delivery_mode=mode)
+        scraped_assessment = get_course_assessment(course_code=name,
+                                                   semester=semester, year=year, delivery_mode=mode)
         if scraped_assessment is False:
             return HttpResponse("error scraping assessment... contact george?")
 
@@ -185,6 +191,7 @@ def blackboard_scrape(username, pword, chrome=False):
 
     return True
 
+
 @csrf_exempt  # warning: might be bad practice?
 def log_in(request):
     global is_local
@@ -259,7 +266,7 @@ def initialize_course(header, stu):
         # todo: what about teachers?!?!
 
         if len(StudentCourse.objects
-                .filter(student=stu, course=course_obj)) == 0:
+                       .filter(student=stu, course=course_obj)) == 0:
             print("saving studentCourse...")
             stu_course = StudentCourse(student=stu, course=course_obj)
             stu_course.save()
@@ -287,11 +294,15 @@ def initialize(request):
     user.save()
 
     if student:
-        stu = Student(user=user)
-        stu.save()
+        if len(Student.objects.filter(user=user)) == 0:
+            stu = Student(user=user)
+            stu.save()
+        else:
+            stu = Student.objects.get(user=user)
     else:
-        teacher = Staff(user=user)
-        teacher.save()
+        if len(Staff.objects.filter(user=user)) == 0:
+            teacher = Staff(user=user)
+            teacher.save()
 
     # Initialize UQ if needed
     if len(Institution.objects.filter(name="University of Queensland")) == 0:
@@ -304,6 +315,7 @@ def initialize(request):
                                     "lastname": last_name,
                                     "username": username,
                                     "student": int(student)}))
+
 
 def get_student_courses(request):
     json_body = json.loads(request.body)
@@ -330,6 +342,7 @@ def get_student_courses(request):
 
     else:
         return HttpResponse("failed auth")
+
 
 def get_student_grades(request):
     json_body = json.loads(request.body)
