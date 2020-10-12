@@ -222,7 +222,7 @@ function StudentApp(props) {
             <Assessment />
           </Route>
           <Route path="/feedback">
-            <Feedback />
+            <Feedback courses={courses}/>
           </Route>
           <Route path="/goals">
             <Goals />
