@@ -38,10 +38,11 @@ function Feedback(props) {
     setState({ ...state, anon: event.target.checked});
   }
 
-  const save = () => {
+  const handleSubmit = () => {
     console.log(state);
     props.sendFeedback(state);
   }
+  
 
   return (
     <Box width="80%">
@@ -89,7 +90,7 @@ function Feedback(props) {
             />
           </FormGroup>
         </FormControl>
-        <Button variant="contained" color="primary" size="large" onClick={save}>
+        <Button variant="contained" color="primary" size="large" onClick={handleSubmit}>
           SEND TO COORDINATOR
         </Button>
         <Link to="/">

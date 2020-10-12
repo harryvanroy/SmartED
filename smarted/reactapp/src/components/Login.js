@@ -64,7 +64,6 @@ export default function Login() {
   const [password, setPassword] = React.useState('');
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [key, setKey] = React.useState(null);
-  const [isTeacher, setIsTeacher] = React.useState(false);
 
 
   const handleSubmit = (event) => {
@@ -78,14 +77,15 @@ export default function Login() {
         withCredentials: true
       })
       .then(res => {
-      setKey(res.data.key);
-      localStorage.setItem('key', res.data.key);
-      localStorage.setItem('username', username);
-      console.log(res.data.key);
+        setKey(res.data.key);
+        localStorage.setItem('key', res.data.key);
+        localStorage.setItem('username', username);
+        localStorage.setItem('isTeacher', true);
+        console.log(res.data.key);
       }).then(res => {
-      setUsername('');
-      setPassword('');
-      setLoggedIn(true);
+        setUsername('');
+        setPassword('');
+        setLoggedIn(true);
       });
       event.preventDefault();
     } else {
@@ -98,14 +98,15 @@ export default function Login() {
         withCredentials: true
       })
       .then(res => {
-      setKey(res.data.key);
-      localStorage.setItem('key', res.data.key);
-      localStorage.setItem('username', username);
-      console.log(res.data.key);
+        setKey(res.data.key);
+        localStorage.setItem('key', res.data.key);
+        localStorage.setItem('username', username);
+        localStorage.setItem('isTeacher', false);
+        console.log(res.data.key);
       }).then(res => {
-      setUsername('');
-      setPassword('');
-      setLoggedIn(true);
+        setUsername('');
+        setPassword('');
+        setLoggedIn(true);
       });
       event.preventDefault();
     }
@@ -121,8 +122,7 @@ export default function Login() {
   };
   return (
     loggedIn ? <Redirect to={{
-      pathname: '/',
-      state: { teacher: localStorage.getItem('username').startsWith('uq') }
+      pathname: '/'
     }} /> : 
     <div>
     <Grid container component="main" className={classes.root}>
