@@ -77,6 +77,10 @@ function Goals({ courses, assessment }) {
     setGoals([...goals, state]);
   }
 
+  const getCourseNameFromID = (id) => {
+    return courses.filter(course => course.id === id)[0].name;
+  }
+
   const drawOverallGoal = () => {
     if (state.type == 1 && state.course != '') {
       return (
@@ -249,7 +253,7 @@ function Goals({ courses, assessment }) {
           {goals.filter(row => row.type === 4).map((row) => (
             <TableRow key={row.course}>
               <TableCell component="th" scope="row">
-                {row.course}
+                {getCourseNameFromID(row.course)}
               </TableCell>
               <TableCell align="right">{row.text}</TableCell>
             </TableRow>
@@ -269,7 +273,7 @@ function Goals({ courses, assessment }) {
           {goals.filter(row => row.type === 1).map((row) => (
             <TableRow key={row.course}>
               <TableCell component="th" scope="row">
-                {row.course}
+                {getCourseNameFromID(row.course)}
               </TableCell>
               <TableCell align="right">{row.grade}</TableCell>
             </TableRow>
@@ -289,7 +293,7 @@ function Goals({ courses, assessment }) {
           {goals.filter(row => row.type === 3).map((row) => (
             <TableRow key={row.course}>
               <TableCell component="th" scope="row">
-                {row.course}
+                {getCourseNameFromID(row.course)}
               </TableCell>
               <TableCell align="right">{row.hours}</TableCell>
             </TableRow>
@@ -310,7 +314,7 @@ function Goals({ courses, assessment }) {
           {goals.filter(row => row.type === 2).map((row) => (
             <TableRow key={row.course}>
               <TableCell component="th" scope="row">
-                {row.course}
+                {getCourseNameFromID(row.course)}
               </TableCell>
               <TableCell align="right">{row.assessment}</TableCell>
               <TableCell align="right">{row.grade}</TableCell>
