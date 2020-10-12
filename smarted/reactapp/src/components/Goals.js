@@ -12,6 +12,13 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -162,68 +169,110 @@ function Goals({ courses }) {
   };
   
   return (
-    <Box width="80%">
-      <Typography variant="h4">
-        Course Goals
-      </Typography>
-      
-      <Box m={2}>
-        <Button variant="contained" color="primary" size="large" onClick={handleOpen}>
-          ADD GOAL
-        </Button>
-        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
-        <DialogContent>
-          <Box m={2}>
-          <FormControl style={{marginBottom: 12}, {marginRight: 6}} variant="outlined" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              label="Course"
-              onChange={handleCourseChange}
-            >
-              {courses.map((a, index) => (
-                <MenuItem key={index} value={a.id}> {a.name} </MenuItem>
-              ))}
-            </Select>
-          </FormControl> {' '}
-          <FormControl style={{marginBottom: 12}} variant="outlined" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-outlined-label">Goal type</InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              label="Course"
-              onChange={handleGoalChange}
-            >
-              <MenuItem value={1}> Overall grade </MenuItem>
-              <MenuItem value={2}> Specific assessment grade </MenuItem>
-              <MenuItem value={3}> Weekly study time </MenuItem>
-              <MenuItem value={4}> Custom goal </MenuItem>
-            </Select>
-          </FormControl>
-          {drawOverallGoal()}
-          {drawAssessmentGoal()}
-          {drawStudyGoal()}
-          {drawTextField()}
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button variant="contained" onClick={handleSubmit} color="primary">
-            ADD
+    <div>
+      <Box width="80%">
+        <Typography variant="h4">
+          Course Goals
+        </Typography>
+        
+        <Box m={2}>
+          <Button variant="contained" color="primary" size="large" onClick={handleOpen}>
+            ADD GOAL
           </Button>
-          <Button onClick={handleClose} color="primary">
-            CLOSE
-          </Button>
-        </DialogActions>
-        </Dialog>
-        <Link to="/">
-          <Button color="primary" size="large"> 
-            Back
-          </Button>
-        </Link>
-      </Box>  
-    </Box>
+          <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+          <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
+          <DialogContent>
+            <Box m={2}>
+            <FormControl style={{marginBottom: 12}, {marginRight: 6}} variant="outlined" className={classes.formControl}>
+              <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                label="Course"
+                onChange={handleCourseChange}
+              >
+                {courses.map((a, index) => (
+                  <MenuItem key={index} value={a.id}> {a.name} </MenuItem>
+                ))}
+              </Select>
+            </FormControl> {' '}
+            <FormControl style={{marginBottom: 12}} variant="outlined" className={classes.formControl}>
+              <InputLabel id="demo-simple-select-outlined-label">Goal type</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                label="Course"
+                onChange={handleGoalChange}
+              >
+                <MenuItem value={1}> Overall grade </MenuItem>
+                <MenuItem value={2}> Specific assessment grade </MenuItem>
+                <MenuItem value={3}> Weekly study time </MenuItem>
+                <MenuItem value={4}> Custom goal </MenuItem>
+              </Select>
+            </FormControl>
+            {drawOverallGoal()}
+            {drawAssessmentGoal()}
+            {drawStudyGoal()}
+            {drawTextField()}
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="contained" onClick={handleSubmit} color="primary">
+              ADD
+            </Button>
+            <Button onClick={handleClose} color="primary">
+              CLOSE
+            </Button>
+          </DialogActions>
+          </Dialog>
+          <Link to="/">
+            <Button color="primary" size="large"> 
+              Back
+            </Button>
+          </Link>
+        </Box>
+      </Box>
+      <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
+      <Table className={classes.table} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Course</TableCell>
+            <TableCell align="right">Custom goal</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {goals.filter(row => row.type === 4).map((row) => (
+            <TableRow key={row.course}>
+              <TableCell component="th" scope="row">
+                {row.course}
+              </TableCell>
+              <TableCell align="right">{row.text}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
+      <Table className={classes.table} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Course</TableCell>
+            <TableCell align="right">Overall Grade</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {goals.filter(row => row.type === 3).map((row) => (
+            <TableRow key={row.course}>
+              <TableCell component="th" scope="row">
+                {row.course}
+              </TableCell>
+              <TableCell align="right">{row.hours}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    </div>
   )
 };
 
