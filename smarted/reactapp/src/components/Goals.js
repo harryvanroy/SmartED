@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Goals({ courses }) {
+function Goals({ courses, assessment }) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState({
@@ -41,23 +41,27 @@ function Goals({ courses }) {
   const [goals, setGoals] = React.useState([]);
 
   const handleCourseChange = (event) => {
-    setState({ ...state, course: event.target.value});
+    setState({ ...state, course: event.target.value} );
   }
 
   const handleTextChange = (event) => {
-    setState({ ...state, text: event.target.value});
+    setState({ ...state, text: event.target.value });
   }
 
   const handleHoursChange = (event) => {
-    setState({ ...state, hours: parseInt(event.target.value)});
+    setState({ ...state, hours: parseInt(event.target.value) });
   }
 
   const handleGoalChange = (event) => {
-    setState({ ...state, type: event.target.value, grade: 0, hours: 0, assessment: '', text: ''});
+    setState({ ...state, type: event.target.value, grade: 0, hours: 0, assessment: '', text: '' });
   }
 
   const handleAssessmentChange = (event) => {
-    setState({ ...state, assessment: event.target.value});
+    setState({ ...state, assessment: event.target.value });
+  }
+
+  const handleGradeChange = (event) => {
+    setState({ ...state, grade: parseInt(event.target.value) })
   }
 
   const handleOpen = () => {
@@ -81,7 +85,7 @@ function Goals({ courses }) {
           <FormControl style={{marginLeft: 6, marginRight: 6}} variant="outlined">
             <Select
               id="demo-simple-select-outlined"
-              onChange={handleCourseChange}
+              onChange={handleGradeChange}
             >
               <MenuItem value={1}> 1</MenuItem>
               <MenuItem value={2}> 2</MenuItem>
@@ -106,7 +110,7 @@ function Goals({ courses }) {
           <FormControl style={{marginLeft: 6, marginRight: 6}} variant="outlined">
             <Select
               id="demo-simple-select-outlined"
-              onChange={handleCourseChange}
+              onChange={handleGradeChange}
             >
               <MenuItem value={1}> 1</MenuItem>
               <MenuItem value={2}> 2</MenuItem>
@@ -123,8 +127,9 @@ function Goals({ courses }) {
               id="demo-simple-select-outlined"
               onChange={handleAssessmentChange}
             >
-              <MenuItem value={'a1'}> a1</MenuItem>
-              <MenuItem value={'a2'}> a2</MenuItem>
+              {assessment.filter(ass => ass.course === state.course).map(e => 
+                <MenuItem value={e.name}>{e.name}</MenuItem>
+              )}
             </Select>
           </FormControl>
         </Box>
@@ -257,7 +262,27 @@ function Goals({ courses }) {
         <TableHead>
           <TableRow>
             <TableCell>Course</TableCell>
-            <TableCell align="right">Overall Grade</TableCell>
+            <TableCell align="right">Overall grade</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {goals.filter(row => row.type === 1).map((row) => (
+            <TableRow key={row.course}>
+              <TableCell component="th" scope="row">
+                {row.course}
+              </TableCell>
+              <TableCell align="right">{row.grade}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
+      <Table className={classes.table} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Course</TableCell>
+            <TableCell align="right">Weekly study time</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -267,6 +292,28 @@ function Goals({ courses }) {
                 {row.course}
               </TableCell>
               <TableCell align="right">{row.hours}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+    <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
+      <Table className={classes.table} aria-label="simple table">
+        <TableHead>
+          <TableRow>
+            <TableCell>Course</TableCell>
+            <TableCell align="right">Assessment item</TableCell>
+            <TableCell align="right">Grade</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {goals.filter(row => row.type === 2).map((row) => (
+            <TableRow key={row.course}>
+              <TableCell component="th" scope="row">
+                {row.course}
+              </TableCell>
+              <TableCell align="right">{row.assessment}</TableCell>
+              <TableCell align="right">{row.grade}</TableCell>
             </TableRow>
           ))}
         </TableBody>
