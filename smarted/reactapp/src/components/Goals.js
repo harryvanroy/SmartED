@@ -31,6 +31,7 @@ function Goals({ courses }) {
     assessment: '',
     text: ''
   });
+  const [goals, setGoals] = React.useState([]);
 
   const handleCourseChange = (event) => {
     setState({ ...state, course: event.target.value});
@@ -62,6 +63,7 @@ function Goals({ courses }) {
   
   const handleSubmit = () => {
     console.log(state);
+    setGoals([...goals, state]);
   }
 
   const drawOverallGoal = () => {

@@ -21,7 +21,7 @@ import SubjectIcon from '@material-ui/icons/Sort';
 import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import HomeIcon from '@material-ui/icons/Home';
 
 import { Switch, Route, Link, NavLink } from 'react-router-dom';
 import Assessment from './components/Assessment';
@@ -164,7 +164,13 @@ function StudentApp(props) {
               SmartED
             </Link>
           </Typography>
+          <Typography style={{marginRight: 4}}>
+            VARK score:
+          </Typography>
           {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
+          <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
+            <HomeIcon style={{marginLeft: 10}}fontSize={'large'}/>
+          </Link>
         </Toolbar>
       </AppBar>
       <Drawer

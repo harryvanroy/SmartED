@@ -95,7 +95,7 @@ const TeacherApp = () => {
               SmartED
             </Link>
           </Typography>
-          <FormControl style={{marginRight: 11, marginTop: 5, marginBottom: 5}}variant="outlined" className={classes.formControl}>
+          <FormControl style={{marginRight: 18, marginTop: 5, marginBottom: 5}}variant="outlined" className={classes.formControl}>
             <InputLabel id="demo-simple-select-outlined-label" style={{color: 'white'}} >Course</InputLabel>
             <Select
               value={currentCourse}
