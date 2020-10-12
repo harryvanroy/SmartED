@@ -82,6 +82,7 @@ def get_vark(request):
     return HttpResponse(json.dumps(json_response))
 
 
+@csrf_exempt  # still need as its a POST
 def course_assessment(request):
     json_body = json.loads(request.body)
 
@@ -317,31 +318,24 @@ def initialize(request):
                                     "student": int(student)}))
 
 
+@csrf_exempt  # still need as its a POST (for now)
 def get_student_courses(request):
     json_body = json.loads(request.body)
-    username = json_body.get("username")
-    key = json_body.get("key")
+    username = json_body.get("username")  # required while in development...
+    # key = json_body.get("key")
 
-    if username is None or key is None:
+    if username is None:
         return HttpResponse('err')
 
-    # checks auth
-    if len([user for user in student_keys
-            if user["username"] == username and user["key"] == key]):
-        print("auth success for " + username + " " + str(key))
+    # auth successful - now get courses here
+    course_list = [student_course.course for student_course in StudentCourse.objects.all()
+                   if student_course.student.user.username == username]
 
-        # auth successful - now get courses here
-        course_list = [student_course.course for student_course in StudentCourse.objects.all()
-                       if student_course.student.user.username == username]
+    json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
+                     "semester": x.semester, "year": x.year}
+                    for x in course_list]
 
-        json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
-                         "semester": x.semester, "year": x.year}
-                        for x in course_list]
-
-        return HttpResponse(json.dumps(json_courses))
-
-    else:
-        return HttpResponse("failed auth")
+    return HttpResponse(json.dumps(json_courses))
 
 
 def get_student_grades(request):
