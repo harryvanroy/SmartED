@@ -69,7 +69,7 @@ class File(models.Model):
 
 
 class Institution(models.Model):
-    name = models.CharField(max_length=200, primary_key=True)
+    name = models.CharField(max_length=200)
 
     def __str__(self):
         return f"{self.name}"
@@ -172,6 +172,7 @@ class ResourceFeedback(models.Model):
 
     def __str__(self):
         return f"{self.id} {self.user} {self.resource} {self.lastUpdated} {self.feedback}"
+
 
 class CourseFeedback(models.Model):
     id = models.AutoField(primary_key=True)
