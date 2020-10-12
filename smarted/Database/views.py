@@ -8,6 +8,7 @@ from .scrape.scrape import *
 from .models import Course, Institution, AssessmentItem, StudentCourse, \
     User, Student, Staff, StaffCourse, StudentAssessment
 from django.core import serializers
+import re
 
 is_local = True
 
@@ -241,11 +242,17 @@ def initialize_course(header, stu):
     year = 2020
     mode = 'EXTERNAL'
 
+    print(header)
+    
     courses = []
     try:
         groups = json.loads(header['X-Kvd-Payload'])['groups']
-        [courses.append(x.split('-')[0].split('labs:')[1])
-         for x in groups if ("2020-2" in x)]
+        #[courses.append(x.split('-')[0].split('labs:')[1])
+         #for x in groups if ("2020-2" in x)]
+        for g in groups:
+            match = re.search(r'[a-zA-Z]{4}[0-9]{4}_*_*', g)
+            if match:
+                print(match.string.split("uq:")[1].split("_")[0])
     except:
         courses = ['comp3301', "deco3801", "comp3710", "coms4200"]
 
