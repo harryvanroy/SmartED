@@ -132,10 +132,11 @@ class StudentAssessment(models.Model):
     lastModified = models.DateTimeField(null=True)
     passFail = models.BooleanField(default=False)
     value = models.DecimalField(max_digits=10, decimal_places=4)
-    goal = models.DecimalField(max_digits=10, decimal_places=4)
+    goal = models.DecimalField(default=100, max_digits=10, decimal_places=4)
 
     def __str__(self):
         return f"{self.student} {self.assessment} {self.lastModified} {self.passFail} {self.value}"
+
 
 class ViewResource(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
@@ -149,6 +150,7 @@ class ViewResource(models.Model):
     def __str__(self):
         return f"{self.user} {self.course} {self.timestamp} {self.viewTime}"
 
+
 class CourseGradeGoal(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
@@ -160,7 +162,8 @@ class CourseGradeGoal(models.Model):
     def __str__(self):
         return f"{self.user} {self.resource} {self.dateAdded} {self.timeViewed}"
 
-class Feedback(models.Model):
+
+class ResourceFeedback(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, blank=True, null=True)
@@ -170,5 +173,12 @@ class Feedback(models.Model):
     def __str__(self):
         return f"{self.id} {self.user} {self.resource} {self.lastUpdated} {self.feedback}"
 
+class CourseFeedback(models.Model):
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    lastUpdated = models.DateTimeField(auto_now=True)
+    feedback = models.TextField()
 
-
+    def __str__(self):
+        return f"{self.id} {self.user} {self.course} {self.lastUpdated} {self.feedback}"
