@@ -7,12 +7,13 @@ import Login from './components/Login';
 import { Switch, Route, Link, NavLink } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute'
 
+
 ReactDOM.render(
   <BrowserRouter>
-    <Switch>
-      <Route path='/login' component={Login} />
-      <ProtectedRoute path='/' component={App} />
-    </Switch>
+      <Switch>
+        <Route path='/login' component={Login} />
+        <ProtectedRoute path='/' component={App} />
+      </Switch>
   </BrowserRouter>,
   document.getElementById('root')
 );
