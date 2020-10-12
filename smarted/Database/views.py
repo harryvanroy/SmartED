@@ -34,7 +34,7 @@ def teacher_auth(username, password):
 
     if len(User.objects.filter(username=username)) == 1 and \
             len(Staff.objects.filter(user=User.objects
-                .get(username=username))) == 1:
+                    .get(username=username))) == 1:
         return True
 
     return False
@@ -350,6 +350,49 @@ def log_in(request):
     return HttpResponse('err')
 
 
+# GET COURSES USING HEADER, DEFAULT IS:
+#   CSSE3301,
+#   DECO3801,
+#   COMP3710,
+#   COMS4200
+@csrf_exempt
+def get_courses(request):
+    json_header = request.headers
+    print(json_header)
+    courses = []
+    try:
+        groups = json_header['X-Kvd-Payload']['groups']
+        [courses.append(x.split('-')[0].split('labs:')[1])
+         for x in groups if ("2020-2" in x)]
+    except:
+        courses = ['CSSE3301', "DECO3801", "COMP3710", "COMS4200"]
+
+    return HttpResponse(json.dumps({"courses": courses}))
+
+
+# FIRST API CALL, INITALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
+@csrf_exempt
+def initialize(request):
+    json_header = request.headers
+    student = True
+    first_name = "Johnno"
+    last_name = "Sri"
+    username = "s69420"
+
+    try:
+        student = json_header['X-Uq-User-Type'] == 'Student'
+        first_name = json_header['X-Kvd-Payload']['firstname']
+        last_name = json_header['X-Kvd-Payload']['lastname']
+        username = json_header['X-Kvd-Payload']['user']
+    except:
+        pass
+
+    return HttpResponse(json.dumps({"firstname": first_name,
+                                    "lastname": last_name,
+                                    "username": username,
+                                    "student": int(student)}))
+
+
 @csrf_exempt
 def get_student_courses(request):
     json_body = json.loads(request.body)
@@ -416,11 +459,11 @@ def get_student_grades(request):
     # expected grade time
     if course_filter:
         total_weight = sum([int(grade.assessment.weight) for grade in grades])
-        total_earnt = sum([(grade.value/100) * int(grade.assessment.weight)
+        total_earnt = sum([(grade.value / 100) * int(grade.assessment.weight)
                            for grade in grades])
 
         if total_weight > 0:
-            current_grade = 100*(total_earnt/total_weight)
+            current_grade = 100 * (total_earnt / total_weight)
         else:
             current_grade = 100
 
