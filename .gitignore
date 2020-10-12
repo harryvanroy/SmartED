@@ -11,3 +11,6 @@ static
 geckodriver.log
 env
 db.sqlite3
+bin
+lib
+migrations/*

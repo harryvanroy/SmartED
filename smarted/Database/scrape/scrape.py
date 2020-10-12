@@ -1,3 +1,4 @@
+import os
 from selenium import webdriver
 from selenium.common.exceptions import InvalidArgumentException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
@@ -16,12 +17,17 @@ class UQBlackboardScraper:
         self.verbose = verbose
 
         if not chrome:
+            try:
+                os.mkdir("/tmp/www_fake_home/")
+            except FileExistsError:
+                pass
+            os.environ["HOME"] = "/tmp/www_fake_home/"
             print("starting driver as firefox")
             options = webdriver.FirefoxOptions()
             options.add_argument("--headless")
-            ua = UserAgent()
-            userAgent = ua.random
-            options.add_argument('user-agent={}'.format(userAgent))
+            #ua = UserAgent()
+            #userAgent = ua.random
+            #options.add_argument('user-agent={}'.format(userAgent))
             self.driver = webdriver.Firefox(options=options, service_log_path="/var/www/uwsgi/geckodriver.log")
         else:
             print("starting driver as chrome")
@@ -33,7 +39,7 @@ class UQBlackboardScraper:
 
         # Load
         self.driver.implicitly_wait(10)
-        
+
         # Login
         self.driver.find_element_by_xpath('//*[@id="username"]') \
             .send_keys(username)
@@ -41,7 +47,6 @@ class UQBlackboardScraper:
             .send_keys(password)
         self.driver.find_element_by_xpath('//*[@name="submit"]') \
             .click()
-        
 
     def get_learning_resources(self, course_id):
         self.driver.get(self.COURSE_URL % course_id)
@@ -92,10 +97,9 @@ class UQBlackboardScraper:
             item['title'] = post.find('h3').get_text().strip()
             item['content'] = post.find('div', class_='vtbegenerated').get_text().strip()
             item['date'] = post.find('div', class_='details') \
-                .find('p').get_text().split('Posted on:')[1][1:] 
+                               .find('p').get_text().split('Posted on:')[1][1:]
 
         return announced
-
 
     def get_current_courses(self):
         """
@@ -115,7 +119,7 @@ class UQBlackboardScraper:
             link = course.find("a")
             if link is None:
                 continue
-            
+
             course_id = link.attrs['href'].split("%")[-3].split("_")[1]
 
             # Unique identifier
@@ -125,23 +129,28 @@ class UQBlackboardScraper:
             # [COURSE_CODE] COURSE_NAME (St Lucia & external). 
             # Semester 2, 2020, Flexible Delivery
             course_info = courses[int(course_id)]
+            course_info['year'] = 2020
+            course_info['semester'] = "Semester 2"
             last_break = 1
             for i in range(len(link.text)):
                 if link.text[i] == ']':
-                    course_info['code'] = link.get_text()[last_break : i]
+                    course_info['code'] = link.get_text()[last_break: i]
                     last_break = i + 2
                 elif link.text[i] == '(':
-                    course_info['name'] = link.get_text()[last_break : i-1]
+                    course_info['name'] = link.get_text()[last_break: i - 1]
                     last_break = i + 1
                 elif link.text[i] == ')':
-                    course_info['delivery'] = link.get_text()[last_break : i]
+                    course_info['delivery'] = link.get_text()[last_break: i]
                     last_break = i + 3
-                elif link.text[i] == ',' and course_info.get("semester", None) is None:
-                    course_info['semester'] = link.get_text()[last_break : i]
-                    last_break = i + 2
-                elif link.text[i] == ',':
-                    course_info['year'] = link.get_text()[last_break : i]
-                
+                ## NOTE: BELOW DOES NOT WORK FOR SOME COURSES SO IS TEMPORARILY REPLACED WITH DEFAULTS..
+                ## NEEDS FIXING!!
+                #elif link.text[i] == ',' and course_info.get("semester", None) is None:
+                #    course_info['semester'] = link.get_text()[last_break: i]
+                #    last_break = i + 2
+                #elif link.text[i] == ',':
+                #    print(link.get_text()[last_break: i])
+                #    course_info['year'] = link.get_text()[last_break: i]
+
         return courses
 
 
@@ -157,4 +166,3 @@ if __name__ == "__main__":
     for course in courses.keys():
         resources = scraper.get_learning_resources(course)
         print(resources)
-

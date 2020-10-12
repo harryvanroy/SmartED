@@ -16,6 +16,7 @@ router.register('student', StudentViewSet, 'student')
 router.register('staff', StaffViewSet, 'staff')
 router.register('studentAssessment', StudentAssessmentViewSet, 'studentAssessment')
 router.register('courseGradeGoal', CourseGradeGoalViewSet, 'courseGradeGoal')
+router.register('feedback')
 urlpatterns = router.urls
 
 urlpatterns += [
