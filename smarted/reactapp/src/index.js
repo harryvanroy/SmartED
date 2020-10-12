@@ -4,9 +4,8 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import Login from './components/Login';
-import { Switch, Route, Link, NavLink } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
-import TeacherApp from './TeacherApp';
 
 
 ReactDOM.render(

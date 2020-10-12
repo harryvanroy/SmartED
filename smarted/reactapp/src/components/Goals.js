@@ -1,12 +1,11 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Container, Box, Typography } from '@material-ui/core';
+import { Button, Box, Typography } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -82,7 +81,7 @@ function Goals({ courses, assessment }) {
   }
 
   const drawOverallGoal = () => {
-    if (state.type == 1 && state.course != '') {
+    if (state.type === 1 && state.course !== '') {
       return (
         <Box>
           Get grade 
@@ -107,7 +106,7 @@ function Goals({ courses, assessment }) {
   };
 
   const drawAssessmentGoal = () => {
-    if (state.type == 2 && state.course != '') {
+    if (state.type === 2 && state.course !== '') {
       return (
         <Box>
           Get grade 
@@ -142,7 +141,7 @@ function Goals({ courses, assessment }) {
   };
 
   const drawStudyGoal = () => {
-    if (state.type == 3 && state.course != '') {
+    if (state.type === 3 && state.course !== '') {
       return (
         <Box>
           Spend
@@ -161,7 +160,7 @@ function Goals({ courses, assessment }) {
   };
 
   const drawTextField = () => {
-    if (state.type == 4 && state.course != '') {
+    if (state.type === 4 && state.course !== '') {
       return (
         <FormControl fullWidth>
           <TextField
@@ -192,7 +191,7 @@ function Goals({ courses, assessment }) {
           <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
           <DialogContent>
             <Box m={2}>
-            <FormControl style={{marginBottom: 12}, {marginRight: 6}} variant="outlined" className={classes.formControl}>
+            <FormControl style={{marginBottom: 12, marginRight: 6}} variant="outlined" className={classes.formControl}>
               <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
               <Select
                 labelId="demo-simple-select-outlined-label"
@@ -295,7 +294,7 @@ function Goals({ courses, assessment }) {
               <TableCell component="th" scope="row">
                 {getCourseNameFromID(row.course)}
               </TableCell>
-              <TableCell align="right">{row.hours}</TableCell>
+              <TableCell align="right">{row.hours} hours</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -2,7 +2,7 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -23,7 +23,7 @@ function Home({ assessment, courses }) {
       return new Date(8640000000000000);
     }
 
-    let splitStr = dateString.indexOf("-") != -1 
+    let splitStr = dateString.indexOf("-") !== -1 
     ? dateString.substr(dateString.indexOf("-") + 2).split(' ')
     : dateString.split(' ');
 

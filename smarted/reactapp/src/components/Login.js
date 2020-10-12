@@ -12,7 +12,6 @@ import Image from '../images/uq_0.jpg';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Redirect } from 'react-router';
-import { useHistory } from 'react-router-dom';
 
 // DETERMINE LOCATION
 var url;
@@ -59,12 +58,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Login() {
   const classes = useStyles();
-  const history = useHistory();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [loggedIn, setLoggedIn] = React.useState(false);
-  const [key, setKey] = React.useState(null);
-
 
   const handleSubmit = (event) => {
     if (username.startsWith('uq')) {
@@ -77,7 +73,6 @@ export default function Login() {
         withCredentials: true
       })
       .then(res => {
-        setKey(res.data.key);
         localStorage.setItem('key', res.data.key);
         localStorage.setItem('username', username);
         localStorage.setItem('isTeacher', true);
@@ -98,7 +93,6 @@ export default function Login() {
         withCredentials: true
       })
       .then(res => {
-        setKey(res.data.key);
         localStorage.setItem('key', res.data.key);
         localStorage.setItem('username', username);
         localStorage.setItem('isTeacher', false);

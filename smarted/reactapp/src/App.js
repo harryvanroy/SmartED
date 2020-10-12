@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import StudentApp from './StudentApp';
 import TeacherApp from './TeacherApp';
 
