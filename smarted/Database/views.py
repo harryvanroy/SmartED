@@ -350,27 +350,7 @@ def log_in(request):
     return HttpResponse('err')
 
 
-# GET COURSES USING HEADER, DEFAULT IS:
-#   CSSE3301,
-#   DECO3801,
-#   COMP3710,
-#   COMS4200
-@csrf_exempt
-def get_courses(request):
-    json_header = request.headers
-    print(json_header)
-    courses = []
-    try:
-        groups = json_header['X-Kvd-Payload']['groups']
-        [courses.append(x.split('-')[0].split('labs:')[1])
-         for x in groups if ("2020-2" in x)]
-    except:
-        courses = ['CSSE3301', "DECO3801", "COMP3710", "COMS4200"]
-
-    return HttpResponse(json.dumps({"courses": courses}))
-
-
-# FIRST API CALL, INITALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
+# FIRST API CALL, INITIALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
 @csrf_exempt
 def initialize(request):
     json_header = request.headers
@@ -378,7 +358,11 @@ def initialize(request):
     first_name = "Johnno"
     last_name = "Sri"
     username = "s69420"
+    sem = 2
+    year = 2020
+    mode = 'EXTERNAL'
 
+    # basic user info
     try:
         student = json_header['X-Uq-User-Type'] == 'Student'
         first_name = json_header['X-Kvd-Payload']['firstname']
@@ -386,6 +370,56 @@ def initialize(request):
         username = json_header['X-Kvd-Payload']['user']
     except:
         pass
+
+    user = User(username=username, firstName=first_name, lastName=last_name)
+    user.save()
+
+    if student:
+        stu = Student(user=user)
+        stu.save()
+    else:
+        teacher = Staff(user=user)
+        teacher.save()
+    #
+
+    # Initialize UQ if needed
+    if len(Institution.objects.filter(name="University of Queensland")) == 0:
+        UQ = Institution(name="University of Queensland")
+        UQ.save()
+    #
+
+    # initialize course info
+    courses = []
+    try:
+        groups = json_header['X-Kvd-Payload']['groups']
+        [courses.append(x.split('-')[0].split('labs:')[1])
+         for x in groups if ("2020-2" in x)]
+    except:
+        courses = ['COMP3301', "DECO3801", "COMP3710", "COMS4200"]
+
+    for course in courses:
+        if len(Course.objects.filter(name=course, mode=mode,
+                    semester=sem, year=year)) == 0:
+            # course not already in database
+            print("saving course...")
+            UQ = Institution.objects.get(name="University of Queensland")
+            course_obj = Course(name=course, mode=mode, semester=sem,
+                                year=year, institution=UQ)
+            course_obj.save()
+
+        course_obj = Course.objects.filter(name=course, mode=mode,
+                                           semester=sem, year=year)[0]
+        print(course_obj)
+
+        # SAVE STUDENT COURSES
+        # todo: what about teachers?!?!
+
+        if len(StudentCourse.objects
+                .filter(student=stu, course=course_obj)) == 0:
+            print("saving studentCourse...")
+            stu_course = StudentCourse(student=stu, course=course_obj)
+            stu_course.save()
+    #
 
     return HttpResponse(json.dumps({"firstname": first_name,
                                     "lastname": last_name,
