@@ -277,9 +277,9 @@ def initialize(request):
     # basic user info
     try:
         student = json_header['X-Uq-User-Type'] == 'Student'
-        first_name = json_header['X-Kvd-Payload']['firstname']
-        last_name = json_header['X-Kvd-Payload']['lastname']
-        username = json_header['X-Kvd-Payload']['user']
+        first_name = json.loads(json_header['X-Kvd-Payload'])['firstname']
+        last_name = json.loads(json_header['X-Kvd-Payload'])['lastname']
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
     except:
         pass
 

@@ -13,4 +13,6 @@ env
 db.sqlite3
 bin
 lib
-migrations/00*
+migrations
+scrape.py.orig
+core
