@@ -11,11 +11,15 @@ from django.core import serializers
 
 is_local = True
 
-@csrf_exempt
+def check_valid_key(key):
+    return True
+
 def students_in_course(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
     key = json_body.get("key")
+    if not check_valid_key(key):
+        return HttpResponse("")
 
     course = Course.objects.get(id=json_body.get("courseID"))
 
@@ -26,15 +30,12 @@ def students_in_course(request):
 
     return HttpResponse(json.dumps(json_students))
 
-@csrf_exempt
 def student_assessment_grade(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
     key = json_body.get("key")
 
     ass_item = AssessmentItem.objects.get(id=json_body.get("assID"))
-
-    # todo: check staff can actually modify course here (i.e. is in courseStaff)
 
     stu_user = User.objects.get(username=json_body.get("studentID"))
     student = Student.objects.get(user=stu_user)
@@ -64,8 +65,6 @@ def post_vark(request):
     stu.save()
     return HttpResponse("")
 
-
-@csrf_exempt
 def get_vark(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
@@ -77,7 +76,6 @@ def get_vark(request):
                      "R": str(stu.R), "K": str(stu.K)}
     return HttpResponse(json.dumps(json_response))
 
-@csrf_exempt
 def course_assessment(request):
     json_body = json.loads(request.body)
 
@@ -187,51 +185,7 @@ def blackboard_scrape(username, pword, chrome=False):
 
     return True
 
-
-@csrf_exempt  # warning: might be bad practice?
-def log_in(request):
-    global is_local
-    # extract json from post method
-    # todo: subject to change depending on how we decide to format
-    json_post = json.loads(request.body)
-    username = json_post.get("username")
-    pword = json_post.get("password")
-
-    is_local = True
-
-    json_header = request.headers
-    print(json_header)
-    try:
-        print("Cookie: ", json_header['Cookie'])
-        is_local = 'EAIT_WEB' not in json_header['Cookie']
-    except:
-        pass
-    print("IS LOCAL: ", is_local)
-
-    if username is not None and pword is not None:
-        # this is where the login scrape is called
-        # the scrape checks if their data is in the database already
-        # else it will login and add all relevant data to database.
-        # it should return something that indicates if the log in
-        # was successful
-
-        successful_login = blackboard_scrape(username, pword, chrome=is_local)
-        if successful_login:
-            # todo: the following is VERY poor practice, temporary only...
-            random.seed(pword)
-            key = random.randint(0, 1000000)
-            # save username with key such that the session continues
-            student_keys.append({"username": username, "key": key})
-
-            jsons_response = "{" + \
-                             f'"key": {key}' + "}"
-            return HttpResponse(jsons_response)
-
-    return HttpResponse('err')
-
-
 # FIRST API CALL, INITIALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
-@csrf_exempt
 def initialize(request):
     json_header = request.headers
     student = True
@@ -260,26 +214,22 @@ def initialize(request):
     else:
         teacher = Staff(user=user)
         teacher.save()
-    #
 
     # Initialize UQ if needed
     if len(Institution.objects.filter(name="University of Queensland")) == 0:
         UQ = Institution(name="University of Queensland")
         UQ.save()
-    #
 
     # initialize course info
     courses = []
     try:
-        groups = json_header['X-Kvd-Payload']['groups']
-        [courses.append(x.split('-')[0].split('labs:')[1])
-         for x in groups if ("2020-2" in x)]
+        groups = [json_header['X-Kvd-Payload']['groups'][courses.append(x.split('-')[0].split('labs:')[1])] for x in groups if ("2020-2" in x)]
     except:
         courses = ['COMP3301', "DECO3801", "COMP3710", "COMS4200"]
 
     for course in courses:
-        if len(Course.objects.filter(name=course, mode=mode,
-                    semester=sem, year=year)) == 0:
+        if len(Course.objects.filter(
+                name=course, mode=mode, semester=sem, year=year)) == 0:
             # course not already in database
             print("saving course...")
             UQ = Institution.objects.get(name="University of Queensland")
@@ -287,27 +237,20 @@ def initialize(request):
                                 year=year, institution=UQ)
             course_obj.save()
 
-        course_obj = Course.objects.filter(name=course, mode=mode,
-                                           semester=sem, year=year)[0]
-        print(course_obj)
-
-        # SAVE STUDENT COURSES
-        # todo: what about teachers?!?!
+        course_obj = Course.objects.filter(
+            name=course, mode=mode, semester=sem, year=year)[0]
 
         if len(StudentCourse.objects
                 .filter(student=stu, course=course_obj)) == 0:
             print("saving studentCourse...")
             stu_course = StudentCourse(student=stu, course=course_obj)
             stu_course.save()
-    #
 
     return HttpResponse(json.dumps({"firstname": first_name,
                                     "lastname": last_name,
                                     "username": username,
                                     "student": int(student)}))
 
-
-@csrf_exempt
 def get_student_courses(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
@@ -334,8 +277,6 @@ def get_student_courses(request):
     else:
         return HttpResponse("failed auth")
 
-
-@csrf_exempt
 def get_student_grades(request):
     json_body = json.loads(request.body)
     username = json_body.get("username")
