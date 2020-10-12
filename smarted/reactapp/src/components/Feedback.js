@@ -9,6 +9,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Feedback(props) {
+function Feedback({ courses }) {
   const classes = useStyles();
   const [state, setState] = React.useState({
     course: '',
@@ -59,10 +60,9 @@ function Feedback(props) {
             label="Course"
             onChange={handleCourseChange}
           >
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
-            <MenuItem value={4}>4</MenuItem>
+            {courses.map((a, index) => (
+              <MenuItem key={index} value={a.id}> {a.name} </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <div>
