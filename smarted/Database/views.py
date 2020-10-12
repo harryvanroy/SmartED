@@ -239,7 +239,7 @@ def initialize_course(header, stu):
         [courses.append(x.split('-')[0].split('labs:')[1])
          for x in groups if ("2020-2" in x)]
     except:
-        courses = ['COMP3301', "DECO3801", "COMP3710", "COMS4200"]
+        courses = ['comp3301', "deco3801", "comp3710", "coms4200"]
 
     for course in courses:
         if len(Course.objects.filter(name=course, mode=mode,

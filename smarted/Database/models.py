@@ -31,6 +31,7 @@ class Student(models.Model):
     A = models.DecimalField(max_digits=5, decimal_places=4, null=True)
     R = models.DecimalField(max_digits=5, decimal_places=4, null=True)
     K = models.DecimalField(max_digits=5, decimal_places=4, null=True)
+    unique_key = "user"
 
     def __str__(self):
         return f"{self.user} / V:{self.V} A:{self.A} R:{self.R} K:{self.K}"
@@ -38,6 +39,7 @@ class Student(models.Model):
 
 class Staff(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    unique_key = "user"
 
     def __str__(self):
         return f"{self.user}"
@@ -185,6 +187,7 @@ class CourseFeedback(models.Model):
 
     def __str__(self):
         return f"{self.id} {self.user} {self.course} {self.lastUpdated} {self.feedback}"
+
 
 class DailyGoals(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
