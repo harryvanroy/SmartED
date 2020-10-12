@@ -180,6 +180,7 @@ class CourseFeedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
     lastUpdated = models.DateTimeField(auto_now=True)
+    anonymous = models.BooleanField(default=False)
     feedback = models.TextField()
 
     def __str__(self):
