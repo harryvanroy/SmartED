@@ -13,4 +13,4 @@ env
 db.sqlite3
 bin
 lib
-migrations/*
+migrations/00*
