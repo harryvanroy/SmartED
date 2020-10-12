@@ -350,6 +350,45 @@ def log_in(request):
     return HttpResponse('err')
 
 
+# helper for initialize
+def initialize_course(header, stu):
+    sem = 2
+    year = 2020
+    mode = 'EXTERNAL'
+
+    courses = []
+    try:
+        groups = header['X-Kvd-Payload']['groups']
+        [courses.append(x.split('-')[0].split('labs:')[1])
+         for x in groups if ("2020-2" in x)]
+    except:
+        courses = ['COMP3301', "DECO3801", "COMP3710", "COMS4200"]
+
+    for course in courses:
+        if len(Course.objects.filter(name=course, mode=mode,
+                                     semester=sem, year=year)) == 0:
+            # course not already in database
+            print("saving course...")
+            UQ = Institution.objects.get(name="University of Queensland")
+            course_obj = Course(name=course, mode=mode, semester=sem,
+                                year=year, institution=UQ)
+            course_obj.save()
+
+        course_obj = Course.objects.filter(name=course, mode=mode,
+                                           semester=sem, year=year)[0]
+        print(course_obj)
+
+        # SAVE STUDENT COURSES
+        # todo: what about teachers?!?!
+
+        if len(StudentCourse.objects
+                .filter(student=stu, course=course_obj)) == 0:
+            print("saving studentCourse...")
+            stu_course = StudentCourse(student=stu, course=course_obj)
+            stu_course.save()
+    #
+
+
 # FIRST API CALL, INITIALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
 @csrf_exempt
 def initialize(request):
@@ -358,9 +397,6 @@ def initialize(request):
     first_name = "Johnno"
     last_name = "Sri"
     username = "s69420"
-    sem = 2
-    year = 2020
-    mode = 'EXTERNAL'
 
     # basic user info
     try:
@@ -388,38 +424,7 @@ def initialize(request):
         UQ.save()
     #
 
-    # initialize course info
-    courses = []
-    try:
-        groups = json_header['X-Kvd-Payload']['groups']
-        [courses.append(x.split('-')[0].split('labs:')[1])
-         for x in groups if ("2020-2" in x)]
-    except:
-        courses = ['COMP3301', "DECO3801", "COMP3710", "COMS4200"]
-
-    for course in courses:
-        if len(Course.objects.filter(name=course, mode=mode,
-                    semester=sem, year=year)) == 0:
-            # course not already in database
-            print("saving course...")
-            UQ = Institution.objects.get(name="University of Queensland")
-            course_obj = Course(name=course, mode=mode, semester=sem,
-                                year=year, institution=UQ)
-            course_obj.save()
-
-        course_obj = Course.objects.filter(name=course, mode=mode,
-                                           semester=sem, year=year)[0]
-        print(course_obj)
-
-        # SAVE STUDENT COURSES
-        # todo: what about teachers?!?!
-
-        if len(StudentCourse.objects
-                .filter(student=stu, course=course_obj)) == 0:
-            print("saving studentCourse...")
-            stu_course = StudentCourse(student=stu, course=course_obj)
-            stu_course.save()
-    #
+    initialize_course(json_header, stu)
 
     return HttpResponse(json.dumps({"firstname": first_name,
                                     "lastname": last_name,
