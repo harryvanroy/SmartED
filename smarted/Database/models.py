@@ -120,7 +120,6 @@ class AssessmentItem(models.Model):
 class StudentCourse(models.Model):
     student = models.ForeignKey(Student, on_delete=models.SET_NULL, blank=True, null=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
-    weeklyGoal = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(168)])
     unique_key = ("student", "course")
 
 
@@ -137,7 +136,6 @@ class StudentAssessment(models.Model):
     lastModified = models.DateTimeField(null=True)
     passFail = models.BooleanField(default=False)
     value = models.DecimalField(max_digits=10, decimal_places=4)
-    goal = models.DecimalField(default=100, max_digits=10, decimal_places=4)
 
     def __str__(self):
         return f"{self.student} {self.assessment} {self.lastModified} {self.passFail} {self.value}"
@@ -193,3 +191,35 @@ class DailyGoals(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     lastUpdated = models.DateField(auto_now_add=True)
     complete = models.BooleanField(null=False, default=False)
+
+class LongTermGoals(models.Model):
+    COURSEGRADE = 1
+    ASSESSMENTGRADE = 2
+    STUDYWEEK = 3
+    CUSTOM = 4
+    Goal_Types = [
+        (COURSEGRADE, 1),
+        (ASSESSMENTGRADE, 2),
+        (STUDYWEEK, 3),
+        (CUSTOM, 4)
+    ]
+
+    type = models.PositiveSmallIntegerField(null=False, choices=Goal_Types, default=CUSTOM, validators=(MinValueValidator(1), MaxValueValidator(4)))
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+
+    class Meta:
+        unique_together = ('type', 'course', 'user')
+
+    # For type 1
+    courseGrade = models.PositiveSmallIntegerField(null=True, default=1, validators=(MinValueValidator(1), MaxValueValidator(7)))
+
+    # For type 2
+    assessment = models.ForeignKey(AssessmentItem, on_delete=models.SET_NULL, blank=True, null=True)
+    assessmentGrade = models.PositiveIntegerField(null=True)
+
+    # For type 3
+    hourGoal = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(168)])
+
+    # For type 4
+    customGoal = models.TextField(null=True, max_length=300)
