@@ -2,7 +2,7 @@ import React from 'react';
 
 const TeacherResources = ({ course }) => (
   <div>
-    Teacher resources page for {course}
+    Teacher resources page for {course.name}
   </div>
 )
 

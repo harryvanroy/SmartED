@@ -79,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function StudentApp({ user }) {
+const StudentApp = ({ user }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [vark, setVark] = React.useState({});
@@ -99,7 +99,7 @@ function StudentApp({ user }) {
             "R": score['R'], "K": score['K']
           },
           withCredentials: true
-        });
+    });
   };
 
   useEffect(() => {

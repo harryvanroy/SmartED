@@ -8,7 +8,7 @@ from .models import *
 import re
 
 is_local = True
-FORCE_TEACHER = False
+FORCE_TEACHER = True
 
 DEFAUlT_TEACHER_USER = "uqTeacher1"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"

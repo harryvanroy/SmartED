@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -25,6 +25,7 @@ import Select from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import HomeIcon from '@material-ui/icons/Home';
+import axios from 'axios';
 
 const drawerWidth = 200;
 
@@ -74,100 +75,137 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 100,
   },
   selectBorder: {
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'white'
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white"
     }
   }
 }));
 
 const TeacherApp = ({ user }) => {
   const classes = useStyles();
-  const [courses, setCourses] = React.useState(['MEME1000', 'TROL2001', 'HARI2022', 'XDXD200']);
-  const [currentCourse, setCurrentCourse] = React.useState(courses[0]);
+  const [courses, setCourses] = React.useState([]);
+  const [currentCourse, setCurrentCourse] = React.useState({
+    "name": " ",
+  });
+  const [assessment, setAssessment] = React.useState([]);
+
+  useEffect(() => {
+    axios(url+'/Database/teacher-courses/', {
+      method: "get",
+      withCredentials: true
+      })
+      .then(res => {
+        console.log(res.data);
+        setCourses(res.data);
+        console.log(res.data[0])
+        setCurrentCourse(res.data[0]);
+        let resp = [];
+        let promises = [];
+        res.data.map(course => {
+          promises.push(
+            axios(url+`/Database/course-assessment/?id=${course.id}`, {
+              method: "get",
+              withCredentials: true
+            })
+            .then(resAss => {
+              resp.push([...new Set(resAss.data
+                .map(o => JSON.stringify(o)))]
+                .map(s => JSON.parse(s)));
+            })
+          );
+        });
+        Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
+      });
+  }, []);
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h4" noWrap style={{flexGrow: 1}}>
-            <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
-              SmartED
-            </Link>
-          </Typography>
-          <FormControl style={{marginRight: 18, marginTop: 5, marginBottom: 5}}variant="outlined" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-outlined-label" style={{color: 'white'}} >Course</InputLabel>
-            <Select
-              value={currentCourse}
-              className={classes.selectBorder}
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              label="Course"
-              style={{color: 'white'}}
-              onChange={(e) => setCurrentCourse(e.target.value)}
-              >
-              {courses.map((a, index) => (
-                <MenuItem key={index} value={a}> {a} </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
-            <HomeIcon fontSize={'large'}/>
-          </Link>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <Toolbar />
-        <div className={classes.drawerContainer}>
-          <List>
-            {['Students', 'Resources', 'Grades', 'Feedback'].map((text, index) => (
-                <ListItem 
-                  button key={text} component={NavLink} 
-                  to={['/teacherstudents', '/teacherresources', '/teachergrades', '/teacherfeedback'][index]} 
-                  activeStyle={{ background: 'rgb(0, 0, 0, 0.1)'}}
+    <div>
+      <div className={classes.root}>
+        <CssBaseline />
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
+              <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
+                SmartED
+              </Link>
+            </Typography>
+            <Typography style={{marginLeft: 20, flexGrow: 1}}>
+              Welcome {user.firstname}!
+            </Typography>
+            <FormControl style={{marginRight: 18, marginTop: 5, marginBottom: 5}}variant="outlined" className={classes.formControl}>
+              <InputLabel id="demo-simple-select-outlined-label" style={{color: 'white'}} >Course</InputLabel>
+              <Select
+                value={currentCourse}
+                className={classes.selectBorder}
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                label="Course"
+                style={{color: 'white'}}
+                onChange={(e) => setCurrentCourse(e.target.value)}
                 >
-                  <ListItemIcon>
-                  {
-                    { 
-                      0: <SupervisedUserCircleIcon />,
-                      1: <SubjectIcon />,
-                      2: <SchoolIcon />,
-                      3: <FeedbackIcon />,
-                    }[index]
-                  }
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItem>
-              ))}
-          </List>
-        </div>
-      </Drawer>
-      <main className={classes.content}>
-        <Toolbar />
-        <Switch>
-          <Route path="/teacherstudents">
-            <Students course={currentCourse} />
-          </Route>
-          <Route path="/teacherresources">
-            <TeacherResources course={currentCourse} />
-          </Route>
-          <Route path="/teachergrades">
-            <TeacherGrades course={currentCourse} />
-          </Route>
-          <Route path="/teacherfeedback">
-            <TeacherFeedback course={currentCourse} />
-          </Route>
-          <Route path="/">
-            <TeacherHome course={currentCourse} />
-          </Route>
-        </Switch>
-      </main>
+                {courses.map((a, index) => 
+                  <MenuItem key={index} value={a}> {a.name} </MenuItem>
+                )}
+              </Select>
+            </FormControl>
+            <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
+              <HomeIcon fontSize={'large'}/>
+            </Link>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          className={classes.drawer}
+          variant="permanent"
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <Toolbar />
+          <div className={classes.drawerContainer}>
+            <List>
+              {['Students', 'Resources', 'Grades', 'Feedback'].map((text, index) => (
+                  <ListItem 
+                    button key={text} component={NavLink} 
+                    to={['/teacherstudents', '/teacherresources', '/teachergrades', '/teacherfeedback'][index]} 
+                    activeStyle={{ background: 'rgb(0, 0, 0, 0.1)'}}
+                  >
+                    <ListItemIcon>
+                    {
+                      { 
+                        0: <SupervisedUserCircleIcon />,
+                        1: <SubjectIcon />,
+                        2: <SchoolIcon />,
+                        3: <FeedbackIcon />,
+                      }[index]
+                    }
+                    </ListItemIcon>
+                    <ListItemText primary={text} />
+                  </ListItem>
+                ))}
+            </List>
+          </div>
+        </Drawer>
+        <main className={classes.content}>
+          <Toolbar />
+          <Switch>
+            <Route path="/teacherstudents">
+              <Students course={currentCourse} />
+            </Route>
+            <Route path="/teacherresources">
+              <TeacherResources course={currentCourse} />
+            </Route>
+            <Route path="/teachergrades">
+              <TeacherGrades assessment={assessment} course={currentCourse} />
+            </Route>
+            <Route path="/teacherfeedback">
+              <TeacherFeedback course={currentCourse} />
+            </Route>
+            <Route path="/">
+              <TeacherHome course={currentCourse} />
+            </Route>
+          </Switch>
+        </main>
+      </div>
     </div>
   );
 };
