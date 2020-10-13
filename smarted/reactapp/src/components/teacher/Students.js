@@ -2,7 +2,7 @@ import React from 'react';
 
 const Students = ({ course }) => (
   <div>
-    Students page for {course}
+    Students page for {course.name}
   </div>
 )
 

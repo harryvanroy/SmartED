@@ -2,7 +2,7 @@ import React from 'react';
 
 const TeacherFeedback = ({ course }) => (
   <div>
-    Teacher feedback page for {course}
+    Teacher feedback page for {course.name}
   </div>
 )
 
