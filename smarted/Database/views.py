@@ -42,7 +42,7 @@ def initialize_course(header, stu):
                 print(match.string.split("uq:")[1].split("_")[0])
                 courses.append(match.string.split("uq:")[1].split("_")[0])
     except:
-        courses = ['COMP3301', "DECO3801", "COMP3506", "COMS4200"]
+        courses = ['COMP3301', "DECO3801", "COMP3506", "COMS4200", "ECON3520"]
 
     for course in courses:
         if len(Course.objects.filter(name=course, mode=mode,
@@ -258,8 +258,8 @@ def get_student_grades(request):
 
     # expected grade time
     if course_filter:
-        total_weight = sum([int(grade.assessment.weight) for grade in grades])
-        total_earnt = sum([(grade.value / 100) * int(grade.assessment.weight)
+        total_weight = sum([float(grade.assessment.weight) for grade in grades])
+        total_earnt = sum([(float(grade.value) / 100) * float(grade.assessment.weight)
                            for grade in grades])
 
         if total_weight > 0:
