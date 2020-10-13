@@ -8,12 +8,19 @@ from .models import *
 import re
 
 is_local = True
+FORCE_TEACHER = True
+
+DEFAUlT_TEACHER_USER = "uqTeacher1"
+DEFAULT_TEACHER_FIRST_NAME = "Johnno"
+DEFAULT_TEACHER_LAST_NAME = "Sri"
+
 DEFAULT_USER = "s4532094"
-DEFAUlT_TEACHER_USER = "uqGeorge"
-DEFAULT_IS_STUDENT = True
 DEFAULT_FIRST_NAME = "George"
 DEFAULT_LAST_NAME = "Test"
 
+from . import teacher_views  # down here to avoid circular import error
+
+######################## INIT #########################################
 
 # helper for initialize
 def initialize_course(header, stu):
@@ -65,19 +72,26 @@ def initialize_course(header, stu):
 def initialize(request):
     json_header = request.headers
 
-    is_student = DEFAULT_IS_STUDENT
-    first_name = DEFAULT_FIRST_NAME
-    last_name = DEFAULT_LAST_NAME
-    username = DEFAULT_USER
-
     # basic user info
     try:
+        # extracts from header (works only on live site)
         is_student = json_header['X-Uq-User-Type'] == 'Student'
         first_name = json.loads(json_header['X-Kvd-Payload'])['firstname']
         last_name = json.loads(json_header['X-Kvd-Payload'])['lastname']
         username = json.loads(json_header['X-Kvd-Payload'])['user']
     except:
-        pass
+        # default student data if header fetch fails (i.e. not on live site)
+        is_student = True
+        first_name = DEFAULT_FIRST_NAME
+        last_name = DEFAULT_LAST_NAME
+        username = DEFAULT_USER
+
+    # overwrites fetched data if force_teacher flag is set
+    if FORCE_TEACHER:
+        username = DEFAUlT_TEACHER_USER
+        first_name = DEFAULT_TEACHER_FIRST_NAME
+        last_name = DEFAULT_TEACHER_LAST_NAME
+        is_student = False
 
     user = User(username=username, firstName=first_name, lastName=last_name)
     user.save()
@@ -93,12 +107,16 @@ def initialize(request):
         if len(Staff.objects.filter(user=user)) == 0:
             teacher = Staff(user=user)
             teacher.save()
+        else:
+            teacher = Staff.objects.get(user=user)
+        teacher_views.initialize_teacher_courses(json_header, teacher)
 
     return HttpResponse(json.dumps({"firstname": first_name,
                                     "lastname": last_name,
                                     "username": username,
                                     "is_student": int(is_student)}))
 
+#########################################################
 
 @csrf_exempt  # has to be csrf excempt for post request
 def vark(request):

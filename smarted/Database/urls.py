@@ -25,6 +25,7 @@ urlpatterns += [
     path('get-grades/', views.get_student_grades, name='get-grades'),
     path('initialize/', views.initialize, name='initialize'),
 
+    path('teacher-courses/', teacher_views.get_teacher_courses, name='teacher-courses'),
     path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),
     path('student-assessment-grade/', teacher_views.student_assessment_grade, name='student-assessment-grade'),
 ]
