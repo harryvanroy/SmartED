@@ -11,7 +11,7 @@ import re
 is_local = True
 DEFAULT_USER = "s4532094"
 DEFAULT_FIRST_NAME = "George"
-DEFAULT_LAST_NAME = "Mulhearn"
+DEFAULT_LAST_NAME = "Test"
 
 
 # helper for initialize
@@ -40,7 +40,7 @@ def initialize_course(header, stu):
                 print(match.string.split("uq:")[1].split("_")[0])
                 courses.append(match.string.split("uq:")[1].split("_")[0])
     except:
-        courses = ['COMP3301', "DECO3801", "COMP3710", "COMS4200"]
+        courses = ['COMP3301', "DECO3801", "COMP3506", "COMS4200"]
 
     for course in courses:
         if len(Course.objects.filter(name=course, mode=mode,
