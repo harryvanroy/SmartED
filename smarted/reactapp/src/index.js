@@ -1,18 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import StudentApp from './StudentApp';
 import { BrowserRouter } from 'react-router-dom';
-import Login from './components/Login';
-import { Switch, Route, Link, NavLink } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute'
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import TeacherApp from './TeacherApp';
 
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
+
+const App = () => {
+  const [user, setUser] = React.useState({});
+  const useEffect = () => {
+    axios(url+'/Database/initialize/', {
+      method: "get",
+      withCredentials: true
+    }).then(res => {
+      setUser(res);
+    })
+  }
+  return (
+    <StudentApp />
+  )
+}
 ReactDOM.render(
   <BrowserRouter>
-    <Switch>
-      <Route path='/login' component={Login} />
-      <ProtectedRoute path='/' component={App} />
-    </Switch>
+    <App />
   </BrowserRouter>,
   document.getElementById('root')
 );

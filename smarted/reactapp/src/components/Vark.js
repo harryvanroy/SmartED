@@ -1,5 +1,4 @@
 import React from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -8,12 +7,14 @@ import FormControl from '@material-ui/core/FormControl';
 import {  Box, Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 
+/*
 const useStyles = makeStyles({
   root: {
     maxWidth: 1000,
     flexGrow: 1,
   }
 });
+*/
 
 const questions = [
   {
@@ -199,7 +200,7 @@ export default function Vark(props) {
   const saveResults = () => {
     for (var i = 0; i < 16; i++) {
       for (var j = 0; j < 4; j++) {
-        if (state["checked"+String.fromCharCode(j+65)+String(i)] == true) {
+        if (state["checked"+String.fromCharCode(j+65)+String(i)] === true) {
           scores[scoring[i][j]] += 1;
         }
       }

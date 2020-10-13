@@ -16,41 +16,9 @@ console.log("location: " + url);
 
 
 function Grades() {
-  let user_courses = [9, 10, 11, 12];
-  async function get_course_grades(courseID) {
-      let data = {
-          "username": localStorage.getItem('username'),
-          "key": parseInt(localStorage.getItem('key')),
-          "courseID": courseID
-      };
-      let result = {};
-      await axios(url + '/Database/get-grades/', {
-          method: "post",
-          data: data,
-          withCredentials: true
-      }).then(res => {
-          console.log(res);
-          console.log(res.data);
-          result = res.data;
-      });
-
-      return result;
-  }
-
-  let course;
-  let results = [];
-  for (course of user_courses) {
-      let result = get_course_grades(course);
-      console.log(result);
-      results.concat(result);
-  }
-
   return (
     <div>
       Grades page.
-      <ul>
-          {results.map(result => (<li>{JSON.stringify(result)}</li>))}
-      </ul>
     </div>
   );
 };

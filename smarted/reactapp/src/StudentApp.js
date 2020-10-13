@@ -21,6 +21,7 @@ import SubjectIcon from '@material-ui/icons/Sort';
 import SchoolIcon from '@material-ui/icons/School';
 import ClassIcon from '@material-ui/icons/Class';
 import FingerprintIcon from '@material-ui/icons/Fingerprint';
+import HomeIcon from '@material-ui/icons/Home';
 
 import { Switch, Route, Link, NavLink } from 'react-router-dom';
 import Assessment from './components/Assessment';
@@ -78,7 +79,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function App() {
+function StudentApp(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const [vark, setVark] = React.useState({});
@@ -91,11 +92,9 @@ function App() {
 
   const setParentVarkScore = (score) => {
     setVark(score);
-    axios(url+'/Database/post-vark/', {
+    axios(url+'/Database/vark/', {
           method: "post",
           data: {
-            "username": localStorage.getItem('username'),
-            "key": parseInt(localStorage.getItem('key')), 
             "V": score['V'], "A": score['A'], 
             "R": score['R'], "K": score['K']
           },
@@ -104,15 +103,8 @@ function App() {
   };
 
   useEffect(() => {
-      console.log(localStorage.getItem('username'));
-      console.log(localStorage.getItem('key'));
-      console.log('test');
       axios(url+'/Database/student-courses/', {
-        method: "post",
-        data: {
-          "username": localStorage.getItem('username'), 
-          "key": parseInt(localStorage.getItem('key'))
-        },
+        method: "get",
         withCredentials: true
         })
         .then(res => {
@@ -122,11 +114,8 @@ function App() {
           let promises = [];
           res.data.map(course => {
             promises.push(
-              axios(url+'/Database/course-assessment/', {
-                method: "post",
-                data: {
-                  'id': course.id
-                },
+              axios(url+`/Database/course-assessment/?id=${course.id}`, {
+                method: "get",
                 withCredentials: true
               })
               .then(resAss => {
@@ -138,12 +127,8 @@ function App() {
           });
           Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
         });
-      axios(url+'/Database/get-vark/', {
-          method: "post",
-          data: {
-            "username": localStorage.getItem('username'),
-            "key": parseInt(localStorage.getItem('key'))
-          },
+      axios(url+'/Database/vark/', {
+          method: "get",
           withCredentials: true
         })
         .then(res => {
@@ -152,17 +137,24 @@ function App() {
         });
   }, []);
 
+
   return (
     <div className={classes.root}>
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-            <Typography variant="h4" noWrap style={{flexGrow: 1}}>
+          <Typography variant="h4" noWrap style={{flexGrow: 1}}>
             <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
               SmartED
             </Link>
           </Typography>
-            {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
+          <Typography style={{marginRight: 4}}>
+            VARK score:
+          </Typography>
+          {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
+          <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
+            <HomeIcon style={{marginLeft: 10}}fontSize={'large'}/>
+          </Link>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -220,10 +212,10 @@ function App() {
             <Assessment />
           </Route>
           <Route path="/feedback">
-            <Feedback />
+            <Feedback courses={courses}/>
           </Route>
           <Route path="/goals">
-            <Goals />
+            <Goals assessment={assessment} courses={courses}/>
           </Route>
           <Route path="/grades">
             <Grades />
@@ -243,4 +235,4 @@ function App() {
   );
 };
 
-export default App;
+export default StudentApp;

@@ -1,7 +1,7 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Container, Box, Typography } from '@material-ui/core';
+import { Button, Box, Typography } from '@material-ui/core';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -14,11 +14,11 @@ import { Link } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(0),
-    minWidth: 200,
+    minWidth: 120,
   }
 }));
 
-function Feedback(props) {
+function Feedback({ courses }) {
   const classes = useStyles();
   const [state, setState] = React.useState({
     course: '',
@@ -38,9 +38,8 @@ function Feedback(props) {
     setState({ ...state, anon: event.target.checked});
   }
 
-  const save = () => {
+  const handleSubmit = () => {
     console.log(state);
-    props.sendFeedback(state);
   }
 
   return (
@@ -50,7 +49,7 @@ function Feedback(props) {
       </Typography>
       
       <Box m={2}>
-        <FormControl variant="outlined" className={classes.formControl}>
+        <FormControl style={{marginBottom: 12}} variant="outlined" className={classes.formControl}>
           <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
           <Select
             labelId="demo-simple-select-outlined-label"
@@ -58,15 +57,11 @@ function Feedback(props) {
             label="Course"
             onChange={handleCourseChange}
           >
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
-            <MenuItem value={4}>4</MenuItem>
+            {courses.map((a, index) => (
+              <MenuItem key={index} value={a.id}> {a.name} </MenuItem>
+            ))}
           </Select>
         </FormControl>
-        <div>
-
-        </div>
         <FormControl fullWidth>
           <TextField
             id="outlined-multiline-static"
@@ -89,8 +84,9 @@ function Feedback(props) {
             />
           </FormGroup>
         </FormControl>
-        <Button variant="contained" color="primary" size="large" onClick={save}>
-          SEND TO COORDINATOR
+        <br />
+        <Button variant="contained" color="primary" size="large" onClick={handleSubmit}>
+          SEND TO COURSE STAFF
         </Button>
         <Link to="/">
           <Button color="primary" size="large"> 
