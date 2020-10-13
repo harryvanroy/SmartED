@@ -9,6 +9,7 @@ from .models import *
 import re
 
 DEFAULT_TEACHER = "uqGeorge"
+TEACHER_OVERWRITE = False  # set to true if you want to act like a teacher
 
 #### TEACHER METHODS ####
 
@@ -16,7 +17,8 @@ def students_in_course(request):
     json_header = request.headers
 
     try:
-        if json_header['X-Uq-User-Type'] == 'Student':  # there might be edge cases...
+        # there might be edge cases for this...
+        if json_header['X-Uq-User-Type'] == 'Student' and not TEACHER_OVERWRITE:
             return HttpResponse("failed.. you are not a teacher")
         username = json.loads(json_header['X-Kvd-Payload'])['user']
     except:
