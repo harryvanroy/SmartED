@@ -24,6 +24,7 @@ urlpatterns += [
     path('vark/', views.vark, name='vark'),
     path('get-grades/', views.get_student_grades, name='get-grades'),
     path('initialize/', views.initialize, name='initialize'),
+
     path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),
     path('student-assessment-grade/', teacher_views.student_assessment_grade, name='student-assessment-grade'),
 ]

@@ -4,12 +4,13 @@ import random
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
-from .scrape.scrape import *
 from .models import *
 import re
 
 is_local = True
 DEFAULT_USER = "s4532094"
+DEFAUlT_TEACHER_USER = "uqGeorge"
+DEFAULT_IS_STUDENT = True
 DEFAULT_FIRST_NAME = "George"
 DEFAULT_LAST_NAME = "Test"
 
@@ -28,14 +29,8 @@ def initialize_course(header, stu):
     courses = []
     try:
         groups = json.loads(header['X-Kvd-Payload'])['groups']
-        # [courses.append(x.split('-')[0].split('labs:')[1])
-        # for x in groups if ("2020-2" in x)]
-        print(groups)
         for g in groups:
-            # print(g)
             match = re.search(r'uq:[a-zA-Z]{4}[0-9]{4}_*_*', g)
-            # if match:
-            #    print(match.string)
             if match:
                 print(match.string.split("uq:")[1].split("_")[0])
                 courses.append(match.string.split("uq:")[1].split("_")[0])
@@ -57,7 +52,6 @@ def initialize_course(header, stu):
         print(course_obj)
 
         # SAVE STUDENT COURSES
-        # todo: what about teachers?!?!
 
         if len(StudentCourse.objects
                        .filter(student=stu, course=course_obj)) == 0:
@@ -71,7 +65,7 @@ def initialize_course(header, stu):
 def initialize(request):
     json_header = request.headers
 
-    is_student = True
+    is_student = DEFAULT_IS_STUDENT
     first_name = DEFAULT_FIRST_NAME
     last_name = DEFAULT_LAST_NAME
     username = DEFAULT_USER
@@ -214,20 +208,25 @@ def get_student_courses(request):
 
 
 def get_student_grades(request):
-    json_body = json.loads(request.body)
-    username = json_body.get("username")
-    key = json_body.get("key")
-    course_filter = True
+    json_header = request.headers
     try:
-        course = Course.objects.get(id=json_body.get("courseID"))
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
+    except:
+        username = DEFAULT_USER
+
+    courseID = request.GET.get('id')
+    try:
+        courseID = int(courseID)
+        course_filter = True
     except:
         course_filter = False
 
     student = Student.objects.get(user=User.objects.get(username=username))
 
     if course_filter:
-        grades = [grade for grade in StudentAssessment.objects.all()
-                  if grade.student == student and grade.assessment.course == course]
+        print(courseID)
+        grades = [grade for grade in StudentAssessment.objects.filter(student=student)
+                  if grade.assessment.course.id == courseID]
     else:
         grades = [grade for grade in StudentAssessment.objects.filter(student=student)]
 
@@ -256,5 +255,4 @@ def get_student_grades(request):
                        "total_earnt": str(total_earnt),
                        "current_grade": str(current_grade)}
 
-    print("json request log: ", json_body)
     return HttpResponse(json.dumps(json_grades))
