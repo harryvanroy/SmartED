@@ -92,11 +92,9 @@ function StudentApp(props) {
 
   const setParentVarkScore = (score) => {
     setVark(score);
-    axios(url+'/Database/post-vark/', {
+    axios(url+'/Database/vark/', {
           method: "post",
           data: {
-            "username": localStorage.getItem('username'),
-            "key": parseInt(localStorage.getItem('key')), 
             "V": score['V'], "A": score['A'], 
             "R": score['R'], "K": score['K']
           },
@@ -105,15 +103,8 @@ function StudentApp(props) {
   };
 
   useEffect(() => {
-      console.log(localStorage.getItem('username'));
-      console.log(localStorage.getItem('key'));
-      console.log('test');
       axios(url+'/Database/student-courses/', {
-        method: "post",
-        data: {
-          "username": localStorage.getItem('username'), 
-          "key": parseInt(localStorage.getItem('key'))
-        },
+        method: "get",
         withCredentials: true
         })
         .then(res => {
@@ -123,11 +114,8 @@ function StudentApp(props) {
           let promises = [];
           res.data.map(course => {
             promises.push(
-              axios(url+'/Database/course-assessment/', {
-                method: "post",
-                data: {
-                  'id': course.id
-                },
+              axios(url+`/Database/course-assessment/?id=${course.id}`, {
+                method: "get",
                 withCredentials: true
               })
               .then(resAss => {
@@ -139,12 +127,8 @@ function StudentApp(props) {
           });
           Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
         });
-      axios(url+'/Database/get-vark/', {
-          method: "post",
-          data: {
-            "username": localStorage.getItem('username'),
-            "key": parseInt(localStorage.getItem('key'))
-          },
+      axios(url+'/Database/vark/', {
+          method: "get",
           withCredentials: true
         })
         .then(res => {
