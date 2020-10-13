@@ -108,7 +108,10 @@ def students_in_course(request):
     students = [stu_course.student for stu_course in
                 StudentCourse.objects.filter(course=course)]
 
-    json_students = [{"username": student.user.username for student in students}]
+    json_students = [{"username": student.user.username,
+                      "firstname": student.user.firstName,
+                      "lastname": student.user.lastName}
+                     for student in students]
 
     return HttpResponse(json.dumps(json_students))
 
