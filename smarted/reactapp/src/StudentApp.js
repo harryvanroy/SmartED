@@ -39,10 +39,10 @@ const drawerWidth = 200;
 // DETERMINE LOCATION
 var url;
 if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
-  console.log("ON DECO SITE");
+  // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
-  console.log("ON LOCAL");
+  // console.log("ON LOCAL");
   url = "http://localhost:8000";
 }
 console.log("location: " + url);
@@ -79,9 +79,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function StudentApp(props) {
+function StudentApp({ user }) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
   const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
   const [assessment, setAssessment] = React.useState([]);
@@ -143,10 +143,13 @@ function StudentApp(props) {
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
-          <Typography variant="h4" noWrap style={{flexGrow: 1}}>
+          <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
             <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
               SmartED
             </Link>
+          </Typography>
+          <Typography style={{marginLeft: 20, flexGrow: 1}}>
+            Welcome {user.firstname}!
           </Typography>
           <Typography style={{marginRight: 4}}>
             VARK score:
