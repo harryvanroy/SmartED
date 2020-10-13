@@ -31,10 +31,10 @@ const drawerWidth = 200;
 // DETERMINE LOCATION
 var url;
 if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
-  console.log("ON DECO SITE");
+  // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
-  console.log("ON LOCAL");
+  // console.log("ON LOCAL");
   url = "http://localhost:8000";
 }
 console.log("location: " + url);
@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const TeacherApp = () => {
+const TeacherApp = ({ user }) => {
   const classes = useStyles();
   const [courses, setCourses] = React.useState(['MEME1000', 'TROL2001', 'HARI2022', 'XDXD200']);
   const [currentCourse, setCurrentCourse] = React.useState(courses[0]);
