@@ -111,7 +111,7 @@ class AssessmentItem(models.Model):
     date = models.DateTimeField(null=True)
     dateDescription = models.CharField(max_length=255)
     isPassFail = models.BooleanField(default=False)
-    weight = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    weight = models.FloatField(null=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     def __str__(self):
         return f"{self.name}. {self.course}. {self.weight}. {self.dateDescription}"

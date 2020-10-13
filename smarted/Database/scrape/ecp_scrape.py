@@ -76,7 +76,7 @@ def get_course_assessment(course_code, semester=None, year=None, delivery_mode=N
             isPassFail = True
             weight = 0
         elif "%" in weight_txt:
-            weight = int(weight_txt.split("%")[0])
+            weight = float(weight_txt.split("%")[0])
         else:
             weight = None
 
