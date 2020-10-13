@@ -11,3 +11,8 @@ static
 geckodriver.log
 env
 db.sqlite3
+bin
+lib
+migrations
+scrape.py.orig
+core

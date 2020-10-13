@@ -41,7 +41,6 @@ function Feedback({ courses }) {
   const handleSubmit = () => {
     console.log(state);
   }
-  
 
   return (
     <Box width="80%">
