@@ -1,6 +1,6 @@
 from rest_framework import routers
 from django.urls import path
-from . import views
+from . import views, teacher_views
 from .api import UserViewSet, ResourceViewSet, FileViewSet, InstitutionViewSet, CourseViewSet, AssessmentViewSet, \
     StaffCourseViewSet, StudentCourseViewSet, StudentViewSet, StaffViewSet, StudentAssessmentViewSet
 
@@ -25,6 +25,6 @@ urlpatterns += [
     path('get-vark/', views.get_vark, name='get-vark'),
     path('get-grades/', views.get_student_grades, name='get-grades'),
     path('initialize/', views.initialize, name='initialize'),
-    path('students-in-course/', views.students_in_course, name='students-in-course'),
-    path('student-assessment-grade/', views.student_assessment_grade, name='student-assessment-grade'),
+    path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),
+    path('student-assessment-grade/', teacher_views.student_assessment_grade, name='student-assessment-grade'),
 ]
