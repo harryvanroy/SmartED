@@ -10,7 +10,27 @@ from . import views
 import re
 
 FORCE_TEACHER = views.FORCE_TEACHER  # if enabled, overrides student/teacher check
-DEFAULT_TEACHER = views.DEFAUlT_TEACHER_USER  # used if student/teacher check is overridden
+DEFAULT_TEACHER_USER = views.DEFAUlT_TEACHER_USER  # used if student/teacher check is overridden
+
+
+# returns a boolean for success/fail and the teachers username
+def authorize_teacher(header):
+    try:
+        # there might be edge cases for this...
+        if header['X-Uq-User-Type'] == 'Student':
+            if not FORCE_TEACHER:
+                # no teacher overwrite and not a real teacher
+                return False, "error"
+        else:
+            # this is a legit teacher
+            username = json.loads(header['X-Kvd-Payload'])['user']
+            return True, username
+    except:
+        pass
+
+    # either on live server and FORCE_TEACHER, or on local...
+    # ...and therefore FORCE_TEACHER
+    return True, DEFAULT_TEACHER_USER
 
 
 def initialize_teacher_courses(header, staff):
@@ -52,17 +72,10 @@ def initialize_teacher_courses(header, staff):
 def get_teacher_courses(request):
     json_header = request.headers
 
-    if not FORCE_TEACHER:
-        try:
-            # there might be edge cases for this...
-            if json_header['X-Uq-User-Type'] == 'Student':
-                return HttpResponse("failed.. you are not a teacher")
-            username = json.loads(json_header['X-Kvd-Payload'])['user']
-        except:
-            return HttpResponse("err: called a teacher api offline," +
-                                " without FORCE_TEACHER enabled..")
-    else:
-        username = DEFAULT_TEACHER
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
 
     course_list = [staff_course.course for staff_course in StaffCourse.objects.all()
                    if staff_course.staff.user.username == username]
@@ -77,17 +90,10 @@ def get_teacher_courses(request):
 def students_in_course(request):
     json_header = request.headers
 
-    if not FORCE_TEACHER:
-        try:
-            # there might be edge cases for this...
-            if json_header['X-Uq-User-Type'] == 'Student':
-                return HttpResponse("failed.. you are not a teacher")
-            username = json.loads(json_header['X-Kvd-Payload'])['user']
-        except:
-            return HttpResponse("err: called a teacher api offline," +
-                                " without FORCE_TEACHER enabled..")
-    else:
-        username = DEFAULT_TEACHER
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
 
     id = request.GET.get('id')
     try:
@@ -112,17 +118,10 @@ def student_assessment_grade(request):
     json_body = json.loads(request.body)
     json_header = request.headers
 
-    if not FORCE_TEACHER:
-        try:
-            # there might be edge cases for this...
-            if json_header['X-Uq-User-Type'] == 'Student':
-                return HttpResponse("failed.. you are not a teacher")
-            username = json.loads(json_header['X-Kvd-Payload'])['user']
-        except:
-            return HttpResponse("err: called a teacher api offline," +
-                                " without FORCE_TEACHER enabled..")
-    else:
-        username = DEFAULT_TEACHER
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
 
     # todo: check staff has access to course here
 
