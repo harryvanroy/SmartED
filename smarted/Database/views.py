@@ -10,6 +10,8 @@ import re
 
 is_local = True
 DEFAULT_USER = "s4532094"
+DEFAULT_FIRST_NAME = "George"
+DEFAULT_LAST_NAME = "Mulhearn"
 
 
 # helper for initialize
@@ -18,7 +20,10 @@ def initialize_course(header, stu):
     year = 2020
     mode = 'EXTERNAL'
 
-    # print(header)
+    # Initialize UQ if needed
+    if len(Institution.objects.filter(name="University of Queensland")) == 0:
+        UQ = Institution(name="University of Queensland")
+        UQ.save()
 
     courses = []
     try:
@@ -65,14 +70,15 @@ def initialize_course(header, stu):
 # FIRST API CALL, INITIALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
 def initialize(request):
     json_header = request.headers
-    student = True
-    first_name = "Johnno"
-    last_name = "Sri"
-    username = "s69420"
-    print(f"DEBUG!!!!!: \n\n{json_header}\n\n\n")
+
+    is_student = True
+    first_name = DEFAULT_FIRST_NAME
+    last_name = DEFAULT_LAST_NAME
+    username = DEFAULT_USER
+
     # basic user info
     try:
-        student = json_header['X-Uq-User-Type'] == 'Student'
+        is_student = json_header['X-Uq-User-Type'] == 'Student'
         first_name = json.loads(json_header['X-Kvd-Payload'])['firstname']
         last_name = json.loads(json_header['X-Kvd-Payload'])['lastname']
         username = json.loads(json_header['X-Kvd-Payload'])['user']
@@ -82,69 +88,63 @@ def initialize(request):
     user = User(username=username, firstName=first_name, lastName=last_name)
     user.save()
 
-    if student:
+    if is_student:
         if len(Student.objects.filter(user=user)) == 0:
             stu = Student(user=user)
             stu.save()
         else:
             stu = Student.objects.get(user=user)
+        initialize_course(json_header, stu)
     else:
         if len(Staff.objects.filter(user=user)) == 0:
             teacher = Staff(user=user)
             teacher.save()
 
-    # Initialize UQ if needed
-    if len(Institution.objects.filter(name="University of Queensland")) == 0:
-        UQ = Institution(name="University of Queensland")
-        UQ.save()
-
-    initialize_course(json_header, stu)
-
     return HttpResponse(json.dumps({"firstname": first_name,
                                     "lastname": last_name,
                                     "username": username,
-                                    "student": int(student)}))
+                                    "is_student": int(is_student)}))
 
 
-#### VARK
+@csrf_exempt  # has to be csrf excempt for post request
+def vark(request):
+    json_header = request.headers
+    try:
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
+    except:
+        username = DEFAULT_USER
 
-@csrf_exempt
-def post_vark(request):
-    json_body = json.loads(request.body)
-    username = json_body.get("username")
-    key = json_body.get("key")
+    if request.method == "POST":
+        # POST VARK
+        print("post vark request received..")
+        json_body = json.loads(request.body)
 
-    V, A, R, K = json_body.get("V"), json_body.get("A"), json_body.get("R"), \
-                 json_body.get("K")
-    print(V, A, R, K)
+        V, A, R, K = json_body.get("V"), json_body.get("A"), json_body.get("R"), \
+                     json_body.get("K")
+        print(V, A, R, K)
 
-    user = User.objects.get(username=username)
-    stu = Student.objects.get(user=user)
-    stu.V, stu.A, stu.R, stu.K = V, A, R, K
-    stu.save()
-    return HttpResponse("")
+        user = User.objects.get(username=username)
+        stu = Student.objects.get(user=user)
+        stu.V, stu.A, stu.R, stu.K = V, A, R, K
+        stu.save()
+        return HttpResponse("")
+    else:
+        print("get vark request received...")
+        # GET VARK
+        user = User.objects.get(username=username)
+        stu = Student.objects.get(user=user)
+        json_response = {"V": str(stu.V), "A": str(stu.A),
+                         "R": str(stu.R), "K": str(stu.K)}
+        return HttpResponse(json.dumps(json_response))
 
 
-def get_vark(request):
-    json_body = json.loads(request.body)
-    username = json_body.get("username")
-    key = json_body.get("key")
-
-    user = User.objects.get(username=username)
-    stu = Student.objects.get(user=user)
-    json_response = {"V": str(stu.V), "A": str(stu.A),
-                     "R": str(stu.R), "K": str(stu.K)}
-    return HttpResponse(json.dumps(json_response))
-
-### END VARK
-
-@csrf_exempt  # still need as its a POST
 def course_assessment(request):
-    json_body = json.loads(request.body)
+    id = request.GET.get('id')
 
-    id = json_body.get("id")
-    if id is None:
-        HttpResponse("failed query... specify the course ID pls..")
+    try:
+        id = int(id)
+    except:
+        return HttpResponse("failed query... specify the course ID...")
 
     course = Course.objects.get(id=id)
 
