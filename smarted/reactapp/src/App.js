@@ -17,7 +17,7 @@ console.log("location: " + url);
 //
 
 const App = () => {
-  const [user, setUser] = React.useState({});
+  const [user, setUser] = React.useState(null);
 
   useEffect(() => {
     axios(url+'/Database/initialize/', {
@@ -30,7 +30,7 @@ const App = () => {
 
   return (
     <div>
-      {user.is_student ? <StudentApp user={user} /> : <TeacherApp user={user} />}
+      {user !== null && (user.is_student === 0 ? <TeacherApp user={user} /> : <StudentApp user={user} />)}
     </div>
   );
 }
