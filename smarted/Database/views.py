@@ -418,7 +418,35 @@ def post_goals(request, username):
 
 
 def get_goals(username):
-    pass
+    course_grades, ass_grades, weekly_study, custom = [], [], [], []
+
+    user = User.objects.get(username=username)
+
+    for goal in LongTermGoals.objects.filter(user=user):
+
+        course_info = {"id": goal.course.id, "name": goal.course.name}
+
+        if goal.type == 1:  # course grade goal
+            course_grades.append({"course": course_info,
+                                  "grade": goal.courseGrade})
+        elif goal.type == 2: # ass grade goal
+            ass_info = {"id": goal.assessment.id,
+                        "name": goal.assessment.name}
+            ass_grades.append({"course": course_info,
+                               "assessment": ass_info})
+        elif goal.type == 3:  # weekly study goal
+            weekly_study.append({"course": course_info,
+                                 "hours": goal.hourGoal})
+        elif goal.type == 4:
+            custom.append({"course": course_info,
+                           "text": goal.customGoal})
+
+    all_goals = {"COURSEGRADE": course_grades,
+                 "ASSESSMENTGRADE": ass_grades,
+                 "STUDYWEEK": weekly_study,
+                 "CUSTOM": custom}
+
+    return HttpResponse(json.dumps(all_goals))
 
 
 @csrf_exempt
