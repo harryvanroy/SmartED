@@ -1,6 +1,4 @@
 import json
-import random
-
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
@@ -18,7 +16,7 @@ DEFAULT_USER = "s4532094"
 DEFAULT_FIRST_NAME = "George"
 DEFAULT_LAST_NAME = "Test"
 
-from . import teacher_views  # down here to avoid circular import error
+from . import teacher_views  # must be down here to avoid circular import error
 
 
 ######################## INIT #########################################
@@ -163,8 +161,8 @@ def vark(request):
         print("post vark request received..")
         json_body = json.loads(request.body)
 
-        V, A, R, K = json_body.get("V"), json_body.get("A"), json_body.get("R"), \
-                     json_body.get("K")
+        V, A, R, K = json_body.get("V"), json_body.get("A"), \
+                     json_body.get("R"), json_body.get("K")
         print(V, A, R, K)
 
         user = User.objects.get(username=username)
@@ -226,7 +224,9 @@ def course_assessment(request):
         return HttpResponse(json.dumps(json_assessment))
     else:
         scraped_assessment = get_course_assessment(course_code=name,
-                                                   semester=semester, year=year, delivery_mode=mode)
+                                                   semester=semester,
+                                                   year=year,
+                                                   delivery_mode=mode)
         if scraped_assessment is False:
             return HttpResponse("error scraping assessment... contact george?")
 
@@ -267,7 +267,8 @@ def get_student_courses(request):
     except:
         username = DEFAULT_USER
 
-    course_list = [student_course.course for student_course in StudentCourse.objects.all()
+    course_list = [student_course.course for student_course
+                   in StudentCourse.objects.all()
                    if student_course.student.user.username == username]
 
     json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
@@ -306,10 +307,12 @@ def get_student_grades(request):
 
     if course_filter:
         print(courseID)
-        grades = [grade for grade in StudentAssessment.objects.filter(student=student)
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)
                   if grade.assessment.course.id == courseID]
     else:
-        grades = [grade for grade in StudentAssessment.objects.filter(student=student)]
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)]
 
     json_grades = [{"assessment":
                         {"name": grade.assessment.name,
@@ -321,8 +324,10 @@ def get_student_grades(request):
 
     # expected grade time
     if course_filter:
-        total_weight = sum([float(grade.assessment.weight) for grade in grades])
-        total_earnt = sum([(float(grade.value) / 100) * float(grade.assessment.weight)
+        total_weight = sum([float(grade.assessment.weight)
+                            for grade in grades])
+        total_earnt = sum([(float(grade.value) / 100)
+                           * float(grade.assessment.weight)
                            for grade in grades])
 
         if total_weight > 0:
@@ -332,8 +337,35 @@ def get_student_grades(request):
 
         print(total_weight, total_earnt)
 
-        json_grades = {"items": json_grades, "total_completed": str(total_weight),
+        json_grades = {"items": json_grades,
+                       "total_completed": str(total_weight),
                        "total_earnt": str(total_earnt),
                        "current_grade": str(current_grade)}
 
     return HttpResponse(json.dumps(json_grades))
+
+
+@csrf_exempt
+def post_course_feedback(request):
+    json_header = request.headers
+    try:
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
+    except:
+        username = DEFAULT_USER
+
+    json_body = json.loads(request.body)
+
+    courseID = json_body.get('courseID')
+    feedback = json_body.get('feedback')
+    anonymous = json_body.get('anonymous')
+
+    # todo: check student is actually in course. Check if feedback already
+    #  exists
+
+    course_feedback = CourseFeedback(user=User.objects.get(username=username),
+                                     course=Course.objects.get(id=courseID),
+                                     anonymous=anonymous, feedback=feedback)
+
+    course_feedback.save()
+
+    return HttpResponse("")

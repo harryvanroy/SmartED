@@ -1,8 +1,5 @@
 from rest_framework import serializers
-from .models import User, Resource, File, Institution, \
-    Course, AssessmentItem, StaffCourse, Student, StudentCourse, Staff, \
-    StudentAssessment
-
+from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -68,4 +65,10 @@ class AssessmentSerializer(serializers.ModelSerializer):
 class StudentAssessmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentAssessment
+        fields = '__all__'
+
+
+class CourseFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseFeedback
         fields = '__all__'
