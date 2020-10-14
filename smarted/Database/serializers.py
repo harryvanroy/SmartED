@@ -72,3 +72,8 @@ class CourseFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseFeedback
         fields = '__all__'
+
+class CourseGoalsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LongTermGoals
+        fields = '__all__'

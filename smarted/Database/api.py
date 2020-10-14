@@ -82,12 +82,14 @@ class AssessmentViewSet(viewsets.ModelViewSet):
     }
     serializer_class = AssessmentSerializer
 
+
 class StudentAssessmentViewSet(viewsets.ModelViewSet):
     queryset = StudentAssessment.objects.all()
     permission_classes = {
         permissions.AllowAny
     }
     serializer_class = StudentAssessmentSerializer
+
 
 class CourseFeedbackViewSet(viewsets.ModelViewSet):
     queryset = CourseFeedback.objects.all()
@@ -96,3 +98,12 @@ class CourseFeedbackViewSet(viewsets.ModelViewSet):
     }
 
     serializer_class = CourseFeedbackSerializer
+
+
+class CourseGoalsViewSet(viewsets.ModelViewSet):
+    queryset = LongTermGoals.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+
+    serializer_class = CourseGoalsSerializer

@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
 from .models import *
 import re
+from rest_framework.exceptions import ValidationError, ParseError
 
 is_local = True
 FORCE_TEACHER = False
@@ -369,3 +370,68 @@ def post_course_feedback(request):
     course_feedback.save()
 
     return HttpResponse("")
+
+
+################ GOALS #################
+@csrf_exempt
+def post_goals(request, username):
+    json_body = json.loads(request.body)
+
+    courseID = json_body.get('courseID')
+    type = json_body.get('type')
+
+    user = User.objects.get(username=username)
+    course = Course.objects.get(id=courseID)
+
+    if type == "COURSEGRADE":
+        grade = json_body.get('grade')
+        # todo: check if exists
+        goal = LongTermGoals(user=user, course=course, type=1,
+                             courseGrade=grade)
+        goal.save()
+
+    elif type == "ASSESSMENTGRADE":
+        grade = json_body.get('grade')
+        assID = json_body.get('assID')
+        ass = AssessmentItem.objects.get(id=assID)
+        # todo: check if exists
+        goal = LongTermGoals(user=user, course=course, type=2,
+                             assessment=ass,
+                             assessmentGrade=grade)
+        goal.save()
+    elif type == "STUDYWEEK":
+        hours = json_body.get('hours')
+        # todo: check if exists
+        goal = LongTermGoals(user=user, course=course, type=3,
+                             hourGoal=hours)
+        goal.save()
+    elif type == "CUSTOM":
+        text = json_body.get('text')
+        goal = LongTermGoals(user=user, course=course, type=4,
+                             customGoal=text)
+        goal.save()
+    else:
+        print("ruh roh, parse error")
+        raise ParseError
+
+    return HttpResponse("")
+
+
+def get_goals(username):
+    pass
+
+
+@csrf_exempt
+def goals(request):
+    json_header = request.headers
+    try:
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
+    except:
+        username = DEFAULT_USER
+
+    if request.method == "POST":
+        return post_goals(request, username)
+    else:
+        return get_goals(username)
+
+##############################################

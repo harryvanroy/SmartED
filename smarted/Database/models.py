@@ -154,18 +154,6 @@ class ViewResource(models.Model):
         return f"{self.user} {self.course} {self.timestamp} {self.viewTime}"
 
 
-class CourseGradeGoal(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
-    grade = models.PositiveSmallIntegerField(null=True, validators=[MinValueValidator(1), MaxValueValidator(7)])
-
-    class Meta:
-        unique_together = ('user', 'course', 'grade')
-
-    def __str__(self):
-        return f"{self.user} {self.resource} {self.dateAdded} {self.timeViewed}"
-
-
 class ResourceFeedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
     resource = models.ForeignKey(Resource, on_delete=models.SET_NULL, blank=True, null=True)

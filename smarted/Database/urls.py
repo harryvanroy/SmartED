@@ -17,6 +17,7 @@ router.register('student', StudentViewSet, 'student')
 router.register('staff', StaffViewSet, 'staff')
 router.register('studentAssessment', StudentAssessmentViewSet, 'studentAssessment')
 router.register('CourseFeedback', CourseFeedbackViewSet, 'courseFeedback')
+router.register('CourseGoals', CourseGoalsViewSet, 'courseGoals')
 urlpatterns = router.urls
 
 # CUSTOM API VIEWS
@@ -28,6 +29,7 @@ urlpatterns += [
     path('vark/', views.vark, name='vark'),
     path('get-grades/', views.get_student_grades, name='get-grades'),
     path('post-course-feedback/', views.post_course_feedback, name='course-feedback-post'),
+    path('goals/', views.goals, name='goals'),
 
     path('teacher-courses/', teacher_views.get_teacher_courses, name='teacher-courses'),
     path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),
