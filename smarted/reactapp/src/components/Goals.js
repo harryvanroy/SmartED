@@ -94,9 +94,9 @@ function Goals({ courses, assessment }) {
   }, []);
 
   const handleCourseChange = (event) => {
-    let courseID = event.target.value.id
-    let courseName = event.target.value.name
-    setState({ ...state, courseID: courseID, courseName: courseName} );
+    console.log('Handling course change ...');
+    console.log(event.target.value);
+    setState({ ...state, courseID: event.target.value.id, courseName: event.target.value.name});
   }
 
   const handleTextChange = (event) => {
@@ -108,7 +108,8 @@ function Goals({ courses, assessment }) {
   }
 
   const handleGoalChange = (event) => {
-    setState({type: event.target.value, grade: 0, hours: 0, assName: '', assID: 0, text: '' , courseID: 0, courseName: ''});
+    console.log(state);
+    setState({ ...state, type: event.target.value, grade: 0, hours: 0, assName: '', assID: 0, text: ''});
   }
 
   const handleAssessmentChange = (event) => {
@@ -130,7 +131,8 @@ function Goals({ courses, assessment }) {
     setOpen(false);
   }
   
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     console.log(state);
     let postGoal = {};
     switch (state.type) {
@@ -194,7 +196,8 @@ function Goals({ courses, assessment }) {
               assessment: {
                 id: state.assID,
                 name: state.assName
-              }
+              },
+              grade: state.grade
             }
             setAssGoals([...assGoals, goalAssGrade])
             break;
