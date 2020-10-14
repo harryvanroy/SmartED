@@ -20,10 +20,18 @@ DEFAULT_LAST_NAME = "Test"
 
 from . import teacher_views  # down here to avoid circular import error
 
+
 ######################## INIT #########################################
 
-# helper for initialize
 def initialize_course(header, stu):
+    """
+    Helper function for initialize. This function takes in the request header
+    and uses either the UQ SSO header or default values to add the student
+    and course pairing into the database.
+    :param header: a Http Request received by the initialize view
+    :param stu: an instance of the student to pair the courses with
+    :return: Nothing
+    """
     sem = 2
     year = 2020
     mode = 'EXTERNAL'
@@ -70,6 +78,17 @@ def initialize_course(header, stu):
 
 # FIRST API CALL, INITIALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
 def initialize(request):
+    """"
+    This is the first API call that should be made by the webapp client.
+    It uses either their UQ SSO header or default values defined at the top
+    to determine the users: Username, Full Name, and Type (student or teacher).
+    If this is called by a user not in the database already, they will be
+    added in.
+    :param request: The Http Request made to the view.
+    :return: a json object of basic user details
+
+    (see https://github.com/harryvanroy/SmartED/wiki)
+    """
     json_header = request.headers
 
     # basic user info
@@ -116,10 +135,23 @@ def initialize(request):
                                     "username": username,
                                     "is_student": int(is_student)}))
 
+
 #########################################################
 
 @csrf_exempt  # has to be csrf excempt for post request
 def vark(request):
+    """
+    A view to handle a vark post/get request.
+    The user is authenticated with their UQ SSO header, or default values.
+    :param request: The Http Request for the view
+    :return:
+        - If GET request: return a http response of a json object with the
+        users VARK details
+        - If POST request: the VARK json object in the request body will
+        be used to update the VARK in the database for this user
+
+    (see https://github.com/harryvanroy/SmartED/wiki)
+    """
     json_header = request.headers
     try:
         username = json.loads(json_header['X-Kvd-Payload'])['user']
@@ -151,6 +183,17 @@ def vark(request):
 
 
 def course_assessment(request):
+    """
+    A view for handling a get request for a courses assessment.
+    This function reads the GET request's URL to determine the requested
+    course. If the course's assessment exists in the database, it is
+    immediately returned, otherwise the ECP scraper is called to scrape
+    the assessment info.
+    :param request: HttpRequest for the view
+    :return: a json list of assessment details for the requested course
+
+    (see https://github.com/harryvanroy/SmartED/wiki)
+    """
     id = request.GET.get('id')
 
     try:
@@ -208,6 +251,15 @@ def course_assessment(request):
 
 
 def get_student_courses(request):
+    """
+    A view to handle a request from a student to get their list of courses.
+    Uses the UQ SSO header or default values to authenticate the user and
+    then fetches courses paired to that user in the database.
+    :param request: Http Request for this view
+    :return: A json object that lists the courses the user/student does.
+
+    (see https://github.com/harryvanroy/SmartED/wiki)
+    """
     json_header = request.headers
 
     try:
@@ -226,6 +278,17 @@ def get_student_courses(request):
 
 
 def get_student_grades(request):
+    """
+    A view to handle a request for a student's grades.
+    The user is authenticated by the UQ SSO header or default values and
+    the assessment grades paired with that student/user are fetched from
+    the database.
+    :param request: http request for this view.
+    :return: A http response of a json object containing a list of the
+    students grades for assessment.
+
+    (see https://github.com/harryvanroy/SmartED/wiki)
+    """
     json_header = request.headers
     try:
         username = json.loads(json_header['X-Kvd-Payload'])['user']
