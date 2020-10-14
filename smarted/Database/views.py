@@ -429,7 +429,7 @@ def get_goals(username):
         if goal.type == 1:  # course grade goal
             course_grades.append({"course": course_info,
                                   "grade": goal.courseGrade})
-        elif goal.type == 2: # ass grade goal
+        elif goal.type == 2:  # ass grade goal
             ass_info = {"id": goal.assessment.id,
                         "name": goal.assessment.name}
             ass_grades.append({"course": course_info,
