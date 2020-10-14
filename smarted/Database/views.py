@@ -433,7 +433,8 @@ def get_goals(username):
             ass_info = {"id": goal.assessment.id,
                         "name": goal.assessment.name}
             ass_grades.append({"course": course_info,
-                               "assessment": ass_info})
+                               "assessment": ass_info,
+                               "grade": goal.assessmentGrade})
         elif goal.type == 3:  # weekly study goal
             weekly_study.append({"course": course_info,
                                  "hours": goal.hourGoal})
