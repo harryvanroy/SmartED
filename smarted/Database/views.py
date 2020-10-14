@@ -1,9 +1,11 @@
 import json
+import re
+import arrow
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
+from .scrape.scrape import UQBlackboardScraper
 from .models import *
-import re
 from rest_framework.exceptions import ValidationError, ParseError
 
 is_local = True
@@ -14,8 +16,8 @@ DEFAULT_TEACHER_FIRST_NAME = "Johnno"
 DEFAULT_TEACHER_LAST_NAME = "Sri"
 
 DEFAULT_USER = "s4532094"
-DEFAULT_FIRST_NAME = "George"
-DEFAULT_LAST_NAME = "Test"
+DEFAULT_FIRST_NAME = "Kyle"
+DEFAULT_LAST_NAME = "Sanderlands"
 
 from . import teacher_views  # must be down here to avoid circular import error
 
@@ -72,7 +74,6 @@ def initialize_course(header, stu):
             print("saving studentCourse...")
             stu_course = StudentCourse(student=stu, course=course_obj)
             stu_course.save()
-    #
 
 
 # FIRST API CALL, INITIALIZES AND RETURNS KEY DETAILS FOR REACT TO USE
@@ -461,5 +462,112 @@ def goals(request):
         return post_goals(request, username)
     else:
         return get_goals(username)
+
+def refresh_content(username, password):
+    scraper = UQBlackboardScraper(username, password, chrome=is_local)
+    courses = scraper.get_current_courses()
+    print(courses)
+    for course in courses.keys():
+        courses[course]['announcements'] = scraper.get_course_announcements(course)
+        courses[course]['resources'] = scraper.get_learning_resources(course)
+        courses[course]['assessment'] = scraper.get_course_assessment(course)
+
+    scraper.driver.quit()
+    return courses
+   
+def save_announcements(course, announcements):
+    """
+    Save course announcements to the database
+
+    Args:
+        course (Course) : Object representing a course from the database
+        announcements (Dict<int : Dict<String : String(s)>>): bears the form
+        id -> (
+            "title" : "[TITLE]", 
+            "content" : "[CONTENT]", 
+            "date" : "DAY, DAY# MONTH YEAR hh:mm:ss [AM/PM] AEST"
+        )
+    """
+    def format_date(date):
+        FORMAT = "D MMMM YYYY"
+        split_date = date.split(" ")
+        cleaned_date = "{} {} {}".format(split_date[1], split_date[2], split_date[3])
+        return arrow.get(cleaned_date, FORMAT).format('YYYY-MM-DD')
+
+    for post in announcements.keys():
+        announcement = Announcement(
+            id=post, 
+            title=announcements[post]['title'], 
+            content=announcements[post]['content'], 
+            isBlackboardGenerated=True,
+            dateAdded=format_date(announcements[post]['date']),
+            course=course
+        )
+        announcement.save()
+
+
+def save_resources(course, resources, assessed):
+    """
+    Save course announcements to the database
+
+    Args:
+        course (Course) : Object representing a course from the database
+        resources (Dict<int : Dict<String : String(s)>>): bears the form
+        id -> (
+            "name" : "[NAME]", 
+            "type" : "[TYPE]", 
+            "links" : [l1, l2, ..., lN]
+        )
+    """  
+    for item_id in resources.keys():
+        folder = File(
+            id=item_id,
+            name=resources[item_id]['name'],
+            category=resources[item_id]['type'],
+            isAssessment=assessed,
+            course=course
+        )
+        folder.save()
+        for link in resources[item_id]['links']:
+            resource = Resource(
+                title="", # TODO: scrape this 
+                description="", # TODO: scrape this 
+                isBlackboardGenerated=True,
+                blackboardLink=link, 
+                dateAdded="2020-10-15", # TODO: scrape this
+                week=1, # TODO: scrape this
+                folder=folder
+            )
+            resource.save() 
+
+@csrf_exempt
+def refresh(request):
+    """
+    Refresh blackboard information for a given user
+
+    Args:
+        request (HttpRequest): post request sent from client side
+    """
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'POST':
+        return BAD_REQUEST
+    json_body = json.loads(request.body)
+
+    username = json_body.get("username")
+    password = json_body.get("password")
+    if username is None or password is None:
+        return BAD_REQUEST
+
+    courses = refresh_content(username, password)
+    
+    for course in courses.keys():
+        subject = Course.objects.get(name=courses[course]['code'].split("/")[0])
+        save_announcements(subject, courses[course]['announcements'])
+        save_resources(subject, courses[course]['resources'], False)
+        save_resources(subject, courses[course]['assessment'], True)
+
+    return HttpResponse("SUCCESS")
+
+    
 
 ##############################################

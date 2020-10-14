@@ -20,6 +20,12 @@ class StaffSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = '__all__'
+
+
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource

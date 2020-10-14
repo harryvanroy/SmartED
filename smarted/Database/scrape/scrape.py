@@ -48,6 +48,7 @@ class UQBlackboardScraper:
         else:
             print("starting driver as chrome")
             chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument("--kiosk")
             # chrome_options.add_argument("--headless")
             self.driver = webdriver.Chrome(ChromeDriverManager().install(), 
                 options=chrome_options)
@@ -90,8 +91,10 @@ class UQBlackboardScraper:
         """
         links = set()
         for link in soup.find_all('a', href=True):
-            links.add(link['href'])
-
+            if self.BLACKBOARD_URL in link['href']:
+                links.add(link['href'])
+            else:
+                links.add(self.BLACKBOARD_URL[:-1] + link['href'])
         return links
 
     def read_page(self, course_id, resources):
@@ -117,6 +120,7 @@ class UQBlackboardScraper:
             resources[resource_id] = {"name": name, "type": folder, 
                 "links": self.find_links(item)}
 
+            # descend into folders
             if folder == "Content Folder":
                 self.driver.get(self.RESOURCE_URL % (course_id, resource_id))
                 self.read_page(course_id, resources)
@@ -137,7 +141,6 @@ class UQBlackboardScraper:
             .click()
         resources = {}
         self.read_page(course_id, resources)
-
         return resources
 
     def get_course_assessment(self, course_id):
@@ -155,7 +158,6 @@ class UQBlackboardScraper:
         self.driver.find_element_by_xpath('//*[@title="Assessment"]').click()
         resources = {}
         self.read_page(course_id, resources)
-
         return resources
         
     def get_course_announcements(self, course_id):
@@ -240,7 +242,7 @@ if __name__ == "__main__":
     studentNumber = lines[0]
     UQPassword = lines[1]
     f.close()
-    scraper = UQBlackboardScraper(studentNumber, UQPassword, chrome=False)
+    scraper = UQBlackboardScraper(studentNumber, UQPassword, chrome=True)
     courses = scraper.get_current_courses()
     print(courses)
     for course in courses.keys():
