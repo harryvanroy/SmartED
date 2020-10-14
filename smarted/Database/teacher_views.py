@@ -148,3 +148,28 @@ def student_assessment_grade(request):
     student_ass.save()
 
     return HttpResponse("")
+
+
+def get_course_feedback(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    id = request.GET.get('id')
+
+    try:
+        course = Course.objects.get(id=id)
+    except:
+        return HttpResponse("failed query.. specify the correct course ID...")
+
+    json_feedback = [{"user": ({"username": x.user.username,
+                                "name": f"{x.user.firstName} {x.user.lastName}"}
+                               if not x.anonymous else {"username": "anon",
+                                                    "name": "Anonymous"}),
+                      "feedback": x.feedback}
+                     for x in CourseFeedback.objects.filter(course=course)]
+
+    return HttpResponse(json.dumps(json_feedback))
