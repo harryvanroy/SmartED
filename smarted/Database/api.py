@@ -27,6 +27,14 @@ class StaffViewSet(viewsets.ModelViewSet):
     serializer_class = StaffSerializer
 
 
+class AnnouncementViewSet(viewsets.ModelViewSet):
+    queryset = Announcement.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+    serializer_class = AnnouncementSerializer
+
+
 class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.all()
     permission_classes = {

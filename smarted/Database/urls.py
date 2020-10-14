@@ -6,6 +6,7 @@ from .api import *
 # REST FRAMEWORK DATABASE VIEWS
 router = routers.DefaultRouter()
 router.register('users', UserViewSet, 'users')
+router.register('announcements', AnnouncementViewSet, 'announcements')
 router.register('resources', ResourceViewSet, 'resources')
 router.register('files', FileViewSet, 'files')
 router.register('institutions', InstitutionViewSet, 'institutions')
@@ -30,6 +31,7 @@ urlpatterns += [
     path('get-grades/', views.get_student_grades, name='get-grades'),
     path('post-course-feedback/', views.post_course_feedback, name='course-feedback-post'),
     path('goals/', views.goals, name='goals'),
+    path('refresh/', views.refresh, name='refresh'),
 
     path('teacher-courses/', teacher_views.get_teacher_courses, name='teacher-courses'),
     path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),

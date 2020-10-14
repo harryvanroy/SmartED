@@ -4,5 +4,8 @@ from Database.models import *
 
 admin.site.register(User)
 admin.site.register(Course)
+admin.site.register(Resource)
+admin.site.register(File)
+admin.site.register(Announcement)
 admin.site.register(StudentCourse)
 admin.site.register(Institution)
