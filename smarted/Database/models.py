@@ -107,7 +107,7 @@ class Resource(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     isBlackboardGenerated = models.BooleanField()
-    blackboardLink = models.URLField()
+    blackboardLink = models.URLField(max_length=512)
     dateAdded = models.DateTimeField('date published')
     week = models.IntegerField()
     folder = models.ForeignKey(File, on_delete=models.SET_NULL, blank=True, null=True)
