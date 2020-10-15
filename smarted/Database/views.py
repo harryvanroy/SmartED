@@ -437,7 +437,7 @@ def post_goals(request, username):
     elif type == "CUSTOM":
         text = json_body.get('text')
         goal = LongTermGoals(user=user, course=course, type=4,
-                             customGoal=text, isComplete= is_complete)
+                             customGoal=text, isComplete=is_complete)
         goal.save()
     else:
         print("ruh roh, parse error")
@@ -456,22 +456,22 @@ def get_goals(username):
         course_info = {"id": goal.course.id, "name": goal.course.name}
 
         if goal.type == 1:  # course grade goal
-            course_grades.append({"course": course_info,
+            course_grades.append({"id": goal.id, "course": course_info,
                                   "grade": goal.courseGrade,
                                   "is_complete": goal.isComplete})
         elif goal.type == 2:  # ass grade goal
             ass_info = {"id": goal.assessment.id,
                         "name": goal.assessment.name}
-            ass_grades.append({"course": course_info,
+            ass_grades.append({"id": goal.id, "course": course_info,
                                "assessment": ass_info,
                                "grade": goal.assessmentGrade,
                                "is_complete": goal.isComplete})
         elif goal.type == 3:  # weekly study goal
-            weekly_study.append({"course": course_info,
+            weekly_study.append({"id": goal.id, "course": course_info,
                                  "hours": goal.hourGoal,
                                  "is_complete": goal.isComplete})
         elif goal.type == 4:
-            custom.append({"course": course_info,
+            custom.append({"id": goal.id, "course": course_info,
                            "text": goal.customGoal,
                            "is_complete": goal.isComplete})
 
@@ -481,6 +481,23 @@ def get_goals(username):
                  "CUSTOM": custom}
 
     return HttpResponse(json.dumps(all_goals))
+
+
+def delete_goal(request, username):
+    goalID = request.GET.get('id')
+    try:
+        goalID = int(goalID)
+    except:
+        raise ParseError
+
+    goal = LongTermGoals.objects.get(id=goalID)
+
+    if goal.user.username != username:
+        raise ValidationError
+    else:
+        goal.delete()
+
+    return HttpResponse("")
 
 
 @csrf_exempt
@@ -493,8 +510,13 @@ def goals(request):
 
     if request.method == "POST":
         return post_goals(request, username)
-    else:
+    elif request.method == "GET":
         return get_goals(username)
+    elif request.method == "DELETE":
+        return delete_goal(request, username)
+    else:
+        raise ParseError
+
 
 def refresh_content(username, password):
     scraper = UQBlackboardScraper(username, password, chrome=is_local)
@@ -507,7 +529,8 @@ def refresh_content(username, password):
 
     scraper.driver.quit()
     return courses
-   
+
+
 def save_announcements(course, announcements):
     """
     Save course announcements to the database
@@ -521,6 +544,7 @@ def save_announcements(course, announcements):
             "date" : "DAY, DAY# MONTH YEAR hh:mm:ss [AM/PM] AEST"
         )
     """
+
     def format_date(date):
         FORMAT = "D MMMM YYYY"
         split_date = date.split(" ")
@@ -529,9 +553,9 @@ def save_announcements(course, announcements):
 
     for post in announcements.keys():
         announcement = Announcement(
-            id=post, 
-            title=announcements[post]['title'], 
-            content=announcements[post]['content'], 
+            id=post,
+            title=announcements[post]['title'],
+            content=announcements[post]['content'],
             isBlackboardGenerated=True,
             dateAdded=format_date(announcements[post]['date']),
             course=course
@@ -551,7 +575,7 @@ def save_resources(course, resources, assessed):
             "type" : "[TYPE]", 
             "links" : [l1, l2, ..., lN]
         )
-    """  
+    """
     for item_id in resources.keys():
         folder = File(
             id=item_id,
@@ -563,15 +587,16 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link in resources[item_id]['links']:
             resource = Resource(
-                title="", # TODO: scrape this 
-                description="", # TODO: scrape this 
+                title="",  # TODO: scrape this
+                description="",  # TODO: scrape this
                 isBlackboardGenerated=True,
-                blackboardLink=link, 
-                dateAdded="2020-10-15", # TODO: scrape this
-                week=1, # TODO: scrape this
+                blackboardLink=link,
+                dateAdded="2020-10-15",  # TODO: scrape this
+                week=1,  # TODO: scrape this
                 folder=folder
             )
-            resource.save() 
+            resource.save()
+
 
 @csrf_exempt
 def refresh(request):
@@ -592,7 +617,7 @@ def refresh(request):
         return BAD_REQUEST
 
     courses = refresh_content(username, password)
-    
+
     for course in courses.keys():
         subject = Course.objects.get(name=courses[course]['code'].split("/")[0])
         save_announcements(subject, courses[course]['announcements'])
@@ -600,7 +625,5 @@ def refresh(request):
         save_resources(subject, courses[course]['assessment'], True)
 
     return HttpResponse("SUCCESS")
-
-    
 
 ##############################################
