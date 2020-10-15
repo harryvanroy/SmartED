@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Box, Typography } from '@material-ui/core';
@@ -18,6 +18,23 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
+import DialogContentText from '@material-ui/core/DialogContentText';
+
+
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  // console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  // console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -30,17 +47,62 @@ function Goals({ courses, assessment }) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState({
-    course: '',
-    type: 0,
+    courseID: 0,
+    courseName: '',
+    type: '',
     grade: 0,
     hours: 0,
-    assessment: '',
+    assID: 0,
+    assName: '',
     text: ''
   });
-  const [goals, setGoals] = React.useState([]);
+  const [gradeGoals, setGradeGoals] = React.useState([]);
+  const [assGoals, setAssGoals] = React.useState([]);
+  const [studyGoals, setStudyGoals] = React.useState([]);
+  const [customGoals, setCustomGoals] = React.useState([]);
+
+  const[openDialog, setOpenDialog] = React.useState(false);
+  const [dialogText, setDialogText] = React.useState('');
+  
+  useEffect(() => {
+    axios(url+'/Database/goals/', {
+      method: "get",
+      withCredentials: true
+      })
+      .then(res => {
+        let courseGoalsToAdd = [];
+        let assGoalsToAdd = [];
+        let studyGoalsToAdd = [];
+        let customGoalsToAdd = [];
+
+        res.data["COURSEGRADE"].forEach(courseGradeGoal => {
+          console.log(courseGradeGoal);
+          courseGoalsToAdd.push(courseGradeGoal);
+        });
+        res.data["ASSESSMENTGRADE"].forEach(assGoal => {
+          console.log(assGoal);
+          assGoalsToAdd.push(assGoal);
+        });
+        res.data["STUDYWEEK"].forEach(studyGoal => {
+          console.log(studyGoal);
+          studyGoalsToAdd.push(studyGoal);
+        });
+        res.data["CUSTOM"].forEach(customGoal => {
+          console.log(customGoal);
+          customGoalsToAdd.push(customGoal)
+        });
+
+        setGradeGoals(gradeGoals.concat(courseGoalsToAdd));
+        setAssGoals(assGoals.concat(assGoalsToAdd));
+        setStudyGoals(studyGoals.concat(studyGoalsToAdd));
+        setCustomGoals(customGoals.concat(customGoalsToAdd));
+      })
+  }, []);
 
   const handleCourseChange = (event) => {
-    setState({ ...state, course: event.target.value} );
+    console.log('Handling course change ...');
+    console.log(event.target.value);
+    setState({ ...state, courseID: event.target.value.id, courseName: event.target.value.name});
   }
 
   const handleTextChange = (event) => {
@@ -52,15 +114,19 @@ function Goals({ courses, assessment }) {
   }
 
   const handleGoalChange = (event) => {
-    setState({ ...state, type: event.target.value, grade: 0, hours: 0, assessment: '', text: '' });
+    console.log(state);
+    setState({ ...state, type: event.target.value, grade: 0, hours: 0, assName: '', assID: 0, text: ''});
   }
 
   const handleAssessmentChange = (event) => {
-    setState({ ...state, assessment: event.target.value });
+    console.log(event.target.value);
+    let assName = event.target.value.name;
+    let assID = event.target.value.id;
+    setState({ ...state, assName: assName, assID: assID });
   }
 
   const handleGradeChange = (event) => {
-    setState({ ...state, grade: parseInt(event.target.value) })
+    setState({ ...state, grade: parseInt(event.target.value) });
   }
 
   const handleOpen = () => {
@@ -70,18 +136,112 @@ function Goals({ courses, assessment }) {
   const handleClose = () => {
     setOpen(false);
   }
-  
-  const handleSubmit = () => {
-    console.log(state);
-    setGoals([...goals, state]);
-  }
 
-  const getCourseNameFromID = (id) => {
-    return courses.filter(course => course.id === id)[0].name;
+  function handleOpenDialog(text) {
+    return function() {
+      setOpenDialog(true);
+      setDialogText(text);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDialogText('');
+  }
+  
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(state);
+    let postGoal = {};
+    switch (state.type) {
+      case "COURSEGRADE":
+        postGoal = {
+          "courseID": state.courseID,
+          "type": state.type,
+          "grade": state.grade
+        };
+        break;
+      case "ASSESSMENTGRADE":
+        postGoal = {
+          "courseID": state.courseID,
+          "type": state.type,
+          "assID": state.assID,
+          "grade": state.grade
+        };
+        break;
+      case "STUDYWEEK":
+        postGoal = {
+          "courseID": state.courseID,
+          "type": state.type,
+          "hours": state.hours
+        };
+        break;
+      case "CUSTOM":
+        postGoal = {
+          "courseID": state.courseID,
+          "type": state.type,
+          "text": state.text
+        };
+        break;
+      default:
+        
+    }
+    console.log("About to post:");
+    console.log(postGoal);
+
+    axios(url+'/Database/goals/', {
+      method: "post",
+      data: postGoal,
+      withCredentials: true
+      })
+      .then(res => {
+        console.log(postGoal);
+        let course = {
+          id: state.courseID,
+          name: state.courseName
+        }
+        switch (state.type) {
+          case "COURSEGRADE":
+            let goalCourseGrade = {
+              course: course,
+              grade: state.grade
+            }
+            setGradeGoals([...gradeGoals, goalCourseGrade])
+            break;
+          case "ASSESSMENTGRADE":
+            let goalAssGrade = {
+              course: course,
+              assessment: {
+                id: state.assID,
+                name: state.assName
+              },
+              grade: state.grade
+            }
+            setAssGoals([...assGoals, goalAssGrade])
+            break;
+          case "STUDYWEEK":
+            let goalStudy = {
+              course: course,
+              hours: state.hours
+            }
+            setStudyGoals([...studyGoals, goalStudy])
+            break;
+          case "CUSTOM":
+            let goalCustom = {
+              course: course,
+              text: state.text
+            }
+            setCustomGoals([...customGoals, goalCustom])
+          default:
+        }
+      })
+      .catch(err => {
+        alert('cannot add duplicate goals for now');
+      })
   }
 
   const drawOverallGoal = () => {
-    if (state.type === 1 && state.course !== '') {
+    if (state.type === "COURSEGRADE" && state.courseID !== 0) {
       return (
         <Box>
           Get grade 
@@ -106,7 +266,7 @@ function Goals({ courses, assessment }) {
   };
 
   const drawAssessmentGoal = () => {
-    if (state.type === 2 && state.course !== '') {
+    if (state.type === "ASSESSMENTGRADE" && state.courseID !== 0) {
       return (
         <Box>
           Get grade 
@@ -130,8 +290,8 @@ function Goals({ courses, assessment }) {
               id="demo-simple-select-outlined"
               onChange={handleAssessmentChange}
             >
-              {assessment.filter(ass => ass.course === state.course).map(e => 
-                <MenuItem value={e.name}>{e.name}</MenuItem>
+              {assessment.filter(ass => ass.course === state.courseID).map(e => 
+                <MenuItem value={e}>{e.name}</MenuItem>
               )}
             </Select>
           </FormControl>
@@ -141,7 +301,7 @@ function Goals({ courses, assessment }) {
   };
 
   const drawStudyGoal = () => {
-    if (state.type === 3 && state.course !== '') {
+    if (state.type === "STUDYWEEK" && state.courseID !== 0) {
       return (
         <Box>
           Spend
@@ -160,7 +320,7 @@ function Goals({ courses, assessment }) {
   };
 
   const drawTextField = () => {
-    if (state.type === 4 && state.course !== '') {
+    if (state.type === "CUSTOM" && state.courseID !== 0) {
       return (
         <FormControl fullWidth>
           <TextField
@@ -178,6 +338,14 @@ function Goals({ courses, assessment }) {
   
   return (
     <div>
+      <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Custom goal</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {dialogText}
+            </DialogContentText>
+          </DialogContent>
+      </Dialog>
       <Box width="80%">
         <Typography variant="h4">
           Course Goals
@@ -200,7 +368,7 @@ function Goals({ courses, assessment }) {
                 onChange={handleCourseChange}
               >
                 {courses.map((a, index) => (
-                  <MenuItem key={index} value={a.id}> {a.name} </MenuItem>
+                  <MenuItem key={index} value={a}> {a.name} </MenuItem>
                 ))}
               </Select>
             </FormControl> {' '}
@@ -212,10 +380,10 @@ function Goals({ courses, assessment }) {
                 label="Course"
                 onChange={handleGoalChange}
               >
-                <MenuItem value={1}> Overall grade </MenuItem>
-                <MenuItem value={2}> Specific assessment grade </MenuItem>
-                <MenuItem value={3}> Weekly study time </MenuItem>
-                <MenuItem value={4}> Custom goal </MenuItem>
+                <MenuItem value={"COURSEGRADE"}> Overall grade </MenuItem>
+                <MenuItem value={"ASSESSMENTGRADE"}> Specific assessment grade </MenuItem>
+                <MenuItem value={"STUDYWEEK"}> Weekly study time </MenuItem>
+                <MenuItem value={"CUSTOM"}> Custom goal </MenuItem>
               </Select>
             </FormControl>
             {drawOverallGoal()}
@@ -249,12 +417,16 @@ function Goals({ courses, assessment }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {goals.filter(row => row.type === 4).map((row) => (
-            <TableRow key={row.course}>
+          {customGoals.map((row) => (
+            <TableRow key={row.course.id}>
               <TableCell component="th" scope="row">
-                {getCourseNameFromID(row.course)}
+                {row.course.name}
               </TableCell>
-              <TableCell align="right">{row.text}</TableCell>
+              <TableCell align="right">
+                <Button Button variant="outlined" color="primary" onClick={handleOpenDialog(row.text)} >
+                  View goal
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -269,10 +441,10 @@ function Goals({ courses, assessment }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {goals.filter(row => row.type === 1).map((row) => (
-            <TableRow key={row.course}>
+          {gradeGoals.map((row) => (
+            <TableRow key={row.course.id}>
               <TableCell component="th" scope="row">
-                {getCourseNameFromID(row.course)}
+                {row.course.name}
               </TableCell>
               <TableCell align="right">{row.grade}</TableCell>
             </TableRow>
@@ -289,10 +461,10 @@ function Goals({ courses, assessment }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {goals.filter(row => row.type === 3).map((row) => (
-            <TableRow key={row.course}>
+          {studyGoals.map((row) => (
+            <TableRow key={row.course.id}>
               <TableCell component="th" scope="row">
-                {getCourseNameFromID(row.course)}
+                {row.course.name}
               </TableCell>
               <TableCell align="right">{row.hours} hours</TableCell>
             </TableRow>
@@ -310,12 +482,12 @@ function Goals({ courses, assessment }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {goals.filter(row => row.type === 2).map((row) => (
-            <TableRow key={row.course}>
+          {assGoals.map((row) => (
+            <TableRow key={row.course.id}>
               <TableCell component="th" scope="row">
-                {getCourseNameFromID(row.course)}
+                {row.course.name}
               </TableCell>
-              <TableCell align="right">{row.assessment}</TableCell>
+              <TableCell align="right">{row.assessment.name}</TableCell>
               <TableCell align="right">{row.grade}</TableCell>
             </TableRow>
           ))}

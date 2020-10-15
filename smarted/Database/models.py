@@ -44,32 +44,6 @@ class Staff(models.Model):
     def __str__(self):
         return f"{self.user}"
 
-
-class Resource(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    isBlackboardGenerated = models.BooleanField()
-    blackboardLink = models.URLField()
-    dateAdded = models.DateTimeField('date published')
-    week = models.IntegerField()
-
-    def __str__(self):
-        return f"{self.id} {self.title} {self.description} {self.isBlackboardGenerated} {self.blackboardLink}" \
-               f" {self.dateAdded} {self.week}"
-
-
-class File(models.Model):
-    id = models.AutoField(primary_key=True)
-    path = models.FileField(upload_to='uploads/')
-    name = models.CharField(max_length=255)
-    size = models.IntegerField()
-    course = models.ForeignKey(Resource, on_delete=models.SET_NULL, blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.id} {self.path} {self.name} {self.size} {self.course}"
-
-
 class Institution(models.Model):
     name = models.CharField(max_length=200)
 
@@ -100,6 +74,43 @@ class Course(models.Model):
 
     def __str__(self):
         return f"{self.name}. {self.year}, Semester {self.semester}. {self.mode} "
+
+class Announcement(models.Model):
+    id = models.IntegerField(primary_key=True)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    isBlackboardGenerated = models.BooleanField()
+    dateAdded = models.DateTimeField('date published')
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.id} {self.title} {self.content} {self.isBlackboardGenerated} {self.dateAdded}" f" {self.dateAdded} {self.week} {self.course}"
+
+class File(models.Model):
+    id = models.IntegerField(primary_key=True)
+    # path = models.FileField(upload_to='uploads/')
+    name = models.CharField(max_length=255)
+    category = models.CharField(max_length=255, null=True)
+    isAssessment = models.BooleanField(default=False)
+    # size = models.IntegerField()
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.id} {self.name} {self.course}"
+
+class Resource(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    isBlackboardGenerated = models.BooleanField()
+    blackboardLink = models.URLField()
+    dateAdded = models.DateTimeField('date published')
+    week = models.IntegerField()
+    folder = models.ForeignKey(File, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.id} {self.title} {self.description} {self.isBlackboardGenerated} {self.blackboardLink}" \
+               f" {self.dateAdded} {self.week} {self.folder}"
 
 
 class AssessmentItem(models.Model):
