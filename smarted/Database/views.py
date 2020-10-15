@@ -519,8 +519,8 @@ def goals(request):
         raise ParseError
 
 
-def refresh_content(username, password):
-    scraper = UQBlackboardScraper(username, password, chrome=is_local)
+def refresh_content(username, password, chrome=False):
+    scraper = UQBlackboardScraper(username, password, chrome=chrome)
     courses = scraper.get_current_courses()
     print(courses)
     for course in courses.keys():
@@ -607,8 +607,6 @@ def refresh(request):
     Args:
         request (HttpRequest): post request sent from client side
     """
-    global is_local
-
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'POST':
         return BAD_REQUEST
@@ -619,6 +617,8 @@ def refresh(request):
     if username is None or password is None:
         return BAD_REQUEST
 
+    global is_local
+
     try:
         print("Cookie: ", request.header['Cookie'])
         is_local = 'EAIT_WEB' not in request.header['Cookie']
@@ -626,7 +626,7 @@ def refresh(request):
         pass
     print("IS LOCAL: ", is_local)
 
-    courses = refresh_content(username, password)
+    courses = refresh_content(username, password, chrome=is_local)
 
     for course in courses.keys():
         subject = Course.objects.get(name=courses[course]['code'].split("/")[0])
