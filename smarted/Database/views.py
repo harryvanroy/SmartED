@@ -380,7 +380,8 @@ def post_goals(request, username):
 
     courseID = json_body.get('courseID')
     type = json_body.get('type')
-    is_complete = json_body.get('is_complete')
+    is_complete = json_body.get('is_complete') \
+        if json_body.get('is_complete') is not None else False
     print("COMPLETE: ", is_complete)
 
     user = User.objects.get(username=username)
