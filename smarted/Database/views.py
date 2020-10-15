@@ -8,7 +8,7 @@ from .scrape.scrape import UQBlackboardScraper
 from .models import *
 from rest_framework.exceptions import ValidationError, ParseError
 
-is_local = True
+is_local = False
 FORCE_TEACHER = False
 
 DEFAUlT_TEACHER_USER = "uqTeacher1"
