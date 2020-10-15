@@ -8,7 +8,7 @@ from .scrape.scrape import UQBlackboardScraper
 from .models import *
 from rest_framework.exceptions import ValidationError, ParseError
 
-is_local = True
+is_local = False
 FORCE_TEACHER = False
 
 DEFAUlT_TEACHER_USER = "uqTeacher1"
@@ -519,8 +519,8 @@ def goals(request):
         raise ParseError
 
 
-def refresh_content(username, password, chrome=False):
-    scraper = UQBlackboardScraper(username, password, chrome=chrome)
+def refresh_content(username, password):
+    scraper = UQBlackboardScraper(username, password, chrome=is_local)
     courses = scraper.get_current_courses()
     print(courses)
     for course in courses.keys():
@@ -607,8 +607,6 @@ def refresh(request):
     Args:
         request (HttpRequest): post request sent from client side
     """
-    global is_local
-
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'POST':
         return BAD_REQUEST
@@ -619,16 +617,7 @@ def refresh(request):
     if username is None or password is None:
         return BAD_REQUEST
 
-    is_local = True
-
-    try:
-        print("Cookie: ", request.header['Cookie'])
-        is_local = 'EAIT_WEB' not in request.header['Cookie']
-    except:
-        pass
-    print("IS LOCAL: ", is_local)
-
-    courses = refresh_content(username, password, chrome=is_local)
+    courses = refresh_content(username, password)
 
     for course in courses.keys():
         subject = Course.objects.get(name=courses[course]['code'].split("/")[0])
