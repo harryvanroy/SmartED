@@ -21,6 +21,9 @@ import Paper from '@material-ui/core/Paper';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+import DialogContentText from '@material-ui/core/DialogContentText';
+
+
 // DETERMINE LOCATION
 var url;
 if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
@@ -57,6 +60,9 @@ function Goals({ courses, assessment }) {
   const [assGoals, setAssGoals] = React.useState([]);
   const [studyGoals, setStudyGoals] = React.useState([]);
   const [customGoals, setCustomGoals] = React.useState([]);
+
+  const[openDialog, setOpenDialog] = React.useState(false);
+  const [dialogText, setDialogText] = React.useState('');
   
   useEffect(() => {
     axios(url+'/Database/goals/', {
@@ -129,6 +135,18 @@ function Goals({ courses, assessment }) {
 
   const handleClose = () => {
     setOpen(false);
+  }
+
+  function handleOpenDialog(text) {
+    return function() {
+      setOpenDialog(true);
+      setDialogText(text);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDialogText('');
   }
   
   const handleSubmit = (event) => {
@@ -320,6 +338,14 @@ function Goals({ courses, assessment }) {
   
   return (
     <div>
+      <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Custom goal</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {dialogText}
+            </DialogContentText>
+          </DialogContent>
+      </Dialog>
       <Box width="80%">
         <Typography variant="h4">
           Course Goals
@@ -396,7 +422,11 @@ function Goals({ courses, assessment }) {
               <TableCell component="th" scope="row">
                 {row.course.name}
               </TableCell>
-              <TableCell align="right">{row.text}</TableCell>
+              <TableCell align="right">
+                <Button Button variant="outlined" color="primary" onClick={handleOpenDialog(row.text)} >
+                  View goal
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
