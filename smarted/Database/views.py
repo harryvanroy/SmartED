@@ -380,36 +380,64 @@ def post_goals(request, username):
 
     courseID = json_body.get('courseID')
     type = json_body.get('type')
+    is_complete = json_body.get('is_complete')
+    print("COMPLETE: ", is_complete)
 
     user = User.objects.get(username=username)
     course = Course.objects.get(id=courseID)
 
     if type == "COURSEGRADE":
         grade = json_body.get('grade')
-        # todo: check if exists
-        goal = LongTermGoals(user=user, course=course, type=1,
-                             courseGrade=grade)
+
+        if len(LongTermGoals.objects.filter(user=user, course=course,
+                                            type=1)) == 0:
+            # new goal
+            goal = LongTermGoals(user=user, course=course, type=1,
+                                 courseGrade=grade, isComplete=is_complete)
+        else:
+            # existing goal
+            goal = LongTermGoals.objects.get(user=user, course=course,
+                                             type=1)
+            goal.courseGrade, goal.isComplete = grade, is_complete
         goal.save()
 
     elif type == "ASSESSMENTGRADE":
         grade = json_body.get('grade')
         assID = json_body.get('assID')
         ass = AssessmentItem.objects.get(id=assID)
-        # todo: check if exists
-        goal = LongTermGoals(user=user, course=course, type=2,
-                             assessment=ass,
-                             assessmentGrade=grade)
+
+        if len(LongTermGoals.objects.filter(user=user, course=course,
+                                            assessment=ass, type=2)) == 0:
+            # new goal
+            goal = LongTermGoals(user=user, course=course, type=2,
+                                 assessment=ass, assessmentGrade=grade,
+                                 isComplete=is_complete)
+        else:
+            # existing goal
+            goal = LongTermGoals.objects.get(user=user, course=course,
+                                             assessment=ass, type=2)
+            goal.assessmentGrade, goal.isComplete = grade, is_complete
         goal.save()
+
     elif type == "STUDYWEEK":
         hours = json_body.get('hours')
-        # todo: check if exists
-        goal = LongTermGoals(user=user, course=course, type=3,
-                             hourGoal=hours)
+
+        if len(LongTermGoals.objects.filter(user=user, course=course,
+                                            type=3)) == 0:
+            # new goal
+            goal = LongTermGoals(user=user, course=course, type=3,
+                                 hourGoal=hours, isComplete=is_complete)
+        else:
+            # existing goal
+            goal = LongTermGoals.objects.get(user=user, course=course,
+                                             type=3)
+            goal.hourGoal, goal.isComplete = hours, is_complete
         goal.save()
+
     elif type == "CUSTOM":
         text = json_body.get('text')
         goal = LongTermGoals(user=user, course=course, type=4,
-                             customGoal=text)
+                             customGoal=text, isComplete= is_complete)
         goal.save()
     else:
         print("ruh roh, parse error")
@@ -429,19 +457,23 @@ def get_goals(username):
 
         if goal.type == 1:  # course grade goal
             course_grades.append({"course": course_info,
-                                  "grade": goal.courseGrade})
+                                  "grade": goal.courseGrade,
+                                  "is_complete": goal.isComplete})
         elif goal.type == 2:  # ass grade goal
             ass_info = {"id": goal.assessment.id,
                         "name": goal.assessment.name}
             ass_grades.append({"course": course_info,
                                "assessment": ass_info,
-                               "grade": goal.assessmentGrade})
+                               "grade": goal.assessmentGrade,
+                               "is_complete": goal.isComplete})
         elif goal.type == 3:  # weekly study goal
             weekly_study.append({"course": course_info,
-                                 "hours": goal.hourGoal})
+                                 "hours": goal.hourGoal,
+                                 "is_complete": goal.isComplete})
         elif goal.type == 4:
             custom.append({"course": course_info,
-                           "text": goal.customGoal})
+                           "text": goal.customGoal,
+                           "is_complete": goal.isComplete})
 
     all_goals = {"COURSEGRADE": course_grades,
                  "ASSESSMENTGRADE": ass_grades,

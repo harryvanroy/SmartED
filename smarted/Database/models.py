@@ -206,9 +206,10 @@ class LongTermGoals(models.Model):
     type = models.PositiveSmallIntegerField(null=False, choices=Goal_Types, default=CUSTOM, validators=(MinValueValidator(1), MaxValueValidator(4)))
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    isComplete = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('type', 'course', 'user')
+        unique_together = ('type', 'course', 'user', 'customGoal')
 
     # For type 1
     courseGrade = models.PositiveSmallIntegerField(null=True, default=1, validators=(MinValueValidator(1), MaxValueValidator(7)))
