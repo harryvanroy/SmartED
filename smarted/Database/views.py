@@ -545,7 +545,6 @@ def save_announcements(course, announcements):
             "date" : "DAY, DAY# MONTH YEAR hh:mm:ss [AM/PM] AEST"
         )
     """
-
     def format_date(date):
         FORMAT = "D MMMM YYYY"
         split_date = date.split(" ")
