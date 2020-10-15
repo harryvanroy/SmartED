@@ -8,7 +8,7 @@ from .scrape.scrape import UQBlackboardScraper
 from .models import *
 from rest_framework.exceptions import ValidationError, ParseError
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
 
 DEFAUlT_TEACHER_USER = "uqTeacher1"
@@ -545,6 +545,7 @@ def save_announcements(course, announcements):
             "date" : "DAY, DAY# MONTH YEAR hh:mm:ss [AM/PM] AEST"
         )
     """
+
     def format_date(date):
         FORMAT = "D MMMM YYYY"
         split_date = date.split(" ")
@@ -606,6 +607,8 @@ def refresh(request):
     Args:
         request (HttpRequest): post request sent from client side
     """
+    global is_local
+
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'POST':
         return BAD_REQUEST
@@ -615,6 +618,13 @@ def refresh(request):
     password = json_body.get("password")
     if username is None or password is None:
         return BAD_REQUEST
+
+    try:
+        print("Cookie: ", request.header['Cookie'])
+        is_local = 'EAIT_WEB' not in request.header['Cookie']
+    except:
+        pass
+    print("IS LOCAL: ", is_local)
 
     courses = refresh_content(username, password)
 
