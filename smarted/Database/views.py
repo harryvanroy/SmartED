@@ -607,6 +607,8 @@ def refresh(request):
     Args:
         request (HttpRequest): post request sent from client side
     """
+    global is_local
+
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'POST':
         return BAD_REQUEST
@@ -617,7 +619,7 @@ def refresh(request):
     if username is None or password is None:
         return BAD_REQUEST
 
-    global is_local
+    is_local = True
 
     try:
         print("Cookie: ", request.header['Cookie'])
