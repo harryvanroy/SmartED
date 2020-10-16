@@ -153,11 +153,7 @@ const StudentApp = ({ user }) => {
           <Typography style={{marginLeft: 20, flexGrow: 1}}>
             Welcome {user.firstname}!
           </Typography>
-          <Study ></Study>
-          <Typography style={{marginRight: 4}}>
-            VARK score:
-          </Typography>
-          {isNaN(vark.V) ? <div> Please complete VARK quiz </div> : <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>}
+          <Study />
           <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
             <HomeIcon style={{marginLeft: 10}}fontSize={'large'}/>
           </Link>
@@ -233,7 +229,7 @@ const StudentApp = ({ user }) => {
             <Vark parentVark={vark} setParentVarkScore={setParentVarkScore}/>
           </Route>      
           <Route path="/">
-            <Home assessment={assessment} courses={courses}/>
+            <Home vark={vark} assessment={assessment} courses={courses}/>
           </Route>
         </Switch>
       </main>

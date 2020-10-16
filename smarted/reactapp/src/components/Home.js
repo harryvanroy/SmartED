@@ -3,6 +3,13 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import VarkChart from './VarkChart';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -15,9 +22,10 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function Home({ assessment, courses }) {
+function Home({ assessment, courses, vark }) {
   const classes = useStyles();
-
+  
+  const [open, setOpen] = React.useState(false);;
   function checkDate(dateString) {
     if (isNaN(parseInt(dateString[0]))) {
       return new Date(8640000000000000);
@@ -34,8 +42,30 @@ function Home({ assessment, courses }) {
     return new Date(year, month, day);
   }
 
+  const handleVarkOpen = () => {
+    setOpen(true);
+  }
+
+  const handleVarkClose = () => {
+    setOpen(false);
+  }
+
   return (
     <div>
+      <Dialog open={open} onClose={handleVarkClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">About VARK</DialogTitle>
+          <DialogContent>
+            <DialogContentText style={{color: 'black'}}>
+            While there are several tools to study learning styles of students, 
+            the visual-aural-read/write-kinesthetic (VARK) questionnaire is a simple, 
+            freely available, easy to administer tool that encourages students to describe 
+            their behavior in a manner they can identify with and accept. 
+            The aim is to understand the preferred sensory modality (or modalities) of students 
+            for learning. Teachers can use this knowledge to facilitate student learning. 
+            Moreover, students themselves can use this knowledge to change their learning habits.
+            </DialogContentText>
+          </DialogContent>
+      </Dialog>
       <Grid container justify="center" spacing={3}>
         <Grid item xs={8}>
           <Grid container spacing={3}>
@@ -78,9 +108,30 @@ function Home({ assessment, courses }) {
               <Paper className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
+                    VARK statistics 
+                    <Button style={{marginLeft: 5}} color='primary' onClick={handleVarkOpen}>
+                      Read more
+                    </Button>
+                  </Typography>
+                </div>
+                <Typography>
+                  {
+                    isNaN(vark.V)
+                    ? <Typography style={{textAlign: 'center'}}>Please complete vark quiz</Typography>
+                    : <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                  }
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>
+                <div className = {classes.paperTitle}>
+                  <Typography variant="h5">
                     Upcoming assessment
                   </Typography>
-                  <div style ={{fontSize: '12px', color: 'rgb(255, 77, 77)'}}>Assessment highlighted red are due in the next week</div>
+                  <div style ={{fontSize: '12px', color: 'rgb(255, 77, 77)'}}>
+                    <Typography variant="h7">Assessment highlighted red are due in the next week</Typography>
+                  </div>
                 </div>
                 {
                   courses.map(course =>  
@@ -105,10 +156,10 @@ function Home({ assessment, courses }) {
                             <div key={assessCourse.id}>
                               {checkDate(assessCourse.dateDescription) < currentDate.setDate(currentDate.getDate() + 7)
                               ? <div style={{color: 'rgb(255, 77, 77)'}}>
-                                  {'-' + assessCourse.name}
+                                  <Typography>{'-' + assessCourse.name}</Typography>
                                 </div>
                               : <div >
-                                  {'-' + assessCourse.name}
+                                  <Typography>{'-' + assessCourse.name}</Typography>
                                 </div>}
                             </div>
                           )

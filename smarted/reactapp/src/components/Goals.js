@@ -20,8 +20,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
-
 import DialogContentText from '@material-ui/core/DialogContentText';
 
 
