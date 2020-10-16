@@ -92,6 +92,7 @@ const Feedback = ({ courses }) => {
     })
     .then(res => {
       console.log('posted..');
+      console.log(res);
       setOpen(true);
       setState({
         course: '',
