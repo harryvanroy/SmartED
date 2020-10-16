@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 is_local = False
 FORCE_TEACHER = False
 
-DEFAUlT_TEACHER_USER = "uqTeacher1"
+DEFAUlT_TEACHER_USER = "Uqjstuaa"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"
 DEFAULT_TEACHER_LAST_NAME = "Sri"
 

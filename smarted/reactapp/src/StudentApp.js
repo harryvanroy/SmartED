@@ -154,7 +154,7 @@ const StudentApp = ({ user }) => {
           <Typography style={{marginRight: 4}}>
             VARK score:
           </Typography>
-          {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
+          {isNaN(vark.V) ? <div> Please complete VARK quiz </div> : <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>}
           <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
             <HomeIcon style={{marginLeft: 10}}fontSize={'large'}/>
           </Link>

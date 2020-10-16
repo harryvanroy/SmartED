@@ -20,6 +20,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import DeleteOutlinedIcon from '@material-ui/icons/DeleteOutlined';
 
 import DialogContentText from '@material-ui/core/DialogContentText';
 
@@ -336,6 +337,10 @@ function Goals({ courses, assessment }) {
       );
     }
   };
+
+  const handleDelete = () => {
+    console.log('deleted clicked');
+  }
   
   return (
     <div>
@@ -415,6 +420,7 @@ function Goals({ courses, assessment }) {
           <TableRow>
             <TableCell>Course</TableCell>
             <TableCell align="right">Custom goal</TableCell>
+            <TableCell width='2'></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -424,8 +430,16 @@ function Goals({ courses, assessment }) {
                 {row.course.name}
               </TableCell>
               <TableCell align="right">
-                <Button Button variant="outlined" color="primary" onClick={handleOpenDialog(row.text)} >
+                <Button variant="outlined" color="primary" onClick={handleOpenDialog(row.text)} >
                   View goal
+                </Button>
+              </TableCell>
+              <TableCell>
+                <Button 
+                  onClick={handleDelete}
+                  color="secondary"
+                >
+                  Delete
                 </Button>
               </TableCell>
             </TableRow>
@@ -439,6 +453,7 @@ function Goals({ courses, assessment }) {
           <TableRow>
             <TableCell>Course</TableCell>
             <TableCell align="right">Overall grade</TableCell>
+            <TableCell width='2'></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -447,7 +462,17 @@ function Goals({ courses, assessment }) {
               <TableCell component="th" scope="row">
                 {row.course.name}
               </TableCell>
-              <TableCell align="right">{row.grade}</TableCell>
+              <TableCell align="right">
+                {row.grade}
+              </TableCell>
+              <TableCell>
+                <Button 
+                  onClick={handleDelete}
+                  color="secondary"
+                >
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -459,6 +484,7 @@ function Goals({ courses, assessment }) {
           <TableRow>
             <TableCell>Course</TableCell>
             <TableCell align="right">Weekly study time</TableCell>
+            <TableCell width='2'></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -468,6 +494,14 @@ function Goals({ courses, assessment }) {
                 {row.course.name}
               </TableCell>
               <TableCell align="right">{row.hours} hours</TableCell>
+              <TableCell>
+                <Button 
+                  onClick={handleDelete}
+                  color="secondary"
+                >
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -480,6 +514,7 @@ function Goals({ courses, assessment }) {
             <TableCell>Course</TableCell>
             <TableCell align="right">Assessment item</TableCell>
             <TableCell align="right">Grade</TableCell>
+            <TableCell width='2'></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -490,6 +525,14 @@ function Goals({ courses, assessment }) {
               </TableCell>
               <TableCell align="right">{row.assessment.name}</TableCell>
               <TableCell align="right">{row.grade}</TableCell>
+              <TableCell>
+                <Button 
+                  onClick={handleDelete}
+                  color="secondary"
+                >
+                  Delete
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
