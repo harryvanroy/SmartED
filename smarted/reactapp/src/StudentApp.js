@@ -34,6 +34,8 @@ import Vark from './components/Vark';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+import Study from './components/StudySesh'
+
 const drawerWidth = 200;
 
 // DETERMINE LOCATION
@@ -151,6 +153,7 @@ const StudentApp = ({ user }) => {
           <Typography style={{marginLeft: 20, flexGrow: 1}}>
             Welcome {user.firstname}!
           </Typography>
+          <Study ></Study>
           <Typography style={{marginRight: 4}}>
             VARK score:
           </Typography>
