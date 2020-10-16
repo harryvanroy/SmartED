@@ -50,11 +50,7 @@ const TeacherGrades = ({ assessment, course }) => {
       withCredentials: true
     })
     .then(res => {
-      setGrade({
-        "studentID": "",
-        "assID": 0,
-        "grade": 0
-      });
+      console.log('posted grade..')
     });
   }
 

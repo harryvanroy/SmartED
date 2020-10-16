@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import Box from '@material-ui/core/Box';
+import Typography from '@material-ui/core/Typography';
 
 // DETERMINE LOCATION
 var url;
@@ -14,7 +16,7 @@ if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
 console.log("location: " + url);
 //
 
-function Grades() {
+function Grades({ courses }) {
   const [grades, setGrades] = React.useState([]);
 
   useEffect(() => {
@@ -27,11 +29,14 @@ function Grades() {
         setGrades(res.data);
       });
   }, []);
+
   return (
     <div>
-      {grades.map((grade) => (
-        <div>{grade.grade} for {grade.assessment.name}</div>
-      ))}
+      <Box width="80%">
+        <Typography variant="h4">
+          My Grades
+        </Typography>
+      </Box>
     </div>
   );
 };

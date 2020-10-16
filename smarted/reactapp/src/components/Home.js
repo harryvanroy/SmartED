@@ -70,7 +70,7 @@ function Home({ assessment, courses, vark }) {
         <Grid item xs={8}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper elevation={3} className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
                     Announcements
@@ -91,7 +91,7 @@ function Home({ assessment, courses, vark }) {
               </Paper>
             </Grid>
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper elevation={3} className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
                     Personalised feedback
@@ -105,7 +105,7 @@ function Home({ assessment, courses, vark }) {
         <Grid item xs={4}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper elevation={3} className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
                     VARK statistics 
@@ -124,7 +124,7 @@ function Home({ assessment, courses, vark }) {
               </Paper>
             </Grid>
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper elevation={3} className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
                     Upcoming assessment
@@ -183,7 +183,7 @@ function Home({ assessment, courses, vark }) {
               </Paper>
             </Grid>
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper elevation={3} className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
                     Daily goals
@@ -216,7 +216,7 @@ function Home({ assessment, courses, vark }) {
               </Paper>
             </Grid>
             <Grid item xs={12}>
-              <Paper className={classes.paper}>
+              <Paper elevation={3} className={classes.paper}>
                 <div className = {classes.paperTitle}>
                   <Typography variant="h5">
                     Class Attendance

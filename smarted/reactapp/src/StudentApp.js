@@ -220,7 +220,7 @@ const StudentApp = ({ user }) => {
             <Goals assessment={assessment} courses={courses}/>
           </Route>
           <Route path="/grades">
-            <Grades />
+            <Grades courses={courses} />
           </Route>
           <Route path="/resources">
             <Resources />
