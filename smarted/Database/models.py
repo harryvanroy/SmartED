@@ -104,6 +104,7 @@ class File(models.Model):
 
 class Resource(models.Model):
     id = models.AutoField(primary_key=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     isBlackboardGenerated = models.BooleanField()
