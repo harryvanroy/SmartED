@@ -217,7 +217,7 @@ export default function Study() {
       setStarted(false);
       setState({
         duration: 0,
-        endtime: new Date().getTime(),
+        starttime: new Date().getTime(),
         g1: '',
         g2: '',
         g3: '',
