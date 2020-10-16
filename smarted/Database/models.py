@@ -44,6 +44,7 @@ class Staff(models.Model):
     def __str__(self):
         return f"{self.user}"
 
+
 class Institution(models.Model):
     name = models.CharField(max_length=200)
 
@@ -75,6 +76,7 @@ class Course(models.Model):
     def __str__(self):
         return f"{self.name}. {self.year}, Semester {self.semester}. {self.mode} "
 
+
 class Announcement(models.Model):
     id = models.IntegerField(primary_key=True)
     title = models.CharField(max_length=255)
@@ -85,6 +87,7 @@ class Announcement(models.Model):
 
     def __str__(self):
         return f"{self.id} {self.title} {self.content} {self.isBlackboardGenerated} {self.dateAdded}" f" {self.dateAdded} {self.week} {self.course}"
+
 
 class File(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -98,12 +101,13 @@ class File(models.Model):
     def __str__(self):
         return f"{self.id} {self.name} {self.course}"
 
+
 class Resource(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     isBlackboardGenerated = models.BooleanField()
-    blackboardLink = models.URLField()
+    blackboardLink = models.URLField(max_length=512)
     dateAdded = models.DateTimeField('date published')
     week = models.IntegerField()
     folder = models.ForeignKey(File, on_delete=models.SET_NULL, blank=True, null=True)
@@ -191,6 +195,7 @@ class DailyGoals(models.Model):
     lastUpdated = models.DateField(auto_now_add=True)
     complete = models.BooleanField(null=False, default=False)
 
+
 class LongTermGoals(models.Model):
     COURSEGRADE = 1
     ASSESSMENTGRADE = 2
@@ -203,15 +208,18 @@ class LongTermGoals(models.Model):
         (CUSTOM, 4)
     ]
 
-    type = models.PositiveSmallIntegerField(null=False, choices=Goal_Types, default=CUSTOM, validators=(MinValueValidator(1), MaxValueValidator(4)))
+    type = models.PositiveSmallIntegerField(null=False, choices=Goal_Types, default=CUSTOM,
+                                            validators=(MinValueValidator(1), MaxValueValidator(4)))
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    isComplete = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('type', 'course', 'user')
+    #class Meta:
+    #    unique_together = ('type', 'course', 'user', 'customGoal')
 
     # For type 1
-    courseGrade = models.PositiveSmallIntegerField(null=True, default=1, validators=(MinValueValidator(1), MaxValueValidator(7)))
+    courseGrade = models.PositiveSmallIntegerField(null=True, default=1,
+                                                   validators=(MinValueValidator(1), MaxValueValidator(7)))
 
     # For type 2
     assessment = models.ForeignKey(AssessmentItem, on_delete=models.SET_NULL, blank=True, null=True)

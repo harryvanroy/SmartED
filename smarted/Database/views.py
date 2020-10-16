@@ -8,8 +8,8 @@ from .scrape.scrape import UQBlackboardScraper
 from .models import *
 from rest_framework.exceptions import ValidationError, ParseError
 
-is_local = True
-FORCE_TEACHER = True
+is_local = False
+FORCE_TEACHER = False
 
 DEFAUlT_TEACHER_USER = "uqTeacher1"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"
@@ -380,36 +380,65 @@ def post_goals(request, username):
 
     courseID = json_body.get('courseID')
     type = json_body.get('type')
+    is_complete = json_body.get('is_complete') \
+        if json_body.get('is_complete') is not None else False
+    print("COMPLETE: ", is_complete)
 
     user = User.objects.get(username=username)
     course = Course.objects.get(id=courseID)
 
     if type == "COURSEGRADE":
         grade = json_body.get('grade')
-        # todo: check if exists
-        goal = LongTermGoals(user=user, course=course, type=1,
-                             courseGrade=grade)
+
+        if len(LongTermGoals.objects.filter(user=user, course=course,
+                                            type=1)) == 0:
+            # new goal
+            goal = LongTermGoals(user=user, course=course, type=1,
+                                 courseGrade=grade, isComplete=is_complete)
+        else:
+            # existing goal
+            goal = LongTermGoals.objects.get(user=user, course=course,
+                                             type=1)
+            goal.courseGrade, goal.isComplete = grade, is_complete
         goal.save()
 
     elif type == "ASSESSMENTGRADE":
         grade = json_body.get('grade')
         assID = json_body.get('assID')
         ass = AssessmentItem.objects.get(id=assID)
-        # todo: check if exists
-        goal = LongTermGoals(user=user, course=course, type=2,
-                             assessment=ass,
-                             assessmentGrade=grade)
+
+        if len(LongTermGoals.objects.filter(user=user, course=course,
+                                            assessment=ass, type=2)) == 0:
+            # new goal
+            goal = LongTermGoals(user=user, course=course, type=2,
+                                 assessment=ass, assessmentGrade=grade,
+                                 isComplete=is_complete)
+        else:
+            # existing goal
+            goal = LongTermGoals.objects.get(user=user, course=course,
+                                             assessment=ass, type=2)
+            goal.assessmentGrade, goal.isComplete = grade, is_complete
         goal.save()
+
     elif type == "STUDYWEEK":
         hours = json_body.get('hours')
-        # todo: check if exists
-        goal = LongTermGoals(user=user, course=course, type=3,
-                             hourGoal=hours)
+
+        if len(LongTermGoals.objects.filter(user=user, course=course,
+                                            type=3)) == 0:
+            # new goal
+            goal = LongTermGoals(user=user, course=course, type=3,
+                                 hourGoal=hours, isComplete=is_complete)
+        else:
+            # existing goal
+            goal = LongTermGoals.objects.get(user=user, course=course,
+                                             type=3)
+            goal.hourGoal, goal.isComplete = hours, is_complete
         goal.save()
+
     elif type == "CUSTOM":
         text = json_body.get('text')
         goal = LongTermGoals(user=user, course=course, type=4,
-                             customGoal=text)
+                             customGoal=text, isComplete=is_complete)
         goal.save()
     else:
         print("ruh roh, parse error")
@@ -428,20 +457,24 @@ def get_goals(username):
         course_info = {"id": goal.course.id, "name": goal.course.name}
 
         if goal.type == 1:  # course grade goal
-            course_grades.append({"course": course_info,
-                                  "grade": goal.courseGrade})
-        elif goal.type == 2: # ass grade goal
+            course_grades.append({"id": goal.id, "course": course_info,
+                                  "grade": goal.courseGrade,
+                                  "is_complete": goal.isComplete})
+        elif goal.type == 2:  # ass grade goal
             ass_info = {"id": goal.assessment.id,
                         "name": goal.assessment.name}
-            ass_grades.append({"course": course_info,
+            ass_grades.append({"id": goal.id, "course": course_info,
                                "assessment": ass_info,
-                               "grade": goal.assessmentGrade})
+                               "grade": goal.assessmentGrade,
+                               "is_complete": goal.isComplete})
         elif goal.type == 3:  # weekly study goal
-            weekly_study.append({"course": course_info,
-                                 "hours": goal.hourGoal})
+            weekly_study.append({"id": goal.id, "course": course_info,
+                                 "hours": goal.hourGoal,
+                                 "is_complete": goal.isComplete})
         elif goal.type == 4:
-            custom.append({"course": course_info,
-                           "text": goal.customGoal})
+            custom.append({"id": goal.id, "course": course_info,
+                           "text": goal.customGoal,
+                           "is_complete": goal.isComplete})
 
     all_goals = {"COURSEGRADE": course_grades,
                  "ASSESSMENTGRADE": ass_grades,
@@ -449,6 +482,23 @@ def get_goals(username):
                  "CUSTOM": custom}
 
     return HttpResponse(json.dumps(all_goals))
+
+
+def delete_goal(request, username):
+    goalID = request.GET.get('id')
+    try:
+        goalID = int(goalID)
+    except:
+        raise ParseError
+
+    goal = LongTermGoals.objects.get(id=goalID)
+
+    if goal.user.username != username:
+        raise ValidationError
+    else:
+        goal.delete()
+
+    return HttpResponse("")
 
 
 @csrf_exempt
@@ -461,8 +511,13 @@ def goals(request):
 
     if request.method == "POST":
         return post_goals(request, username)
-    else:
+    elif request.method == "GET":
         return get_goals(username)
+    elif request.method == "DELETE":
+        return delete_goal(request, username)
+    else:
+        raise ParseError
+
 
 def refresh_content(username, password):
     scraper = UQBlackboardScraper(username, password, chrome=is_local)
@@ -475,7 +530,8 @@ def refresh_content(username, password):
 
     scraper.driver.quit()
     return courses
-   
+
+
 def save_announcements(course, announcements):
     """
     Save course announcements to the database
@@ -489,6 +545,7 @@ def save_announcements(course, announcements):
             "date" : "DAY, DAY# MONTH YEAR hh:mm:ss [AM/PM] AEST"
         )
     """
+
     def format_date(date):
         FORMAT = "D MMMM YYYY"
         split_date = date.split(" ")
@@ -497,9 +554,9 @@ def save_announcements(course, announcements):
 
     for post in announcements.keys():
         announcement = Announcement(
-            id=post, 
-            title=announcements[post]['title'], 
-            content=announcements[post]['content'], 
+            id=post,
+            title=announcements[post]['title'],
+            content=announcements[post]['content'],
             isBlackboardGenerated=True,
             dateAdded=format_date(announcements[post]['date']),
             course=course
@@ -519,7 +576,7 @@ def save_resources(course, resources, assessed):
             "type" : "[TYPE]", 
             "links" : [l1, l2, ..., lN]
         )
-    """  
+    """
     for item_id in resources.keys():
         folder = File(
             id=item_id,
@@ -531,15 +588,16 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link in resources[item_id]['links']:
             resource = Resource(
-                title="", # TODO: scrape this 
-                description="", # TODO: scrape this 
+                title="",  # TODO: scrape this
+                description="",  # TODO: scrape this
                 isBlackboardGenerated=True,
-                blackboardLink=link, 
-                dateAdded="2020-10-15", # TODO: scrape this
-                week=1, # TODO: scrape this
+                blackboardLink=link,
+                dateAdded="2020-10-15",  # TODO: scrape this
+                week=1,  # TODO: scrape this
                 folder=folder
             )
-            resource.save() 
+            resource.save()
+
 
 @csrf_exempt
 def refresh(request):
@@ -560,7 +618,7 @@ def refresh(request):
         return BAD_REQUEST
 
     courses = refresh_content(username, password)
-    
+
     for course in courses.keys():
         subject = Course.objects.get(name=courses[course]['code'].split("/")[0])
         save_announcements(subject, courses[course]['announcements'])
@@ -568,7 +626,5 @@ def refresh(request):
         save_resources(subject, courses[course]['assessment'], True)
 
     return HttpResponse("SUCCESS")
-
-    
 
 ##############################################
