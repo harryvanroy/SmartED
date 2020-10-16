@@ -232,6 +232,7 @@ function Goals({ courses, assessment }) {
               text: state.text
             }
             setCustomGoals([...customGoals, goalCustom])
+            break;
           default:
         }
       })

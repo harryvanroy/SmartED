@@ -10,6 +10,20 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+  // console.log("ON DECO SITE");
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  // console.log("ON LOCAL");
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -40,6 +54,23 @@ function Feedback({ courses }) {
 
   const handleSubmit = () => {
     console.log(state);
+    axios(url+`/Database/post-course-feedback/`, {
+      method: "post",
+      data: {
+        courseID: state.course,
+        feedback: state.text,
+        anonymous: state.anon === true ? 1 : 0
+      },
+      withCredentials: true
+    })
+    .then(res => {
+      console.log('posted..');
+      setState({
+        course: '',
+        text: '',
+        anon: false
+      })
+    })
   }
 
   return (

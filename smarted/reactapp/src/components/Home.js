@@ -102,13 +102,15 @@ function Home({ assessment, courses }) {
                             new Date().getDate()
                           );
                           return (
-                            checkDate(assessCourse.dateDescription) < currentDate.setDate(currentDate.getDate() + 7)
-                            ? <div style={{color: 'rgb(255, 77, 77)'}}>
-                                {'-' + assessCourse.name}
-                              </div>
-                            : <div style={{}}>
-                                {'-' + assessCourse.name}
-                              </div>
+                            <div key={assessCourse.id}>
+                              {checkDate(assessCourse.dateDescription) < currentDate.setDate(currentDate.getDate() + 7)
+                              ? <div style={{color: 'rgb(255, 77, 77)'}}>
+                                  {'-' + assessCourse.name}
+                                </div>
+                              : <div >
+                                  {'-' + assessCourse.name}
+                                </div>}
+                            </div>
                           )
                         })
                       }

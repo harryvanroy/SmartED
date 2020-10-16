@@ -84,9 +84,7 @@ const useStyles = makeStyles((theme) => ({
 const TeacherApp = ({ user }) => {
   const classes = useStyles();
   const [courses, setCourses] = React.useState([]);
-  const [currentCourse, setCurrentCourse] = React.useState({
-    "name": " ",
-  });
+  const [currentCourse, setCurrentCourse] = React.useState(JSON.parse(localStorage.getItem('currentCourse')));
   const [assessment, setAssessment] = React.useState([]);
 
   useEffect(() => {
@@ -97,11 +95,17 @@ const TeacherApp = ({ user }) => {
       .then(res => {
         console.log(res.data);
         setCourses(res.data);
-        console.log(res.data[0])
-        setCurrentCourse(res.data[0]);
+        console.log(res.data[0]);
+        if (localStorage.getItem('currentCourse') === null) {
+          localStorage.setItem('currentCourse', JSON.stringify(res.data[0]));
+          setCurrentCourse(res.data[0]);
+        } else {
+          setCurrentCourse(JSON.parse(localStorage.getItem('currentCourse')));
+        }
+        //setCurrentCourse(res.data[0])
         let resp = [];
         let promises = [];
-        res.data.map(course => {
+        res.data.forEach(course => {
           promises.push(
             axios(url+`/Database/course-assessment/?id=${course.id}`, {
               method: "get",
@@ -141,7 +145,10 @@ const TeacherApp = ({ user }) => {
                 id="demo-simple-select-outlined"
                 label="Course"
                 style={{color: 'white'}}
-                onChange={(e) => setCurrentCourse(e.target.value)}
+                onChange={(e) => {
+                  setCurrentCourse(e.target.value);
+                  localStorage.setItem('currentCourse', JSON.stringify(e.target.value));
+                }}
                 >
                 {courses.map((a, index) => 
                   <MenuItem key={index} value={a}> {a.name} </MenuItem>

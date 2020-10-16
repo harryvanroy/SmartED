@@ -112,7 +112,7 @@ const StudentApp = ({ user }) => {
           setCourses(res.data);
           let resp = [];
           let promises = [];
-          res.data.map(course => {
+          res.data.forEach(course => {
             promises.push(
               axios(url+`/Database/course-assessment/?id=${course.id}`, {
                 method: "get",

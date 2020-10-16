@@ -66,7 +66,7 @@ const TeacherGrades = ({ assessment, course }) => {
           onChange={handleAssessmentChange}
         >
           {assessment.filter(ass => ass.course === course.id).map(e => 
-            <MenuItem value={e.id}>{e.name}</MenuItem>
+            <MenuItem key={e.id} value={e.id}>{e.name}</MenuItem>
           )}
         </Select>
         <TextField
