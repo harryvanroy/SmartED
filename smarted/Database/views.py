@@ -12,12 +12,16 @@ import pytz
 is_local = False
 FORCE_TEACHER = False
 
-DEFAUlT_TEACHER_USER = "Uqjstuaa"
+DEFAULT_TEACHER_USER = "Uqjstuaa"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"
 DEFAULT_TEACHER_LAST_NAME = "Sri"
 
-DEFAULT_USER = "s4532094"
-DEFAULT_FIRST_NAME = "Kyle"
+DEFAULT_USERS = ["s4532094", "s0000001", "s0000002", "s0000003"]
+DEFAULT_FIRST_NAMES = ["Kyle", "Alex", "Steve", "Jess"]
+
+INDEX = 3
+DEFAULT_USER = DEFAULT_USERS[INDEX]
+DEFAULT_FIRST_NAME = DEFAULT_FIRST_NAMES[INDEX]
 DEFAULT_LAST_NAME = "Sanderlands"
 
 from . import teacher_views  # must be down here to avoid circular import error
@@ -71,7 +75,7 @@ def initialize_course(header, stu):
         # SAVE STUDENT COURSES
 
         if len(StudentCourse.objects
-                       .filter(student=stu, course=course_obj)) == 0:
+               .filter(student=stu, course=course_obj)) == 0:
             print("saving studentCourse...")
             stu_course = StudentCourse(student=stu, course=course_obj)
             stu_course.save()
@@ -108,7 +112,7 @@ def initialize(request):
 
     # overwrites fetched data if force_teacher flag is set
     if FORCE_TEACHER:
-        username = DEFAUlT_TEACHER_USER
+        username = DEFAULT_TEACHER_USER
         first_name = DEFAULT_TEACHER_FIRST_NAME
         last_name = DEFAULT_TEACHER_LAST_NAME
         is_student = False
@@ -165,7 +169,7 @@ def vark(request):
         json_body = json.loads(request.body)
 
         V, A, R, K = json_body.get("V"), json_body.get("A"), \
-                     json_body.get("R"), json_body.get("K")
+            json_body.get("R"), json_body.get("K")
         print(V, A, R, K)
 
         user = User.objects.get(username=username)
@@ -318,10 +322,10 @@ def get_student_grades(request):
                   in StudentAssessment.objects.filter(student=student)]
 
     json_grades = [{"assessment":
-                        {"name": grade.assessment.name,
-                         "courseName": grade.assessment.course.name,
-                         "dateDescription": grade.assessment.dateDescription,
-                         "weight": grade.assessment.weight},
+                    {"name": grade.assessment.name,
+                     "courseName": grade.assessment.course.name,
+                     "dateDescription": grade.assessment.dateDescription,
+                     "weight": grade.assessment.weight},
                     "grade": str(grade.value)}
                    for grade in grades]
 
@@ -369,12 +373,12 @@ def post_course_feedback(request):
         raise ValidationError
 
     if len([x for x in CourseFeedback.objects.filter(user=user, course=course)
-     if (datetime.datetime.now(pytz.utc) - x.lastUpdated).days == 0]) >= 2:
-         # user has already posted twice today!
-         return HttpResponse("spam")  # react should use this res to alert
+            if (datetime.datetime.now(pytz.utc) - x.lastUpdated).days == 0]) >= 2:
+        # user has already posted twice today!
+        return HttpResponse("spam")  # react should use this res to alert
 
-    course_feedback = CourseFeedback(user=user, course=course, 
-                                anonymous=anonymous, feedback=feedback)
+    course_feedback = CourseFeedback(user=user, course=course,
+                                     anonymous=anonymous, feedback=feedback)
 
     course_feedback.save()
 
@@ -531,7 +535,8 @@ def refresh_content(username, password):
     courses = scraper.get_current_courses()
     print(courses)
     for course in courses.keys():
-        courses[course]['announcements'] = scraper.get_course_announcements(course)
+        courses[course]['announcements'] = scraper.get_course_announcements(
+            course)
         courses[course]['resources'] = scraper.get_learning_resources(course)
         courses[course]['assessment'] = scraper.get_course_assessment(course)
 
@@ -556,7 +561,8 @@ def save_announcements(course, announcements):
     def format_date(date):
         FORMAT = "D MMMM YYYY"
         split_date = date.split(" ")
-        cleaned_date = "{} {} {}".format(split_date[1], split_date[2], split_date[3])
+        cleaned_date = "{} {} {}".format(
+            split_date[1], split_date[2], split_date[3])
         return arrow.get(cleaned_date, FORMAT).format('YYYY-MM-DD')
 
     for post in announcements.keys():
@@ -627,7 +633,8 @@ def refresh(request):
     courses = refresh_content(username, password)
 
     for course in courses.keys():
-        subject = Course.objects.get(name=courses[course]['code'].split("/")[0])
+        subject = Course.objects.get(
+            name=courses[course]['code'].split("/")[0])
         save_announcements(subject, courses[course]['announcements'])
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
