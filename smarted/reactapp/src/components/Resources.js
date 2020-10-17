@@ -2,9 +2,11 @@ import React from 'react';
 
 function Resources() {
   return (
-    <div>
-      Resources page.
-    </div>
+    <Box width="80%">
+      <Typography variant="h4">
+        Resources
+      </Typography>
+    <Box>
   );
 };
 
