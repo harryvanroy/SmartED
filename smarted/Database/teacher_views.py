@@ -13,14 +13,24 @@ import re
 FORCE_TEACHER = views.FORCE_TEACHER
 # used if student/teacher check is overridden
 DEFAULT_TEACHER_USER = views.DEFAULT_TEACHER_USER
+TEACHER_CHECK_EXEMPT_CSRFS = views.TEACHER_CHECK_EXEMPT_CSRFS
 
 
 # returns a boolean for success/fail and the teachers username
 def authorize_teacher(header):
+
+    # check if request's csrf has an exemption for teacher checks
+    CSRF_EXEMPT = False
+    try:
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        CSRF_EXEMPT = True if (csrf_token in TEACHER_CHECK_EXEMPT_CSRFS) else False
+    except:
+        pass
+
     try:
         # there might be edge cases for this...
         if header['X-Uq-User-Type'] == 'Student':
-            if not FORCE_TEACHER:
+            if not FORCE_TEACHER and not CSRF_EXEMPT:
                 # no teacher overwrite and not a real teacher
                 return False, "error"
         else:
