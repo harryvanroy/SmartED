@@ -7,7 +7,7 @@ function Resources() {
       <Typography variant="h4">
         Resources
       </Typography>
-    <Box>
+    </Box>
   );
 };
 

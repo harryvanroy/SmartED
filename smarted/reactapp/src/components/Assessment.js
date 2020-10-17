@@ -18,9 +18,9 @@ function Assessment() {
   return (
     <Box width="80%">
       <Typography variant="h4">
-        Resources
+        Assessment
       </Typography>
-    <Box>
+    </Box>
   );
 };
 

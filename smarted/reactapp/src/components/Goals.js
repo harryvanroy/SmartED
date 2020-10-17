@@ -1,31 +1,30 @@
-import React, { useEffect } from 'react';
-import TextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
-import { Button, Box, Typography } from '@material-ui/core';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Select from '@material-ui/core/Select';
-import FormControl from '@material-ui/core/FormControl';
-import { Link } from 'react-router-dom';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import DialogContentText from '@material-ui/core/DialogContentText';
-
+import React, { useEffect } from "react";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles } from "@material-ui/core/styles";
+import { Button, Box, Typography } from "@material-ui/core";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import FormControl from "@material-ui/core/FormControl";
+import { Link } from "react-router-dom";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
+import axios from "axios";
+import Cookies from "js-cookie";
+import DialogContentText from "@material-ui/core/DialogContentText";
 
 // DETERMINE LOCATION
 var url;
-if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
@@ -38,8 +37,11 @@ console.log("location: " + url);
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(0),
-    minWidth: 120
-  }
+    minWidth: 120,
+  },
+  table: {
+    minWidth: 650,
+  },
 }));
 
 function Goals({ courses, assessment }) {
@@ -47,107 +49,118 @@ function Goals({ courses, assessment }) {
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState({
     courseID: 0,
-    courseName: '',
-    type: '',
+    courseName: "",
+    type: "",
     grade: 0,
     hours: 0,
     assID: 0,
-    assName: '',
-    text: ''
+    assName: "",
+    text: "",
   });
   const [gradeGoals, setGradeGoals] = React.useState([]);
   const [assGoals, setAssGoals] = React.useState([]);
   const [studyGoals, setStudyGoals] = React.useState([]);
   const [customGoals, setCustomGoals] = React.useState([]);
 
-  const[openDialog, setOpenDialog] = React.useState(false);
-  const [dialogText, setDialogText] = React.useState('');
-  
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [dialogText, setDialogText] = React.useState("");
+
   useEffect(() => {
-    axios(url+'/Database/goals/', {
+    axios(url + "/Database/goals/", {
       method: "get",
-      withCredentials: true
-      })
-      .then(res => {
-        let courseGoalsToAdd = [];
-        let assGoalsToAdd = [];
-        let studyGoalsToAdd = [];
-        let customGoalsToAdd = [];
+      withCredentials: true,
+    }).then((res) => {
+      let courseGoalsToAdd = [];
+      let assGoalsToAdd = [];
+      let studyGoalsToAdd = [];
+      let customGoalsToAdd = [];
 
-        res.data["COURSEGRADE"].forEach(courseGradeGoal => {
-          console.log(courseGradeGoal);
-          courseGoalsToAdd.push(courseGradeGoal);
-        });
-        res.data["ASSESSMENTGRADE"].forEach(assGoal => {
-          console.log(assGoal);
-          assGoalsToAdd.push(assGoal);
-        });
-        res.data["STUDYWEEK"].forEach(studyGoal => {
-          console.log(studyGoal);
-          studyGoalsToAdd.push(studyGoal);
-        });
-        res.data["CUSTOM"].forEach(customGoal => {
-          console.log(customGoal);
-          customGoalsToAdd.push(customGoal)
-        });
+      res.data["COURSEGRADE"].forEach((courseGradeGoal) => {
+        console.log(courseGradeGoal);
+        courseGoalsToAdd.push(courseGradeGoal);
+      });
+      res.data["ASSESSMENTGRADE"].forEach((assGoal) => {
+        console.log(assGoal);
+        assGoalsToAdd.push(assGoal);
+      });
+      res.data["STUDYWEEK"].forEach((studyGoal) => {
+        console.log(studyGoal);
+        studyGoalsToAdd.push(studyGoal);
+      });
+      res.data["CUSTOM"].forEach((customGoal) => {
+        console.log(customGoal);
+        customGoalsToAdd.push(customGoal);
+      });
 
-        setGradeGoals(gradeGoals.concat(courseGoalsToAdd));
-        setAssGoals(assGoals.concat(assGoalsToAdd));
-        setStudyGoals(studyGoals.concat(studyGoalsToAdd));
-        setCustomGoals(customGoals.concat(customGoalsToAdd));
-      })
+      setGradeGoals(gradeGoals.concat(courseGoalsToAdd));
+      setAssGoals(assGoals.concat(assGoalsToAdd));
+      setStudyGoals(studyGoals.concat(studyGoalsToAdd));
+      setCustomGoals(customGoals.concat(customGoalsToAdd));
+    });
   }, []);
 
   const handleCourseChange = (event) => {
-    console.log('Handling course change ...');
+    console.log("Handling course change ...");
     console.log(event.target.value);
-    setState({ ...state, courseID: event.target.value.id, courseName: event.target.value.name});
-  }
+    setState({
+      ...state,
+      courseID: event.target.value.id,
+      courseName: event.target.value.name,
+    });
+  };
 
   const handleTextChange = (event) => {
     setState({ ...state, text: event.target.value });
-  }
+  };
 
   const handleHoursChange = (event) => {
     setState({ ...state, hours: parseInt(event.target.value) });
-  }
+  };
 
   const handleGoalChange = (event) => {
     console.log(state);
-    setState({ ...state, type: event.target.value, grade: 0, hours: 0, assName: '', assID: 0, text: ''});
-  }
+    setState({
+      ...state,
+      type: event.target.value,
+      grade: 0,
+      hours: 0,
+      assName: "",
+      assID: 0,
+      text: "",
+    });
+  };
 
   const handleAssessmentChange = (event) => {
     console.log(event.target.value);
     let assName = event.target.value.name;
     let assID = event.target.value.id;
     setState({ ...state, assName: assName, assID: assID });
-  }
+  };
 
   const handleGradeChange = (event) => {
     setState({ ...state, grade: parseInt(event.target.value) });
-  }
+  };
 
   const handleOpen = () => {
     setOpen(true);
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
-  }
+  };
 
   function handleOpenDialog(text) {
-    return function() {
+    return function () {
       setOpenDialog(true);
       setDialogText(text);
-    }
-  };
+    };
+  }
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setDialogText('');
-  }
-  
+    setDialogText("");
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(state);
@@ -155,97 +168,99 @@ function Goals({ courses, assessment }) {
     switch (state.type) {
       case "COURSEGRADE":
         postGoal = {
-          "courseID": state.courseID,
-          "type": state.type,
-          "grade": state.grade
+          courseID: state.courseID,
+          type: state.type,
+          grade: state.grade,
         };
         break;
       case "ASSESSMENTGRADE":
         postGoal = {
-          "courseID": state.courseID,
-          "type": state.type,
-          "assID": state.assID,
-          "grade": state.grade
+          courseID: state.courseID,
+          type: state.type,
+          assID: state.assID,
+          grade: state.grade,
         };
         break;
       case "STUDYWEEK":
         postGoal = {
-          "courseID": state.courseID,
-          "type": state.type,
-          "hours": state.hours
+          courseID: state.courseID,
+          type: state.type,
+          hours: state.hours,
         };
         break;
       case "CUSTOM":
         postGoal = {
-          "courseID": state.courseID,
-          "type": state.type,
-          "text": state.text
+          courseID: state.courseID,
+          type: state.type,
+          text: state.text,
         };
         break;
       default:
-        
     }
     console.log("About to post:");
     console.log(postGoal);
 
-    axios(url+'/Database/goals/', {
+    axios(url + "/Database/goals/", {
       method: "post",
       data: postGoal,
-      withCredentials: true
-      })
-      .then(res => {
+      withCredentials: true,
+    })
+      .then((res) => {
         console.log(postGoal);
         let course = {
           id: state.courseID,
-          name: state.courseName
-        }
+          name: state.courseName,
+        };
         switch (state.type) {
           case "COURSEGRADE":
             let goalCourseGrade = {
               course: course,
-              grade: state.grade
-            }
-            setGradeGoals([...gradeGoals, goalCourseGrade])
+              grade: state.grade,
+            };
+            setGradeGoals([...gradeGoals, goalCourseGrade]);
             break;
           case "ASSESSMENTGRADE":
             let goalAssGrade = {
               course: course,
               assessment: {
                 id: state.assID,
-                name: state.assName
+                name: state.assName,
               },
-              grade: state.grade
-            }
-            setAssGoals([...assGoals, goalAssGrade])
+              grade: state.grade,
+            };
+            setAssGoals([...assGoals, goalAssGrade]);
             break;
           case "STUDYWEEK":
             let goalStudy = {
               course: course,
-              hours: state.hours
-            }
-            setStudyGoals([...studyGoals, goalStudy])
+              hours: state.hours,
+            };
+            setStudyGoals([...studyGoals, goalStudy]);
             break;
           case "CUSTOM":
             let goalCustom = {
               course: course,
-              text: state.text
-            }
-            setCustomGoals([...customGoals, goalCustom])
+              text: state.text,
+            };
+            setCustomGoals([...customGoals, goalCustom]);
             break;
           default:
         }
       })
-      .catch(err => {
-        alert('cannot add duplicate goals for now');
-      })
-  }
+      .catch((err) => {
+        alert("cannot add duplicate goals for now");
+      });
+  };
 
   const drawOverallGoal = () => {
     if (state.type === "COURSEGRADE" && state.courseID !== 0) {
       return (
         <Box>
-          Get grade 
-          <FormControl style={{marginLeft: 6, marginRight: 6}} variant="outlined">
+          Get grade
+          <FormControl
+            style={{ marginLeft: 6, marginRight: 6 }}
+            variant="outlined"
+          >
             <Select
               id="demo-simple-select-outlined"
               onChange={handleGradeChange}
@@ -261,7 +276,7 @@ function Goals({ courses, assessment }) {
           </FormControl>
           overall
         </Box>
-      )
+      );
     }
   };
 
@@ -269,8 +284,11 @@ function Goals({ courses, assessment }) {
     if (state.type === "ASSESSMENTGRADE" && state.courseID !== 0) {
       return (
         <Box>
-          Get grade 
-          <FormControl style={{marginLeft: 6, marginRight: 6}} variant="outlined">
+          Get grade
+          <FormControl
+            style={{ marginLeft: 6, marginRight: 6 }}
+            variant="outlined"
+          >
             <Select
               id="demo-simple-select-outlined"
               onChange={handleGradeChange}
@@ -285,18 +303,23 @@ function Goals({ courses, assessment }) {
             </Select>
           </FormControl>
           in assessment item
-          <FormControl style={{marginLeft: 6, marginRight: 6}} variant="outlined">
+          <FormControl
+            style={{ marginLeft: 6, marginRight: 6 }}
+            variant="outlined"
+          >
             <Select
               id="demo-simple-select-outlined"
               onChange={handleAssessmentChange}
             >
-              {assessment.filter(ass => ass.course === state.courseID).map(e => 
-                <MenuItem value={e}>{e.name}</MenuItem>
-              )}
+              {assessment
+                .filter((ass) => ass.course === state.courseID)
+                .map((e) => (
+                  <MenuItem value={e}>{e.name}</MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Box>
-      )
+      );
     }
   };
 
@@ -305,7 +328,7 @@ function Goals({ courses, assessment }) {
       return (
         <Box>
           Spend
-          <FormControl style={{marginLeft: 6, marginRight: 6, maxWidth: 80}}>
+          <FormControl style={{ marginLeft: 6, marginRight: 6, maxWidth: 80 }}>
             <TextField
               id="outlined-basic"
               placeholder="hours"
@@ -337,207 +360,240 @@ function Goals({ courses, assessment }) {
   };
 
   const handleDelete = () => {
-    console.log('deleted clicked');
-  }
-  
+    console.log("deleted clicked");
+  };
+
   return (
     <div>
-      <Dialog open={openDialog} onClose={handleCloseDialog} aria-labelledby="form-dialog-title">
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="form-dialog-title"
+      >
         <DialogTitle id="form-dialog-title">Custom goal</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {dialogText}
-            </DialogContentText>
-          </DialogContent>
+        <DialogContent>
+          <DialogContentText>{dialogText}</DialogContentText>
+        </DialogContent>
       </Dialog>
       <Box width="80%">
-        <Typography variant="h4">
-          Course Goals
-        </Typography>
-        
+        <Typography variant="h4">Course Goals</Typography>
+
         <Box m={2}>
-          <Button variant="contained" color="primary" size="large" onClick={handleOpen}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handleOpen}
+          >
             ADD GOAL
           </Button>
-          <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
-          <DialogContent>
-            <Box m={2}>
-            <FormControl style={{marginBottom: 12, marginRight: 6}} variant="outlined" className={classes.formControl}>
-              <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
-              <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                label="Course"
-                onChange={handleCourseChange}
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
+            <DialogContent>
+              <Box m={2}>
+                <FormControl
+                  style={{ marginBottom: 12, marginRight: 6 }}
+                  variant="outlined"
+                  className={classes.formControl}
+                >
+                  <InputLabel id="demo-simple-select-outlined-label">
+                    Course
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="demo-simple-select-outlined"
+                    label="Course"
+                    onChange={handleCourseChange}
+                  >
+                    {courses.map((a, index) => (
+                      <MenuItem key={index} value={a}>
+                        {" "}
+                        {a.name}{" "}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>{" "}
+                <FormControl
+                  style={{ marginBottom: 12 }}
+                  variant="outlined"
+                  className={classes.formControl}
+                >
+                  <InputLabel id="demo-simple-select-outlined-label">
+                    Goal type
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="demo-simple-select-outlined"
+                    label="Course"
+                    onChange={handleGoalChange}
+                  >
+                    <MenuItem value={"COURSEGRADE"}> Overall grade </MenuItem>
+                    <MenuItem value={"ASSESSMENTGRADE"}>
+                      {" "}
+                      Specific assessment grade{" "}
+                    </MenuItem>
+                    <MenuItem value={"STUDYWEEK"}> Weekly study time </MenuItem>
+                    <MenuItem value={"CUSTOM"}> Custom goal </MenuItem>
+                  </Select>
+                </FormControl>
+                {drawOverallGoal()}
+                {drawAssessmentGoal()}
+                {drawStudyGoal()}
+                {drawTextField()}
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                color="primary"
               >
-                {courses.map((a, index) => (
-                  <MenuItem key={index} value={a}> {a.name} </MenuItem>
-                ))}
-              </Select>
-            </FormControl> {' '}
-            <FormControl style={{marginBottom: 12}} variant="outlined" className={classes.formControl}>
-              <InputLabel id="demo-simple-select-outlined-label">Goal type</InputLabel>
-              <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                label="Course"
-                onChange={handleGoalChange}
-              >
-                <MenuItem value={"COURSEGRADE"}> Overall grade </MenuItem>
-                <MenuItem value={"ASSESSMENTGRADE"}> Specific assessment grade </MenuItem>
-                <MenuItem value={"STUDYWEEK"}> Weekly study time </MenuItem>
-                <MenuItem value={"CUSTOM"}> Custom goal </MenuItem>
-              </Select>
-            </FormControl>
-            {drawOverallGoal()}
-            {drawAssessmentGoal()}
-            {drawStudyGoal()}
-            {drawTextField()}
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="contained" onClick={handleSubmit} color="primary">
-              ADD
-            </Button>
-            <Button onClick={handleClose} color="primary">
-              CLOSE
-            </Button>
-          </DialogActions>
+                ADD
+              </Button>
+              <Button onClick={handleClose} color="primary">
+                CLOSE
+              </Button>
+            </DialogActions>
           </Dialog>
           <Link to="/">
-            <Button color="primary" size="large"> 
+            <Button color="primary" size="large">
               Back
             </Button>
           </Link>
         </Box>
       </Box>
-      <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Course</TableCell>
-            <TableCell align="right">Custom goal</TableCell>
-            <TableCell width='2'></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {customGoals.map((row) => (
-            <TableRow key={row.course.id}>
-              <TableCell component="th" scope="row">
-                {row.course.name}
-              </TableCell>
-              <TableCell align="right">
-                <Button variant="outlined" color="primary" onClick={handleOpenDialog(row.text)} >
-                  View goal
-                </Button>
-              </TableCell>
-              <TableCell>
-                <Button 
-                  onClick={handleDelete}
-                  color="secondary"
-                >
-                  Delete
-                </Button>
-              </TableCell>
+      <TableContainer
+        style={{ marginBottom: 10, marginTop: 10 }}
+        component={Paper}
+      >
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Course</TableCell>
+              <TableCell align="right">Custom goal</TableCell>
+              <TableCell width="2"></TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Course</TableCell>
-            <TableCell align="right">Overall grade</TableCell>
-            <TableCell width='2'></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {gradeGoals.map((row) => (
-            <TableRow key={row.course.id}>
-              <TableCell component="th" scope="row">
-                {row.course.name}
-              </TableCell>
-              <TableCell align="right">
-                {row.grade}
-              </TableCell>
-              <TableCell>
-                <Button 
-                  onClick={handleDelete}
-                  color="secondary"
-                >
-                  Delete
-                </Button>
-              </TableCell>
+          </TableHead>
+          <TableBody>
+            {customGoals.map((row) => (
+              <TableRow key={row.course.id}>
+                <TableCell component="th" scope="row">
+                  {row.course.name}
+                </TableCell>
+                <TableCell align="right">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={handleOpenDialog(row.text)}
+                  >
+                    View goal
+                  </Button>
+                </TableCell>
+                <TableCell>
+                  <Button onClick={handleDelete} color="secondary">
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TableContainer
+        style={{ marginBottom: 10, marginTop: 10 }}
+        component={Paper}
+      >
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Course</TableCell>
+              <TableCell align="right">Overall grade</TableCell>
+              <TableCell width="2"></TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Course</TableCell>
-            <TableCell align="right">Weekly study time</TableCell>
-            <TableCell width='2'></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {studyGoals.map((row) => (
-            <TableRow key={row.course.id}>
-              <TableCell component="th" scope="row">
-                {row.course.name}
-              </TableCell>
-              <TableCell align="right">{row.hours} hours</TableCell>
-              <TableCell>
-                <Button 
-                  onClick={handleDelete}
-                  color="secondary"
-                >
-                  Delete
-                </Button>
-              </TableCell>
+          </TableHead>
+          <TableBody>
+            {gradeGoals.map((row) => (
+              <TableRow key={row.course.id}>
+                <TableCell component="th" scope="row">
+                  {row.course.name}
+                </TableCell>
+                <TableCell align="right">{row.grade}</TableCell>
+                <TableCell>
+                  <Button onClick={handleDelete} color="secondary">
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TableContainer
+        style={{ marginBottom: 10, marginTop: 10 }}
+        component={Paper}
+      >
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Course</TableCell>
+              <TableCell align="right">Weekly study time</TableCell>
+              <TableCell width="2"></TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <TableContainer style={{marginBottom: 10, marginTop: 10}} component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Course</TableCell>
-            <TableCell align="right">Assessment item</TableCell>
-            <TableCell align="right">Grade</TableCell>
-            <TableCell width='2'></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {assGoals.map((row) => (
-            <TableRow key={row.course.id}>
-              <TableCell component="th" scope="row">
-                {row.course.name}
-              </TableCell>
-              <TableCell align="right">{row.assessment.name}</TableCell>
-              <TableCell align="right">{row.grade}</TableCell>
-              <TableCell>
-                <Button 
-                  onClick={handleDelete}
-                  color="secondary"
-                >
-                  Delete
-                </Button>
-              </TableCell>
+          </TableHead>
+          <TableBody>
+            {studyGoals.map((row) => (
+              <TableRow key={row.course.id}>
+                <TableCell component="th" scope="row">
+                  {row.course.name}
+                </TableCell>
+                <TableCell align="right">{row.hours} hours</TableCell>
+                <TableCell>
+                  <Button onClick={handleDelete} color="secondary">
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TableContainer
+        style={{ marginBottom: 10, marginTop: 10 }}
+        component={Paper}
+      >
+        <Table className={classes.table} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Course</TableCell>
+              <TableCell align="right">Assessment item</TableCell>
+              <TableCell align="right">Grade</TableCell>
+              <TableCell width="2"></TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {assGoals.map((row) => (
+              <TableRow key={row.course.id}>
+                <TableCell component="th" scope="row">
+                  {row.course.name}
+                </TableCell>
+                <TableCell align="right">{row.assessment.name}</TableCell>
+                <TableCell align="right">{row.grade}</TableCell>
+                <TableCell>
+                  <Button onClick={handleDelete} color="secondary">
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
-  )
-};
+  );
+}
 
 export default Goals;

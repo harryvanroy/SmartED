@@ -40,6 +40,7 @@ const Alert = (props) => {
 const Feedback = ({ courses }) => {
   const [open, setOpen] = React.useState(false);
   const [openErr, setOpenErr] = React.useState(false);
+  const [openSpam, setOpenSpam] = React.useState(false);
   const classes = useStyles();
   const [state, setState] = React.useState({
     course: '',
@@ -48,6 +49,7 @@ const Feedback = ({ courses }) => {
   });
 
   const handleCourseChange = (event) => {
+    console.log(state.course);
     setState({ ...state, course: event.target.value});
   }
 
@@ -75,7 +77,15 @@ const Feedback = ({ courses }) => {
     setOpenErr(false);
   };
 
-  const handleSubmit = () => {
+  const handleSpamClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSpam(false);
+  }
+
+  const handleSubmit = (event) => {
     if (state.text === '' || state.course === '') {
       setOpenErr(true);
       return;
@@ -91,14 +101,13 @@ const Feedback = ({ courses }) => {
       withCredentials: true
     })
     .then(res => {
+      if (res.data === 'spam') {
+        setOpenSpam(true);
+      } else {
+        setOpen(true);
+      }
       console.log('posted..');
       console.log(res);
-      setOpen(true);
-      setState({
-        course: '',
-        text: '',
-        anon: false
-      })
     })
   }
 
@@ -112,6 +121,16 @@ const Feedback = ({ courses }) => {
         >
           <Alert onClose={handleClose} severity="success">
             Feedback submitted!
+          </Alert>
+      </Snackbar>
+      <Snackbar 
+          open={openSpam} 
+          autoHideDuration={2000}
+          onClose={handleSpamClose} 
+          anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+        >
+          <Alert onClose={handleSpamClose} severity="warning">
+            Limit of 2 course feeback messages per day reached!
           </Alert>
       </Snackbar>
       <Snackbar 
@@ -132,6 +151,7 @@ const Feedback = ({ courses }) => {
         <FormControl style={{marginBottom: 12}} variant="outlined" className={classes.formControl}>
           <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
           <Select
+            defaultValue=''
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
             label="Course"
