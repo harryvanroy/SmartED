@@ -15,9 +15,11 @@ console.log("location: " + url);
 
 function Assessment() {
   return (
-    <div>
-      Assessment page.
-     </div>
+    <Box width="80%">
+      <Typography variant="h4">
+        Resources
+      </Typography>
+    <Box>
   );
 };
 
