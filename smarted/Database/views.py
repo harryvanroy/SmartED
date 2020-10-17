@@ -7,6 +7,7 @@ from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import UQBlackboardScraper
 from .models import *
 from rest_framework.exceptions import ValidationError, ParseError
+import pytz
 
 is_local = False
 FORCE_TEACHER = False
@@ -361,17 +362,23 @@ def post_course_feedback(request):
     feedback = json_body.get('feedback')
     anonymous = json_body.get('anonymous')
 
-    # todo: check student is actually in course. Check if feedback already
-    #  exists
+    course = Course.objects.get(id=courseID)
+    user = User.objects.get(username=username)
 
-    course_feedback = CourseFeedback(user=User.objects.get(username=username),
-                                     course=Course.objects.get(id=courseID),
-                                     anonymous=anonymous, feedback=feedback)
+    if len(StudentCourse.objects.filter(course=course)) == 0:
+        raise ValidationError
+
+    if len([x for x in CourseFeedback.objects.filter(user=user, course=course)
+     if (datetime.datetime.now(pytz.utc) - x.lastUpdated).days == 0]) >= 2:
+         # user has already posted twice today!
+         return HttpResponse("spam")  # react should use this res to alert
+
+    course_feedback = CourseFeedback(user=user, course=course, 
+                                anonymous=anonymous, feedback=feedback)
 
     course_feedback.save()
 
     return HttpResponse("")
-
 
 ################ GOALS #################
 @csrf_exempt
