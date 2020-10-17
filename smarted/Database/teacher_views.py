@@ -9,8 +9,10 @@ from .models import *
 from . import views
 import re
 
-FORCE_TEACHER = views.FORCE_TEACHER  # if enabled, overrides student/teacher check
-DEFAULT_TEACHER_USER = views.DEFAUlT_TEACHER_USER  # used if student/teacher check is overridden
+# if enabled, overrides student/teacher check
+FORCE_TEACHER = views.FORCE_TEACHER
+# used if student/teacher check is overridden
+DEFAULT_TEACHER_USER = views.DEFAULT_TEACHER_USER
 
 
 # returns a boolean for success/fail and the teachers username
@@ -63,7 +65,7 @@ def initialize_teacher_courses(header, staff):
         # SAVE STAFF COURSES
 
         if len(StaffCourse.objects
-                       .filter(staff=staff, course=course_obj)) == 0:
+               .filter(staff=staff, course=course_obj)) == 0:
             print("saving studentCourse...")
             staff_course = StaffCourse(staff=staff, course=course_obj)
             staff_course.save()
@@ -137,7 +139,7 @@ def student_assessment_grade(request):
 
     # check if grade already exists
     if len(StudentAssessment.objects
-                   .filter(student=student, assessment=ass_item)) == 0:
+           .filter(student=student, assessment=ass_item)) == 0:
         student_ass = StudentAssessment(student=student, assessment=ass_item,
                                         value=grade)
     else:
@@ -148,6 +150,58 @@ def student_assessment_grade(request):
     student_ass.save()
 
     return HttpResponse("")
+
+
+def students_at_risk(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    id = request.GET.get('id')
+    try:
+        id = int(id)
+    except:
+        return HttpResponse("failed query... specify the course ID...")
+
+    # todo: check staff has access to course here
+
+    course = Course.objects.get(id=id)
+
+    students_in_course = [stu_course.student for stu_course in
+                          StudentCourse.objects.filter(course=course)]
+
+    students_at_risk = []
+
+    for student in students_in_course:
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)
+                  if grade.assessment.course == course]
+
+        total_weight = sum([float(grade.assessment.weight)
+                            for grade in grades])
+        total_earnt = sum([(float(grade.value) / 100)
+                           * float(grade.assessment.weight)
+                           for grade in grades])
+
+        if total_weight > 0:
+            current_grade = 100 * (total_earnt / total_weight)
+        else:
+            current_grade = 100
+
+        if current_grade < 50:
+            students_at_risk.append({"student":
+                                     {"username": student.user.username,
+                                      "firstname": student.user.firstName,
+                                      "lastname": student.user.lastName},
+                                    "grade": current_grade})
+
+
+    students_at_risk = sorted(students_at_risk, key=lambda i: i['grade'])
+
+    return HttpResponse(json.dumps(students_at_risk))
 
 
 def get_course_feedback(request):
@@ -168,8 +222,7 @@ def get_course_feedback(request):
     json_feedback = [{"user": ({"username": x.user.username,
                                 "name": f"{x.user.firstName} {x.user.lastName}"}
                                if not x.anonymous else {"username": "anon",
-                                                    "name": "Anonymous"}),
+                                                        "name": "Anonymous"}),
                       "feedback": x.feedback}
                      for x in CourseFeedback.objects.filter(course=course)]
-
     return HttpResponse(json.dumps(json_feedback))
