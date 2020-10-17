@@ -1,5 +1,6 @@
 import React from 'react';
 import Cookies from "js-cookie";
+import { Box, Typography } from '@material-ui/core';
 
 //DETERMINE LOCATION
 var url;
@@ -15,9 +16,11 @@ console.log("location: " + url);
 
 function Assessment() {
   return (
-    <div>
-      Assessment page.
-     </div>
+    <Box width="80%">
+      <Typography variant="h4">
+        Assessment
+      </Typography>
+    </Box>
   );
 };
 
