@@ -196,8 +196,7 @@ def students_at_risk(request):
                                      {"username": student.user.username,
                                       "firstname": student.user.firstName,
                                       "lastname": student.user.lastName},
-                                    "grade": current_grade})
-
+                                     "grade": current_grade})
 
     students_at_risk = sorted(students_at_risk, key=lambda i: i['grade'])
 
@@ -219,6 +218,8 @@ def get_course_feedback(request):
     except:
         return HttpResponse("failed query.. specify the correct course ID...")
 
+    # todo: check teacher in course
+
     json_feedback = [{"user": ({"username": x.user.username,
                                 "name": f"{x.user.firstName} {x.user.lastName}"}
                                if not x.anonymous else {"username": "anon",
@@ -226,3 +227,36 @@ def get_course_feedback(request):
                       "feedback": x.feedback}
                      for x in CourseFeedback.objects.filter(course=course)]
     return HttpResponse(json.dumps(json_feedback))
+
+
+def get_average_vark(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    id = request.GET.get('id')
+
+    try:
+        course = Course.objects.get(id=id)
+    except:
+        return HttpResponse("failed query.. specify the correct course ID...")
+
+    # todo: check teacher in course
+
+    students = [
+        stu.student for stu in StudentCourse.objects.filter(course=course)]
+
+    V, A, R, K = [float(x.V) for x in students if x.V is not None], \
+        [float(x.A) for x in students if x.A is not None], \
+        [float(x.R) for x in students if x.R is not None], \
+        [float(x.K) for x in students if x.K is not None]
+
+    def avg(arr):
+        return sum(arr) / float(len(arr))
+
+    vark = {"V": avg(V), "A": avg(A), "R": avg(R), "K": avg(K)}
+
+    return HttpResponse(json.dumps(vark))
