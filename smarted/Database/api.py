@@ -115,3 +115,12 @@ class CourseGoalsViewSet(viewsets.ModelViewSet):
     }
 
     serializer_class = CourseGoalsSerializer
+
+
+class csrfExemptViewSet(viewsets.ModelViewSet):
+    queryset = exemptCSRF.objects.all()
+    permission_classes = {
+        permissions.AllowAny
+    }
+
+    serializer_class = csrfExemptSerializer

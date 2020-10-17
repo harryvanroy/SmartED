@@ -83,3 +83,9 @@ class CourseGoalsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LongTermGoals
         fields = '__all__'
+
+
+class csrfExemptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = exemptCSRF
+        fields = '__all__'

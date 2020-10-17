@@ -13,17 +13,18 @@ import re
 FORCE_TEACHER = views.FORCE_TEACHER
 # used if student/teacher check is overridden
 DEFAULT_TEACHER_USER = views.DEFAULT_TEACHER_USER
-TEACHER_CHECK_EXEMPT_CSRFS = views.TEACHER_CHECK_EXEMPT_CSRFS
-
 
 # returns a boolean for success/fail and the teachers username
+
+
 def authorize_teacher(header):
 
     # check if request's csrf has an exemption for teacher checks
     CSRF_EXEMPT = False
     try:
-        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
-        CSRF_EXEMPT = True if (csrf_token in TEACHER_CHECK_EXEMPT_CSRFS) else False
+        csrf_token = header.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        CSRF_EXEMPT = True if len(
+            exemptCSRF.objects.filter(csrf=csrf_token)) else False
     except:
         pass
 
@@ -267,7 +268,7 @@ def get_average_vark(request):
     def avg(arr):
         if len(arr) == 0:
             return None
-            
+
         return sum(arr) / float(len(arr))
 
     vark = {"V": avg(V), "A": avg(A), "R": avg(R), "K": avg(K)}

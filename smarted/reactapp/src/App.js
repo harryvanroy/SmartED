@@ -35,15 +35,14 @@ const App = () => {
       withCredentials: true
     }).then(res => {
       console.log("force teacher with method: ", method);
-    })
 
-
-    axios(url+'/Database/initialize/', {
-      method: "get",
-      withCredentials: true
-    }).then(res => {
-      setUser(res.data);
-    })
+      axios(url+'/Database/initialize/', {
+        method: "get",
+        withCredentials: true
+      }).then(res => {
+        setUser(res.data);
+      })
+    }) 
   }, []);
 
   return (

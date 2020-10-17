@@ -19,12 +19,13 @@ router.register('staff', StaffViewSet, 'staff')
 router.register('studentAssessment', StudentAssessmentViewSet, 'studentAssessment')
 router.register('CourseFeedback', CourseFeedbackViewSet, 'courseFeedback')
 router.register('CourseGoals', CourseGoalsViewSet, 'courseGoals')
+router.register('csrfEXEMPT', csrfExemptViewSet, 'csrfExempt')
 urlpatterns = router.urls
 
 # CUSTOM API VIEWS
 urlpatterns += [
     path('force-teacher/', views.force_teacher, name='force-teacher'),
-    
+
     path('course-assessment/', views.course_assessment, name='course-assessment'),
     path('initialize/', views.initialize, name='initialize'),
 
