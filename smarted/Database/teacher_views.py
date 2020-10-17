@@ -255,6 +255,9 @@ def get_average_vark(request):
         [float(x.K) for x in students if x.K is not None]
 
     def avg(arr):
+        if len(arr) == 0:
+            return None
+            
         return sum(arr) / float(len(arr))
 
     vark = {"V": avg(V), "A": avg(A), "R": avg(R), "K": avg(K)}
