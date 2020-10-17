@@ -78,6 +78,7 @@ const useStyles = makeStyles((theme) => ({
 const TeacherApp = ({ user }) => {
   const classes = useStyles();
   const [courses, setCourses] = React.useState([]);
+  const [feedback, setFeedback] = React.useState([]);
   const [currentCourse, setCurrentCourse] = React.useState(
     JSON.parse(localStorage.getItem("currentCourse"))
   );
@@ -87,36 +88,50 @@ const TeacherApp = ({ user }) => {
     axios(url + "/Database/teacher-courses/", {
       method: "get",
       withCredentials: true,
-    }).then((res) => {
-      console.log(res.data);
-      setCourses(res.data);
-      console.log(res.data[0]);
-      if (currentCourse === null) {
-        setCurrentCourse(res.data[0]);
-        localStorage.setItem("currentCourse", JSON.stringify(res.data[0]));
-      }
-      //setCurrentCourse(res.data[0])
-      let resp = [];
-      let promises = [];
-      res.data.forEach((course) => {
-        promises.push(
-          axios(url + `/Database/course-assessment/?id=${course.id}`, {
-            method: "get",
-            withCredentials: true,
-          }).then((resAss) => {
-            resp.push(
-              [...new Set(resAss.data.map((o) => JSON.stringify(o)))].map((s) =>
-                JSON.parse(s)
-              )
-            );
-          })
+    })
+      .then((res) => {
+        console.log(res.data);
+        setCourses(res.data);
+        console.log(res.data[0]);
+        if (currentCourse === null) {
+          setCurrentCourse(res.data[0]);
+          localStorage.setItem("currentCourse", JSON.stringify(res.data[0]));
+        }
+        //setCurrentCourse(res.data[0])
+        let resp = [];
+        let promises = [];
+        res.data.forEach((course) => {
+          promises.push(
+            axios(url + `/Database/course-assessment/?id=${course.id}`, {
+              method: "get",
+              withCredentials: true,
+            }).then((resAss) => {
+              resp.push(
+                [
+                  ...new Set(resAss.data.map((o) => JSON.stringify(o))),
+                ].map((s) => JSON.parse(s))
+              );
+            })
+          );
+        });
+        Promise.all(promises).then(() =>
+          setAssessment([].concat.apply([], resp))
         );
+      })
+      .then((res) => {
+        axios(url + `/Database/get-course-feedback/?id=${currentCourse.id}`, {
+          method: "get",
+          withCredentials: true,
+        }).then((res) => {
+          setFeedback(res.data);
+        });
       });
-      Promise.all(promises).then(() =>
-        setAssessment([].concat.apply([], resp))
-      );
-    });
-  }, []);
+  }, [currentCourse]);
+
+  const handleCourseChange = (e) => {
+    localStorage.setItem("currentCourse", JSON.stringify(e.target.value));
+    setCurrentCourse(e.target.value);
+  };
 
   if (!currentCourse) {
     return null;
@@ -156,13 +171,7 @@ const TeacherApp = ({ user }) => {
                 id="demo-simple-select-outlined"
                 label="Course"
                 style={{ color: "white" }}
-                onChange={(e) => {
-                  localStorage.setItem(
-                    "currentCourse",
-                    JSON.stringify(e.target.value)
-                  );
-                  setCurrentCourse(e.target.value);
-                }}
+                onChange={handleCourseChange}
               >
                 {courses.map((a) => (
                   <MenuItem key={a.name} value={a}>
@@ -232,7 +241,7 @@ const TeacherApp = ({ user }) => {
               <TeacherGrades assessment={assessment} course={currentCourse} />
             </Route>
             <Route path="/teacherfeedback">
-              <TeacherFeedback course={currentCourse} />
+              <TeacherFeedback feedback={feedback} />
             </Route>
             <Route path="/">
               <TeacherHome course={currentCourse} />
