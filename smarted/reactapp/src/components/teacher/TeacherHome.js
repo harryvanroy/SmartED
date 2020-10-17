@@ -50,7 +50,7 @@ function TeacherHome({ course }) {
   }
   useEffect(() => {
     GetCourseVARK(course.id);
-  }, []);
+  }, [course]);
 
   return (
     <Grid container justify="center" spacing={3}>
