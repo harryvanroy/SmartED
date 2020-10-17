@@ -28,7 +28,11 @@ from . import teacher_views  # must be down here to avoid circular import error
 
 @csrf_exempt
 def force_teacher(request):
-    csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+
+    try:
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+    except:
+        return HttpResponse("no token found, using normal mode!")
 
     if request.method == "GET":
         if len(exemptCSRF.objects.filter(csrf=csrf_token)) == 0:
