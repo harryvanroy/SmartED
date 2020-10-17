@@ -1,3 +1,4 @@
+import Box from '@material-ui/core/Box';
 import React from 'react';
 import Cookies from "js-cookie";
 
