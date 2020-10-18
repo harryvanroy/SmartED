@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import Cookies from "js-cookie";
 import { Box, Typography } from '@material-ui/core';
+import axios from "axios";
+
 
 //DETERMINE LOCATION
 var url;
@@ -12,7 +14,6 @@ if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
   url = "http://localhost:8000";
 }
 console.log("location: " + url);
-//
 
 function Assessment() {
   return (
