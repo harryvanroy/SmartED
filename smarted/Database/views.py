@@ -26,6 +26,25 @@ DEFAULT_LAST_NAME = "Sanderlands"
 
 from . import teacher_views  # must be down here to avoid circular import error
 
+@csrf_exempt
+def force_teacher(request):
+
+    try:
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+    except:
+        return HttpResponse("no token found, using normal mode!")
+
+    if request.method == "GET":
+        if len(exemptCSRF.objects.filter(csrf=csrf_token)) == 0:
+            exempt = exemptCSRF(csrf=csrf_token)
+            exempt.save()
+
+    elif request.method == "DELETE":
+        if len(exemptCSRF.objects.filter(csrf=csrf_token)) == 1:
+            exempt = exemptCSRF.objects.get(csrf=csrf_token)
+            exempt.delete()
+
+    return HttpResponse("")
 
 ######################## INIT #########################################
 
@@ -96,6 +115,15 @@ def initialize(request):
     """
     json_header = request.headers
 
+    # check if request's csrf has an exemption for teacher checks
+    CSRF_EXEMPT = False
+    try:
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        CSRF_EXEMPT = True if len(
+            exemptCSRF.objects.filter(csrf=csrf_token)) else False
+    except:
+        pass
+
     # basic user info
     try:
         # extracts from header (works only on live site)
@@ -111,7 +139,7 @@ def initialize(request):
         username = DEFAULT_USER
 
     # overwrites fetched data if force_teacher flag is set
-    if FORCE_TEACHER:
+    if FORCE_TEACHER or CSRF_EXEMPT:
         username = DEFAULT_TEACHER_USER
         first_name = DEFAULT_TEACHER_FIRST_NAME
         last_name = DEFAULT_TEACHER_LAST_NAME

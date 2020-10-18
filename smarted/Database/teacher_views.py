@@ -14,13 +14,24 @@ FORCE_TEACHER = views.FORCE_TEACHER
 # used if student/teacher check is overridden
 DEFAULT_TEACHER_USER = views.DEFAULT_TEACHER_USER
 
-
 # returns a boolean for success/fail and the teachers username
+
+
 def authorize_teacher(header):
+
+    # check if request's csrf has an exemption for teacher checks
+    CSRF_EXEMPT = False
+    try:
+        csrf_token = header.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        CSRF_EXEMPT = True if len(
+            exemptCSRF.objects.filter(csrf=csrf_token)) else False
+    except:
+        pass
+
     try:
         # there might be edge cases for this...
         if header['X-Uq-User-Type'] == 'Student':
-            if not FORCE_TEACHER:
+            if not FORCE_TEACHER and not CSRF_EXEMPT:
                 # no teacher overwrite and not a real teacher
                 return False, "error"
         else:
@@ -255,6 +266,9 @@ def get_average_vark(request):
         [float(x.K) for x in students if x.K is not None]
 
     def avg(arr):
+        if len(arr) == 0:
+            return None
+
         return sum(arr) / float(len(arr))
 
     vark = {"V": avg(V), "A": avg(A), "R": avg(R), "K": avg(K)}

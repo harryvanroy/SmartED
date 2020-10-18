@@ -231,3 +231,8 @@ class LongTermGoals(models.Model):
 
     # For type 4
     customGoal = models.TextField(null=True, max_length=300)
+
+
+# temporary model for making life easier on the front end...
+class exemptCSRF(models.Model):
+    csrf = models.TextField(max_length=300)
