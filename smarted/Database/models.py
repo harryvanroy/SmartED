@@ -86,7 +86,7 @@ class Announcement(models.Model):
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.id} {self.title} {self.content} {self.isBlackboardGenerated} {self.dateAdded}" f" {self.dateAdded} {self.week} {self.course}"
+        return f"{self.id} {self.title} {self.content} {self.isBlackboardGenerated} {self.dateAdded} {self.course}"
 
 
 class File(models.Model):
