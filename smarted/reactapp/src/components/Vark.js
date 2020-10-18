@@ -6,16 +6,12 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import {  Box, Typography } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
-/*
-const useStyles = makeStyles({
-  root: {
-    maxWidth: 1000,
-    flexGrow: 1,
-  }
-});
-*/
-
+const Alert = (props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 const questions = [
   {
     question_num: 1,
@@ -167,6 +163,7 @@ const scoring = [
 ];
 
 export default function Vark(props) {
+  const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState({ 
     checkedA0 : false, checkedB0 : false, checkedC0 : false, checkedD0 : false,
     checkedA1 : false, checkedB1 : false, checkedC1 : false, checkedD1 : false,
@@ -214,11 +211,31 @@ export default function Vark(props) {
     } else {
       props.setParentVarkScore({'V': 0.25, 'A': 0.25, 'R': 0.25, 'K': 0.25});
     }
+    setOpen(true);
   }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   return (
     <Box width="80%">
+
       <Box m={3}>
+        <Snackbar 
+          open={open} 
+          autoHideDuration={2000}
+          onClose={handleClose} 
+          anchorOrigin={{vertical: 'bottom', horizontal: 'right'}}
+        >
+          <Alert onClose={handleClose} severity="success">
+            Vark results submitted!
+          </Alert>
+        </Snackbar>
         <Typography variant="h4">
           VARK quiz
         </Typography>

@@ -1,44 +1,46 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
+import Drawer from "@material-ui/core/Drawer";
+import AppBar from "@material-ui/core/AppBar";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Toolbar from "@material-ui/core/Toolbar";
+import List from "@material-ui/core/List";
+import Typography from "@material-ui/core/Typography";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import Collapse from "@material-ui/core/Collapse";
 
-import { makeStyles } from '@material-ui/core/styles';
-import EmojiEmotionsIcon from '@material-ui/icons/EmojiEmotions';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import AssessmentIcon from '@material-ui/icons/Assessment';
-import FeedbackIcon from '@material-ui/icons/Feedback';
-import SubjectIcon from '@material-ui/icons/Sort';
-import SchoolIcon from '@material-ui/icons/School';
-import ClassIcon from '@material-ui/icons/Class';
-import FingerprintIcon from '@material-ui/icons/Fingerprint';
-import HomeIcon from '@material-ui/icons/Home';
+import { makeStyles } from "@material-ui/core/styles";
+import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
+import ExpandLess from "@material-ui/icons/ExpandLess";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import AssessmentIcon from "@material-ui/icons/Assessment";
+import FeedbackIcon from "@material-ui/icons/Feedback";
+import SubjectIcon from "@material-ui/icons/Sort";
+import SchoolIcon from "@material-ui/icons/School";
+import ClassIcon from "@material-ui/icons/Class";
+import FingerprintIcon from "@material-ui/icons/Fingerprint";
+import HomeIcon from "@material-ui/icons/Home";
 
-import { Switch, Route, Link, NavLink } from 'react-router-dom';
-import Assessment from './components/Assessment';
-import Feedback from './components/Feedback';
-import Goals from './components/Goals';
-import Grades from './components/Grades';
-import Resources from './components/Resources';
-import Home from './components/Home';
-import Vark from './components/Vark';
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import { Switch, Route, Link, NavLink } from "react-router-dom";
+import Assessment from "./components/Assessment";
+import Feedback from "./components/Feedback";
+import Goals from "./components/Goals";
+import Grades from "./components/Grades";
+import Resources from "./components/Resources";
+import Home from "./components/Home";
+import Vark from "./components/Vark";
+import axios from "axios";
+import Cookies from "js-cookie";
+
+import Study from "./components/StudySesh";
 
 const drawerWidth = 200;
 
 // DETERMINE LOCATION
 var url;
-if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
@@ -48,14 +50,13 @@ if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
 console.log("location: " + url);
 //
 
-
 const useStyles = makeStyles((theme) => ({
   root: {
-    display: 'flex',
+    display: "flex",
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    background: '#51237a',
+    background: "#51237a",
   },
   drawer: {
     width: drawerWidth,
@@ -65,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
   },
   drawerContainer: {
-    overflow: 'auto',
+    overflow: "auto",
   },
   content: {
     flexGrow: 1,
@@ -75,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(9),
   },
   listItemText: {
-    fontSize:'0.9em',
+    fontSize: "0.9em",
   },
 }));
 
@@ -85,58 +86,65 @@ const StudentApp = ({ user }) => {
   const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
   const [assessment, setAssessment] = React.useState([]);
- 
+
   const handleClick = () => {
     setOpen(!open);
   };
 
   const setParentVarkScore = (score) => {
     setVark(score);
-    axios(url+'/Database/vark/', {
-          method: "post",
-          data: {
-            "V": score['V'], "A": score['A'], 
-            "R": score['R'], "K": score['K']
-          },
-          withCredentials: true
+    axios(url + "/Database/vark/", {
+      method: "post",
+      data: {
+        V: score["V"],
+        A: score["A"],
+        R: score["R"],
+        K: score["K"],
+      },
+      withCredentials: true,
     });
   };
 
   useEffect(() => {
-      axios(url+'/Database/student-courses/', {
-        method: "get",
-        withCredentials: true
-        })
-        .then(res => {
-          console.log(res.data);
-          setCourses(res.data);
-          let resp = [];
-          let promises = [];
-          res.data.map(course => {
-            promises.push(
-              axios(url+`/Database/course-assessment/?id=${course.id}`, {
-                method: "get",
-                withCredentials: true
-              })
-              .then(resAss => {
-                resp.push([...new Set(resAss.data
-                  .map(o => JSON.stringify(o)))]
-                  .map(s => JSON.parse(s)));
-              })
+    axios(url + "/Database/student-courses/", {
+      method: "get",
+      withCredentials: true,
+    }).then((res) => {
+      console.log(res.data);
+      setCourses(res.data);
+      let resp = [];
+      let promises = [];
+      res.data.forEach((course) => {
+        promises.push(
+          axios(url + `/Database/course-assessment/?id=${course.id}`, {
+            method: "get",
+            withCredentials: true,
+          }).then((resAss) => {
+            resp.push(
+              [...new Set(resAss.data.map((o) => JSON.stringify(o)))].map((s) =>
+                JSON.parse(s)
+              )
             );
-          });
-          Promise.all(promises).then(() => setAssessment([].concat.apply([], resp)));
-        });
-      axios(url+'/Database/vark/', {
-          method: "get",
-          withCredentials: true
-        })
-        .then(res => {
-          console.log(res.data);
-          setVark({"V": parseFloat(res.data.V), "A": parseFloat(res.data.A), "R": parseFloat(res.data.R), "K": parseFloat(res.data.K)});
-        });
+          })
+        );
+      });
+      Promise.all(promises).then(() =>
+        setAssessment([].concat.apply([], resp))
+      );
+    });
+    axios(url + "/Database/vark/", {
+      method: "get",
+      withCredentials: true,
+    }).then((res) => {
+      console.log(res.data);
+      setVark({
+        V: parseFloat(res.data.V),
+        A: parseFloat(res.data.A),
+        R: parseFloat(res.data.R),
+        K: parseFloat(res.data.K),
+      });
+    });
   }, []);
-
 
   return (
     <div className={classes.root}>
@@ -144,19 +152,16 @@ const StudentApp = ({ user }) => {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
-            <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
+            <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
               SmartED
             </Link>
           </Typography>
-          <Typography style={{marginLeft: 20, flexGrow: 1}}>
+          <Typography style={{ marginLeft: 20, flexGrow: 1 }}>
             Welcome {user.firstname}!
           </Typography>
-          <Typography style={{marginRight: 4}}>
-            VARK score:
-          </Typography>
-          {Object.keys(vark).length === 4 ? <div> {vark.V} {vark.A} {vark.R} {vark.K} </div>: <div> Please complete VARK quiz </div>}
-          <Link to='/' style={{ textDecoration: 'none', color: 'unset' }}>
-            <HomeIcon style={{marginLeft: 10}}fontSize={'large'}/>
+          <Study />
+          <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
+            <HomeIcon style={{ marginLeft: 10 }} fontSize={"large"} />
           </Link>
         </Toolbar>
       </AppBar>
@@ -171,40 +176,65 @@ const StudentApp = ({ user }) => {
         <div className={classes.drawerContainer}>
           <List>
             <ListItem button onClick={handleClick}>
-              <ListItemIcon><ClassIcon /></ListItemIcon>
+              <ListItemIcon>
+                <ClassIcon />
+              </ListItemIcon>
               <ListItemText primary="Courses" />
               {open ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {courses.map(a => a.name).map((text, index) => (
-                  <ListItem key ={index} button className={classes.nested}>
-                    <ListItemText primary={text} classes={{primary:classes.listItemText}}/>
-                  </ListItem>
-                ))}
+                {courses
+                  .map((a) => a.name)
+                  .map((text, index) => (
+                    <ListItem key={index} button className={classes.nested}>
+                      <ListItemText
+                        primary={text}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                    </ListItem>
+                  ))}
               </List>
             </Collapse>
-              {['Assessment', 'Course Goals', 'My Grades', 'Resources', 'Personal Feedback', 'VARK'].map((text, index) => (
-                <ListItem 
-                  button key={text} component={NavLink} 
-                  to={['/assessment', '/goals', '/grades', '/resources', '/feedback', '/vark'][index]} 
-                  activeStyle={{ background: 'rgb(0, 0, 0, 0.1)'}}
-                >
-                  <ListItemIcon>
+            {[
+              "Assessment",
+              "Course Goals",
+              "My Grades",
+              "Resources",
+              "Personal Feedback",
+              "VARK",
+            ].map((text, index) => (
+              <ListItem
+                button
+                key={text}
+                component={NavLink}
+                to={
+                  [
+                    "/assessment",
+                    "/goals",
+                    "/grades",
+                    "/resources",
+                    "/feedback",
+                    "/vark",
+                  ][index]
+                }
+                activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}
+              >
+                <ListItemIcon>
                   {
-                    { 
+                    {
                       0: <AssessmentIcon />,
                       1: <EmojiEmotionsIcon />,
                       2: <SchoolIcon />,
                       3: <SubjectIcon />,
                       4: <FeedbackIcon />,
-                      5: <FingerprintIcon />
+                      5: <FingerprintIcon />,
                     }[index]
                   }
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItem>
-              ))}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
           </List>
         </div>
       </Drawer>
@@ -215,22 +245,22 @@ const StudentApp = ({ user }) => {
             <Assessment />
           </Route>
           <Route path="/feedback">
-            <Feedback courses={courses}/>
+            <Feedback courses={courses} />
           </Route>
           <Route path="/goals">
-            <Goals assessment={assessment} courses={courses}/>
+            <Goals assessment={assessment} courses={courses} />
           </Route>
           <Route path="/grades">
-            <Grades />
+            <Grades assessment={assessment} courses={courses} />
           </Route>
           <Route path="/resources">
             <Resources />
-          </Route> 
+          </Route>
           <Route path="/vark">
-            <Vark parentVark={vark} setParentVarkScore={setParentVarkScore}/>
-          </Route>      
+            <Vark parentVark={vark} setParentVarkScore={setParentVarkScore} />
+          </Route>
           <Route path="/">
-            <Home assessment={assessment} courses={courses}/>
+            <Home vark={vark} assessment={assessment} courses={courses} />
           </Route>
         </Switch>
       </main>

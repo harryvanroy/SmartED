@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import axios from "axios";
 
-const TeacherFeedback = ({ course }) => (
-  <div>
-    Teacher feedback page for {course.name}
-  </div>
-)
+// DETERMINE LOCATION
+var url;
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
+  url = "https://deco3801-pogware.uqcloud.net";
+} else {
+  url = "http://localhost:8000";
+}
+console.log("location: " + url);
+//
 
-export default TeacherFeedback
+const TeacherFeedback = ({ feedback }) => {
+  return feedback.map((e, index) => <div key={index}>{e.feedback}</div>);
+};
+
+export default TeacherFeedback;

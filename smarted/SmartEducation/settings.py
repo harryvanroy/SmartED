@@ -28,7 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']  # may be insecure, change later - george
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -137,3 +136,6 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = '/var/www/uwsgi/SmartED/static/'
+
+CORS_ORIGIN_ALLOW_ALL = True 
+CORS_ALLOW_CREDENTIALS = True

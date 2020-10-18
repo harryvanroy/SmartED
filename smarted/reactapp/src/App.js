@@ -19,13 +19,30 @@ console.log("location: " + url);
 const App = () => {
   const [user, setUser] = React.useState(null);
 
+  let force_teacher;
+
+  localStorage.getItem("force_teacher") === "1" ? force_teacher = 1 : force_teacher = 0;
+
+  console.log("FORCE TEACHER: ", force_teacher);
+
   useEffect(() => {
-    axios(url+'/Database/initialize/', {
-      method: "get",
+    let method;
+
+    force_teacher === 1 ? method = "get" : method = "delete";
+
+    axios(url+'/Database/force-teacher/', {
+      method: method,
       withCredentials: true
     }).then(res => {
-      setUser(res.data);
-    })
+      console.log("force teacher with method: ", method);
+
+      axios(url+'/Database/initialize/', {
+        method: "get",
+        withCredentials: true
+      }).then(res => {
+        setUser(res.data);
+      })
+    }) 
   }, []);
 
   return (

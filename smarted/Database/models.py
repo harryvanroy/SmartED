@@ -104,6 +104,7 @@ class File(models.Model):
 
 class Resource(models.Model):
     id = models.AutoField(primary_key=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
     isBlackboardGenerated = models.BooleanField()
@@ -230,3 +231,8 @@ class LongTermGoals(models.Model):
 
     # For type 4
     customGoal = models.TextField(null=True, max_length=300)
+
+
+# temporary model for making life easier on the front end...
+class exemptCSRF(models.Model):
+    csrf = models.TextField(max_length=300)

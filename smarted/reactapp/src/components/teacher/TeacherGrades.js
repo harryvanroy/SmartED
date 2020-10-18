@@ -50,11 +50,7 @@ const TeacherGrades = ({ assessment, course }) => {
       withCredentials: true
     })
     .then(res => {
-      setGrade({
-        "studentID": "",
-        "assID": 0,
-        "grade": 0
-      });
+      console.log('posted grade..')
     });
   }
 
@@ -66,7 +62,7 @@ const TeacherGrades = ({ assessment, course }) => {
           onChange={handleAssessmentChange}
         >
           {assessment.filter(ass => ass.course === course.id).map(e => 
-            <MenuItem value={e.id}>{e.name}</MenuItem>
+            <MenuItem key={e.id} value={e.id}>{e.name}</MenuItem>
           )}
         </Select>
         <TextField

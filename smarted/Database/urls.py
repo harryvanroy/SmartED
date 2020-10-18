@@ -19,10 +19,13 @@ router.register('staff', StaffViewSet, 'staff')
 router.register('studentAssessment', StudentAssessmentViewSet, 'studentAssessment')
 router.register('CourseFeedback', CourseFeedbackViewSet, 'courseFeedback')
 router.register('CourseGoals', CourseGoalsViewSet, 'courseGoals')
+router.register('csrfEXEMPT', csrfExemptViewSet, 'csrfExempt')
 urlpatterns = router.urls
 
 # CUSTOM API VIEWS
 urlpatterns += [
+    path('force-teacher/', views.force_teacher, name='force-teacher'),
+
     path('course-assessment/', views.course_assessment, name='course-assessment'),
     path('initialize/', views.initialize, name='initialize'),
 
@@ -36,5 +39,7 @@ urlpatterns += [
     path('teacher-courses/', teacher_views.get_teacher_courses, name='teacher-courses'),
     path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),
     path('student-assessment-grade/', teacher_views.student_assessment_grade, name='student-assessment-grade'),
-    path('get-course-feedback/', teacher_views.get_course_feedback, name='get-course-feedback')
+    path('get-course-feedback/', teacher_views.get_course_feedback, name='get-course-feedback'),
+    path('students-at-risk/', teacher_views.students_at_risk, name='students-at-risk'),
+    path('course-average-vark/', teacher_views.get_average_vark, name='course-average-vark')
 ]
