@@ -629,12 +629,12 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link in resources[item_id]['links']:
             resource = Resource(
-                title="",  # TODO: scrape this
-                description="",  # TODO: scrape this
+                title="", # TODO: scrape this
+                description="", # TODO: scrape this
                 isBlackboardGenerated=True,
                 blackboardLink=link,
-                dateAdded="2020-10-15",  # TODO: scrape this
-                week=1,  # TODO: scrape this
+                dateAdded="2020-10-15", # TODO: scrape this
+                week=1, # TODO: scrape this
                 folder=folder
             )
             resource.save()
