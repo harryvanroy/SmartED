@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import UQBlackboardScraper
 from .models import *
-from .serializers import ResourceSerializer, FileSerializer
+from .serializers import ResourceSerializer, FileSerializer, AnnouncementSerializer
 
 from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
@@ -643,7 +643,6 @@ def save_resources(course, resources, assessed):
             )
             resource.save()
 
-
 @csrf_exempt
 def refresh(request):
     """
@@ -652,9 +651,6 @@ def refresh(request):
     Args:
         request (HttpRequest): post request sent from client side
     """
-    BAD_REQUEST = HttpResponse('This aint it chief')
-    if request.method != 'POST':
-        return BAD_REQUEST
     json_body = json.loads(request.body)
 
     username = json_body.get("username")
@@ -700,12 +696,11 @@ def get_course_resources(request, course_id, file_id=-1):
 
     Args:
         course_id (int): The given course identifier
+        file_id (int): The given file identifier (default=-1)
 
     Returns:
         JSON: List of courses and their fields
     """
-    print(course_id)
-    print(file_id)
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'GET':
         return BAD_REQUEST
@@ -716,6 +711,26 @@ def get_course_resources(request, course_id, file_id=-1):
         course_files = File.objects.filter(course=course)
     course_resources = Resource.objects.filter(folder__in=course_files.values('id'))
     serializer = ResourceSerializer(course_resources, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_course_announcements(request, course_id):
+    """
+    View course announcements using a course id
+
+    Args:
+        course_id (int): The given course identifier
+
+    Returns:
+        JSON: List of announcements and their fields
+    """
+
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'GET':
+        return BAD_REQUEST
+    course = Course.objects.get(id=course_id)
+    course_announcements = Announcement.objects.filter(course=course)
+    serializer = AnnouncementSerializer(course_announcements, many=True)
     return Response(serializer.data)
 
 ##############################################
