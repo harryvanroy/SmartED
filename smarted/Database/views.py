@@ -1,13 +1,17 @@
 import json
 import re
 import arrow
+import pytz
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import UQBlackboardScraper
 from .models import *
+from .serializers import ResourceSerializer
+
 from rest_framework.exceptions import ValidationError, ParseError
-import pytz
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 is_local = False
 FORCE_TEACHER = False
@@ -668,5 +672,24 @@ def refresh(request):
         save_resources(subject, courses[course]['assessment'], True)
 
     return HttpResponse("SUCCESS")
+
+def get_course_resources(course_id):
+    """
+    View course resources using a course id
+
+    Args:
+        course_id (int): The given course identifier
+
+    Returns:
+        JSON: List of courses and their fields
+    """
+    print("CID", course_id)
+    course = Course.objects.get(id=course_id)
+    print(course)
+    course_files = File.objects.filter(course=course).values('id')
+    course_resources = Resource.objects.filter(folder__in=course_files)
+    
+    serializer = ResourceSerializer(course_resources, many=True)
+    return Response(serializer.data)
 
 ##############################################
