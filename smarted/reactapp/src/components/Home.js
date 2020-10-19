@@ -93,14 +93,6 @@ function Home({ assessment, courses, vark }) {
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Announcements</Typography>
                 </div>
-                <Typography variant="h6">DECO3801:</Typography>
-                <Typography>
-                  - Reminder to check schedule for Monday morning!
-                </Typography>
-                <Typography variant="h6">INFS1200:</Typography>
-                <Typography>
-                  - Course content added: Lecture 04/09/2020
-                </Typography>
               </Paper>
             </Grid>
             <Grid item xs={12}>
@@ -108,7 +100,6 @@ function Home({ assessment, courses, vark }) {
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Personalised feedback</Typography>
                 </div>
-                Smooth sailing, keep it up!
               </Paper>
             </Grid>
           </Grid>
