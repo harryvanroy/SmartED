@@ -92,7 +92,7 @@ const TeacherGrades = ({ assessment, course }) => {
     }).then((res) => {
       setStudentsCourse(res.data);
     });
-  }, []);
+  }, [course]);
 
   return (
     <div>
