@@ -56,6 +56,7 @@ function Goals({ courses, assessment }) {
     assID: 0,
     assName: "",
     text: "",
+    isComplete: false,
   });
   const [gradeGoals, setGradeGoals] = React.useState([]);
   const [assGoals, setAssGoals] = React.useState([]);
@@ -92,10 +93,10 @@ function Goals({ courses, assessment }) {
         customGoalsToAdd.push(customGoal);
       });
 
-      setGradeGoals(gradeGoals.concat(courseGoalsToAdd));
-      setAssGoals(assGoals.concat(assGoalsToAdd));
-      setStudyGoals(studyGoals.concat(studyGoalsToAdd));
-      setCustomGoals(customGoals.concat(customGoalsToAdd));
+      setGradeGoals(courseGoalsToAdd);
+      setAssGoals(assGoalsToAdd);
+      setStudyGoals(studyGoalsToAdd);
+      setCustomGoals(customGoalsToAdd);
     });
   }, []);
 
@@ -170,6 +171,7 @@ function Goals({ courses, assessment }) {
         postGoal = {
           courseID: state.courseID,
           type: state.type,
+          is_complete: 0,
           grade: state.grade,
         };
         break;
@@ -178,6 +180,7 @@ function Goals({ courses, assessment }) {
           courseID: state.courseID,
           type: state.type,
           assID: state.assID,
+          is_complete: 0,
           grade: state.grade,
         };
         break;
@@ -185,6 +188,7 @@ function Goals({ courses, assessment }) {
         postGoal = {
           courseID: state.courseID,
           type: state.type,
+          is_complete: 0,
           hours: state.hours,
         };
         break;
@@ -192,6 +196,7 @@ function Goals({ courses, assessment }) {
         postGoal = {
           courseID: state.courseID,
           type: state.type,
+          is_complete: 0,
           text: state.text,
         };
         break;
@@ -199,57 +204,43 @@ function Goals({ courses, assessment }) {
     }
     console.log("About to post:");
     console.log(postGoal);
-
     axios(url + "/Database/goals/", {
       method: "post",
       data: postGoal,
       withCredentials: true,
-    })
-      .then((res) => {
-        console.log(postGoal);
-        let course = {
-          id: state.courseID,
-          name: state.courseName,
-        };
-        switch (state.type) {
-          case "COURSEGRADE":
-            let goalCourseGrade = {
-              course: course,
-              grade: state.grade,
-            };
-            setGradeGoals([...gradeGoals, goalCourseGrade]);
-            break;
-          case "ASSESSMENTGRADE":
-            let goalAssGrade = {
-              course: course,
-              assessment: {
-                id: state.assID,
-                name: state.assName,
-              },
-              grade: state.grade,
-            };
-            setAssGoals([...assGoals, goalAssGrade]);
-            break;
-          case "STUDYWEEK":
-            let goalStudy = {
-              course: course,
-              hours: state.hours,
-            };
-            setStudyGoals([...studyGoals, goalStudy]);
-            break;
-          case "CUSTOM":
-            let goalCustom = {
-              course: course,
-              text: state.text,
-            };
-            setCustomGoals([...customGoals, goalCustom]);
-            break;
-          default:
-        }
-      })
-      .catch((err) => {
-        alert("cannot add duplicate goals for now");
+    }).then((res) => {
+      axios(url + "/Database/goals/", {
+        method: "get",
+        withCredentials: true,
+      }).then((res) => {
+        let courseGoalsToAdd = [];
+        let assGoalsToAdd = [];
+        let studyGoalsToAdd = [];
+        let customGoalsToAdd = [];
+
+        res.data["COURSEGRADE"].forEach((courseGradeGoal) => {
+          console.log(courseGradeGoal);
+          courseGoalsToAdd.push(courseGradeGoal);
+        });
+        res.data["ASSESSMENTGRADE"].forEach((assGoal) => {
+          console.log(assGoal);
+          assGoalsToAdd.push(assGoal);
+        });
+        res.data["STUDYWEEK"].forEach((studyGoal) => {
+          console.log(studyGoal);
+          studyGoalsToAdd.push(studyGoal);
+        });
+        res.data["CUSTOM"].forEach((customGoal) => {
+          console.log(customGoal);
+          customGoalsToAdd.push(customGoal);
+        });
+
+        setGradeGoals(courseGoalsToAdd);
+        setAssGoals(assGoalsToAdd);
+        setStudyGoals(studyGoalsToAdd);
+        setCustomGoals(customGoalsToAdd);
       });
+    });
   };
 
   const drawOverallGoal = () => {
@@ -264,6 +255,7 @@ function Goals({ courses, assessment }) {
             <Select
               id="demo-simple-select-outlined"
               onChange={handleGradeChange}
+              defaultValue=""
             >
               <MenuItem value={1}> 1</MenuItem>
               <MenuItem value={2}> 2</MenuItem>
@@ -292,6 +284,7 @@ function Goals({ courses, assessment }) {
             <Select
               id="demo-simple-select-outlined"
               onChange={handleGradeChange}
+              defaultValue=""
             >
               <MenuItem value={1}> 1</MenuItem>
               <MenuItem value={2}> 2</MenuItem>
@@ -310,11 +303,14 @@ function Goals({ courses, assessment }) {
             <Select
               id="demo-simple-select-outlined"
               onChange={handleAssessmentChange}
+              defaultValue=""
             >
               {assessment
                 .filter((ass) => ass.course === state.courseID)
                 .map((e) => (
-                  <MenuItem value={e}>{e.name}</MenuItem>
+                  <MenuItem key={e.id} value={e}>
+                    {e.name}
+                  </MenuItem>
                 ))}
             </Select>
           </FormControl>
@@ -359,10 +355,29 @@ function Goals({ courses, assessment }) {
     }
   };
 
-  const handleDelete = () => {
-    console.log("deleted clicked");
+  const handleDelete = (id, goalType) => (event) => {
+    axios(url + `/Database/goals/?id=${id}`, {
+      method: "delete",
+      withCredentials: true,
+    }).then((res) => {
+      switch (goalType) {
+        case 0:
+          setCustomGoals(customGoals.filter((goal) => goal.id !== id));
+          break;
+        case 1:
+          setGradeGoals(gradeGoals.filter((goal) => goal.id !== id));
+          break;
+        case 2:
+          setStudyGoals(studyGoals.filter((goal) => goal.id !== id));
+          break;
+        case 3:
+          setAssGoals(assGoals.filter((goal) => goal.id !== id));
+          break;
+        default:
+      }
+    });
   };
-
+  console.log(studyGoals);
   return (
     <div>
       <Dialog
@@ -407,6 +422,7 @@ function Goals({ courses, assessment }) {
                     labelId="demo-simple-select-outlined-label"
                     id="demo-simple-select-outlined"
                     label="Course"
+                    defaultValue=""
                     onChange={handleCourseChange}
                   >
                     {courses.map((a, index) => (
@@ -429,6 +445,7 @@ function Goals({ courses, assessment }) {
                     labelId="demo-simple-select-outlined-label"
                     id="demo-simple-select-outlined"
                     label="Course"
+                    defaultValue=""
                     onChange={handleGoalChange}
                   >
                     <MenuItem value={"COURSEGRADE"}> Overall grade </MenuItem>
@@ -479,8 +496,8 @@ function Goals({ courses, assessment }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {customGoals.map((row) => (
-              <TableRow key={row.course.id}>
+            {customGoals.map((row, index) => (
+              <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
@@ -494,7 +511,7 @@ function Goals({ courses, assessment }) {
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Button onClick={handleDelete} color="secondary">
+                  <Button onClick={handleDelete(row.id, 0)} color="secondary">
                     Delete
                   </Button>
                 </TableCell>
@@ -516,14 +533,14 @@ function Goals({ courses, assessment }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {gradeGoals.map((row) => (
-              <TableRow key={row.course.id}>
+            {gradeGoals.map((row, index) => (
+              <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
                 <TableCell align="right">{row.grade}</TableCell>
                 <TableCell>
-                  <Button onClick={handleDelete} color="secondary">
+                  <Button onClick={handleDelete(row.id, 1)} color="secondary">
                     Delete
                   </Button>
                 </TableCell>
@@ -545,14 +562,14 @@ function Goals({ courses, assessment }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {studyGoals.map((row) => (
-              <TableRow key={row.course.id}>
+            {studyGoals.map((row, index) => (
+              <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
                 <TableCell align="right">{row.hours} hours</TableCell>
                 <TableCell>
-                  <Button onClick={handleDelete} color="secondary">
+                  <Button onClick={handleDelete(row.id, 2)} color="secondary">
                     Delete
                   </Button>
                 </TableCell>
@@ -575,15 +592,15 @@ function Goals({ courses, assessment }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {assGoals.map((row) => (
-              <TableRow key={row.course.id}>
+            {assGoals.map((row, index) => (
+              <TableRow key={index}>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
                 <TableCell align="right">{row.assessment.name}</TableCell>
                 <TableCell align="right">{row.grade}</TableCell>
                 <TableCell>
-                  <Button onClick={handleDelete} color="secondary">
+                  <Button onClick={handleDelete(row.id, 3)} color="secondary">
                     Delete
                   </Button>
                 </TableCell>
