@@ -81,7 +81,7 @@ function Assessment({ assessment, courses }) {
           <DialogContentText style={{ color: "black" }}>
             The priority value is calcuated with consideration for the weighting and due date of the assessment.
             An assignment with a higher priority value indicates a more crucial upcoming assignment.
-            <br></br>
+            <br></br><br></br>
             The priority is calculated with the following:
             <br></br>
           </DialogContentText>
