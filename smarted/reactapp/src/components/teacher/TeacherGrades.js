@@ -216,7 +216,7 @@ const TeacherGrades = ({ assessment, course }) => {
       withCredentials: true,
     }).then((res) => {
       console.log(res.data);
-      setStudentGrades(studentGrades.concat(res.data));
+      setStudentGrades(res.data);
     });
   }, [course]);
 
