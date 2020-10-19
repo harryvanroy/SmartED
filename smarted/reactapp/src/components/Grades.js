@@ -88,16 +88,21 @@ function Grades({ courses, assessment }) {
                 <Typography variant="h5">{grade.courseInfo.name}</Typography>
               </div>
               <Box display="flex" justifyContent="center" alignItems="center">
-                <Progress
+                <Box display="flex" justifyContent="center" flexDirection="column" alignItems="center">
+                  <Progress
+                    style={{ marginRight: 30 }}
+                    subtitle={`Progress for ${grade.courseInfo.name}`}
+                    progress={grade.assessmentInfo.total_earnt}
+                    gradient={[
+                      { stop: 0.0, color: "#3f51b5" },
+                      { stop: 1, color: "#3f51b5" },
+                    ]}
+                    hideBall
+                  />
+                  <Typography 
                   style={{ marginRight: 30 }}
-                  subtitle={`Progress for ${grade.courseInfo.name}`}
-                  progress={grade.assessmentInfo.total_earnt}
-                  gradient={[
-                    { stop: 0.0, color: "#3f51b5" },
-                    { stop: 1, color: "#3f51b5" },
-                  ]}
-                  hideBall
-                />
+                  variant="h6">Out of {grade.assessmentInfo.total_completed}%</Typography>
+                </Box>
                 <TableContainer
                   style={{ marginBottom: 10, marginTop: 10 }}
                   component={Paper}

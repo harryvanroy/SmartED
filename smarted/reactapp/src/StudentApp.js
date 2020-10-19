@@ -25,11 +25,12 @@ import HomeIcon from "@material-ui/icons/Home";
 
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
+import Course from "./components/Course"
 import Feedback from "./components/Feedback";
 import Goals from "./components/Goals";
 import Grades from "./components/Grades";
 import Resources from "./components/Resources";
-import Home from "./components/Home";
+import { Home, checkDate } from "./components/Home";
 import Vark from "./components/Vark";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -85,6 +86,7 @@ const StudentApp = ({ user }) => {
   const [open, setOpen] = React.useState(false);
   const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
+  const [currCourse, setCurrCourse] = React.useState();
   const [assessment, setAssessment] = React.useState([]);
 
   const handleClick = () => {
@@ -186,14 +188,15 @@ const StudentApp = ({ user }) => {
               <List component="div" disablePadding>
                 {courses
                   .map((a) => a.name)
-                  .map((text, index) => (
-                    <ListItem key={index} button className={classes.nested}>
+                  .map((text, index) => {
+                    return <ListItem onClick={() => setCurrCourse(text)} key={index} button className={classes.nested} component={NavLink} to={"/course/" + text}>
                       <ListItemText
                         primary={text}
                         classes={{ primary: classes.listItemText }}
                       />
                     </ListItem>
-                  ))}
+                  })
+                  }
               </List>
             </Collapse>
             {[
@@ -241,8 +244,11 @@ const StudentApp = ({ user }) => {
       <main className={classes.content}>
         <Toolbar />
         <Switch>
+          <Route path="/course/:name">
+            <Course course={currCourse}/>
+          </Route>
           <Route path="/assessment">
-            <Assessment />
+            <Assessment assessment={assessment} courses={courses} />
           </Route>
           <Route path="/feedback">
             <Feedback courses={courses} />

@@ -1,16 +1,20 @@
 import json
 import re
 import arrow
+import pytz
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import UQBlackboardScraper
 from .models import *
-from rest_framework.exceptions import ValidationError, ParseError
-import pytz
+from .serializers import ResourceSerializer, FileSerializer, AnnouncementSerializer
 
-is_local = False
-FORCE_TEACHER = True
+from rest_framework.exceptions import ValidationError, ParseError
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+is_local = True
+FORCE_TEACHER = False
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"
@@ -30,7 +34,8 @@ from . import teacher_views  # must be down here to avoid circular import error
 def force_teacher(request):
 
     try:
-        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[
+            1].split(';')[0]
     except:
         return HttpResponse("no token found, using normal mode!")
 
@@ -47,6 +52,7 @@ def force_teacher(request):
     return HttpResponse("")
 
 ######################## INIT #########################################
+
 
 def initialize_course(header, stu):
     """
@@ -118,7 +124,8 @@ def initialize(request):
     # check if request's csrf has an exemption for teacher checks
     CSRF_EXEMPT = False
     try:
-        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[
+            1].split(';')[0]
         CSRF_EXEMPT = True if len(
             exemptCSRF.objects.filter(csrf=csrf_token)) else False
     except:
@@ -313,6 +320,46 @@ def get_student_courses(request):
     return HttpResponse(json.dumps(json_courses))
 
 
+def construct_student_grades(username, course_filter, courseID):
+    student = Student.objects.get(user=User.objects.get(username=username))
+
+    if course_filter:
+        print(courseID)
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)
+                  if grade.assessment.course.id == courseID]
+    else:
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)]
+    
+    json_grades = [{"assessment":
+                    {"name": grade.assessment.name,
+                     "courseName": grade.assessment.course.name,
+                     "dateDescription": grade.assessment.dateDescription,
+                     "weight": grade.assessment.weight},
+                    "grade": str(grade.value)}
+                   for grade in grades]
+
+    # expected grade time
+    if course_filter:
+        total_weight = sum([float(grade.assessment.weight)
+                            for grade in grades])
+        total_earnt = sum([(float(grade.value) / 100)
+                           * float(grade.assessment.weight)
+                           for grade in grades])
+
+        if total_weight > 0:
+            current_grade = 100 * (total_earnt / total_weight)
+        else:
+            current_grade = 100
+
+        json_grades = {"items": json_grades,
+                       "total_completed": str(total_weight),
+                       "total_earnt": str(total_earnt),
+                       "current_grade": str(current_grade)}
+    return json_grades
+
+
 def get_student_grades(request):
     """
     A view to handle a request for a student's grades.
@@ -338,44 +385,7 @@ def get_student_grades(request):
     except:
         course_filter = False
 
-    student = Student.objects.get(user=User.objects.get(username=username))
-
-    if course_filter:
-        print(courseID)
-        grades = [grade for grade
-                  in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment.course.id == courseID]
-    else:
-        grades = [grade for grade
-                  in StudentAssessment.objects.filter(student=student)]
-
-    json_grades = [{"assessment":
-                    {"name": grade.assessment.name,
-                     "courseName": grade.assessment.course.name,
-                     "dateDescription": grade.assessment.dateDescription,
-                     "weight": grade.assessment.weight},
-                    "grade": str(grade.value)}
-                   for grade in grades]
-
-    # expected grade time
-    if course_filter:
-        total_weight = sum([float(grade.assessment.weight)
-                            for grade in grades])
-        total_earnt = sum([(float(grade.value) / 100)
-                           * float(grade.assessment.weight)
-                           for grade in grades])
-
-        if total_weight > 0:
-            current_grade = 100 * (total_earnt / total_weight)
-        else:
-            current_grade = 100
-
-        print(total_weight, total_earnt)
-
-        json_grades = {"items": json_grades,
-                       "total_completed": str(total_weight),
-                       "total_earnt": str(total_earnt),
-                       "current_grade": str(current_grade)}
+    json_grades = construct_student_grades(username, course_filter, courseID)
 
     return HttpResponse(json.dumps(json_grades))
 
@@ -629,16 +639,15 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link in resources[item_id]['links']:
             resource = Resource(
-                title="", # TODO: scrape this
-                description="", # TODO: scrape this
+                title="",  # TODO: scrape this
+                description="",  # TODO: scrape this
                 isBlackboardGenerated=True,
                 blackboardLink=link,
-                dateAdded="2020-10-15", # TODO: scrape this
-                week=1, # TODO: scrape this
+                dateAdded="2020-10-15",  # TODO: scrape this
+                week=1,  # TODO: scrape this
                 folder=folder
             )
             resource.save()
-
 
 @csrf_exempt
 def refresh(request):
@@ -648,9 +657,6 @@ def refresh(request):
     Args:
         request (HttpRequest): post request sent from client side
     """
-    BAD_REQUEST = HttpResponse('This aint it chief')
-    if request.method != 'POST':
-        return BAD_REQUEST
     json_body = json.loads(request.body)
 
     username = json_body.get("username")
@@ -668,5 +674,69 @@ def refresh(request):
         save_resources(subject, courses[course]['assessment'], True)
 
     return HttpResponse("SUCCESS")
+
+@api_view(['GET'])
+def get_course_files(request, course_id):
+    """
+    View course directories using a course id
+
+    Args:
+        course_id (int): The given course identifier
+
+    Returns:
+        JSON: List of files and their fields
+    """
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'GET':
+        return BAD_REQUEST
+    course = Course.objects.get(id=course_id)
+    course_files = File.objects.filter(course=course)
+    serializer = FileSerializer(course_files, many=True)
+
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_course_resources(request, course_id, file_id=-1):
+    """
+    View course resources using a course id
+
+    Args:
+        course_id (int): The given course identifier
+        file_id (int): The given file identifier (default=-1)
+
+    Returns:
+        JSON: List of courses and their fields
+    """
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'GET':
+        return BAD_REQUEST
+    course = Course.objects.get(id=course_id)
+    if file_id != -1:
+        course_files = File.objects.filter(course=course, id=file_id)
+    else:
+        course_files = File.objects.filter(course=course)
+    course_resources = Resource.objects.filter(folder__in=course_files.values('id'))
+    serializer = ResourceSerializer(course_resources, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_course_announcements(request, course_id):
+    """
+    View course announcements using a course id
+
+    Args:
+        course_id (int): The given course identifier
+
+    Returns:
+        JSON: List of announcements and their fields
+    """
+
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'GET':
+        return BAD_REQUEST
+    course = Course.objects.get(id=course_id)
+    course_announcements = Announcement.objects.filter(course=course)
+    serializer = AnnouncementSerializer(course_announcements, many=True)
+    return Response(serializer.data)
 
 ##############################################
