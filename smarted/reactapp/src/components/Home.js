@@ -22,39 +22,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function checkDate(dateString) {
+  if (isNaN(parseInt(dateString[0]))) {
+    return new Date(8640000000000000);
+  }
+
+  let splitStr =
+    dateString.indexOf("-") !== -1
+      ? dateString.substr(dateString.indexOf("-") + 2).split(" ")
+      : dateString.split(" ");
+
+  let months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  let day = parseInt(splitStr[0]);
+  let month = months.indexOf(splitStr[1]);
+  let year = parseInt("20" + splitStr[2]);
+  return new Date(year, month, day);
+} 
+
 function Home({ assessment, courses, vark }) {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
-  function checkDate(dateString) {
-    if (isNaN(parseInt(dateString[0]))) {
-      return new Date(8640000000000000);
-    }
-
-    let splitStr =
-      dateString.indexOf("-") !== -1
-        ? dateString.substr(dateString.indexOf("-") + 2).split(" ")
-        : dateString.split(" ");
-
-    let months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    let day = parseInt(splitStr[0]);
-    let month = months.indexOf(splitStr[1]);
-    let year = parseInt("20" + splitStr[2]);
-    return new Date(year, month, day);
-  }
 
   const handleVarkOpen = () => {
     setOpen(true);
@@ -224,4 +225,4 @@ function Home({ assessment, courses, vark }) {
   );
 }
 
-export default Home;
+export {Home, checkDate};

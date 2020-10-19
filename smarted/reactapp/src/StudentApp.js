@@ -29,7 +29,7 @@ import Feedback from "./components/Feedback";
 import Goals from "./components/Goals";
 import Grades from "./components/Grades";
 import Resources from "./components/Resources";
-import Home from "./components/Home";
+import { Home, checkDate } from "./components/Home";
 import Vark from "./components/Vark";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -242,7 +242,7 @@ const StudentApp = ({ user }) => {
         <Toolbar />
         <Switch>
           <Route path="/assessment">
-            <Assessment />
+            <Assessment assessment={assessment} courses={courses} />
           </Route>
           <Route path="/feedback">
             <Feedback courses={courses} />
