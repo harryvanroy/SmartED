@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 import pytz
 
 is_local = False
-FORCE_TEACHER = True
+FORCE_TEACHER = False
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"
