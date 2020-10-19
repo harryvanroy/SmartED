@@ -7,13 +7,13 @@ from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import UQBlackboardScraper
 from .models import *
-from .serializers import ResourceSerializer
+from .serializers import ResourceSerializer, FileSerializer
 
 from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
@@ -673,7 +673,28 @@ def refresh(request):
 
     return HttpResponse("SUCCESS")
 
-def get_course_resources(course_id):
+@api_view(['GET'])
+def get_course_files(request, course_id):
+    """
+    View course directories using a course id
+
+    Args:
+        course_id (int): The given course identifier
+
+    Returns:
+        JSON: List of files and their fields
+    """
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'GET':
+        return BAD_REQUEST
+    course = Course.objects.get(id=course_id)
+    course_files = File.objects.filter(course=course)
+    serializer = FileSerializer(course_files, many=True)
+
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_course_resources(request, course_id, file_id=-1):
     """
     View course resources using a course id
 
@@ -683,12 +704,17 @@ def get_course_resources(course_id):
     Returns:
         JSON: List of courses and their fields
     """
-    print("CID", course_id)
+    print(course_id)
+    print(file_id)
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'GET':
+        return BAD_REQUEST
     course = Course.objects.get(id=course_id)
-    print(course)
-    course_files = File.objects.filter(course=course).values('id')
-    course_resources = Resource.objects.filter(folder__in=course_files)
-    
+    if file_id != -1:
+        course_files = File.objects.filter(course=course, id=file_id)
+    else:
+        course_files = File.objects.filter(course=course)
+    course_resources = Resource.objects.filter(folder__in=course_files.values('id'))
     serializer = ResourceSerializer(course_resources, many=True)
     return Response(serializer.data)
 
