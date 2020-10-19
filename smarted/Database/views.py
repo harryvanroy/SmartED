@@ -30,7 +30,8 @@ from . import teacher_views  # must be down here to avoid circular import error
 def force_teacher(request):
 
     try:
-        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[
+            1].split(';')[0]
     except:
         return HttpResponse("no token found, using normal mode!")
 
@@ -47,6 +48,7 @@ def force_teacher(request):
     return HttpResponse("")
 
 ######################## INIT #########################################
+
 
 def initialize_course(header, stu):
     """
@@ -118,7 +120,8 @@ def initialize(request):
     # check if request's csrf has an exemption for teacher checks
     CSRF_EXEMPT = False
     try:
-        csrf_token = request.headers.get('Cookie').split('csrftoken=')[1].split(';')[0]
+        csrf_token = request.headers.get('Cookie').split('csrftoken=')[
+            1].split(';')[0]
         CSRF_EXEMPT = True if len(
             exemptCSRF.objects.filter(csrf=csrf_token)) else False
     except:
@@ -313,6 +316,46 @@ def get_student_courses(request):
     return HttpResponse(json.dumps(json_courses))
 
 
+def construct_student_grades(username, course_filter, courseID):
+    student = Student.objects.get(user=User.objects.get(username=username))
+
+    if course_filter:
+        print(courseID)
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)
+                  if grade.assessment.course.id == courseID]
+    else:
+        grades = [grade for grade
+                  in StudentAssessment.objects.filter(student=student)]
+    
+    json_grades = [{"assessment":
+                    {"name": grade.assessment.name,
+                     "courseName": grade.assessment.course.name,
+                     "dateDescription": grade.assessment.dateDescription,
+                     "weight": grade.assessment.weight},
+                    "grade": str(grade.value)}
+                   for grade in grades]
+
+    # expected grade time
+    if course_filter:
+        total_weight = sum([float(grade.assessment.weight)
+                            for grade in grades])
+        total_earnt = sum([(float(grade.value) / 100)
+                           * float(grade.assessment.weight)
+                           for grade in grades])
+
+        if total_weight > 0:
+            current_grade = 100 * (total_earnt / total_weight)
+        else:
+            current_grade = 100
+
+        json_grades = {"items": json_grades,
+                       "total_completed": str(total_weight),
+                       "total_earnt": str(total_earnt),
+                       "current_grade": str(current_grade)}
+    return json_grades
+
+
 def get_student_grades(request):
     """
     A view to handle a request for a student's grades.
@@ -338,44 +381,7 @@ def get_student_grades(request):
     except:
         course_filter = False
 
-    student = Student.objects.get(user=User.objects.get(username=username))
-
-    if course_filter:
-        print(courseID)
-        grades = [grade for grade
-                  in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment.course.id == courseID]
-    else:
-        grades = [grade for grade
-                  in StudentAssessment.objects.filter(student=student)]
-
-    json_grades = [{"assessment":
-                    {"name": grade.assessment.name,
-                     "courseName": grade.assessment.course.name,
-                     "dateDescription": grade.assessment.dateDescription,
-                     "weight": grade.assessment.weight},
-                    "grade": str(grade.value)}
-                   for grade in grades]
-
-    # expected grade time
-    if course_filter:
-        total_weight = sum([float(grade.assessment.weight)
-                            for grade in grades])
-        total_earnt = sum([(float(grade.value) / 100)
-                           * float(grade.assessment.weight)
-                           for grade in grades])
-
-        if total_weight > 0:
-            current_grade = 100 * (total_earnt / total_weight)
-        else:
-            current_grade = 100
-
-        print(total_weight, total_earnt)
-
-        json_grades = {"items": json_grades,
-                       "total_completed": str(total_weight),
-                       "total_earnt": str(total_earnt),
-                       "current_grade": str(current_grade)}
+    json_grades = construct_student_grades(username, course_filter, courseID)
 
     return HttpResponse(json.dumps(json_grades))
 
@@ -629,12 +635,12 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link in resources[item_id]['links']:
             resource = Resource(
-                title="", # TODO: scrape this
-                description="", # TODO: scrape this
+                title="",  # TODO: scrape this
+                description="",  # TODO: scrape this
                 isBlackboardGenerated=True,
                 blackboardLink=link,
-                dateAdded="2020-10-15", # TODO: scrape this
-                week=1, # TODO: scrape this
+                dateAdded="2020-10-15",  # TODO: scrape this
+                week=1,  # TODO: scrape this
                 folder=folder
             )
             resource.save()

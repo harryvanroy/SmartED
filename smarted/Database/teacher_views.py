@@ -274,3 +274,29 @@ def get_average_vark(request):
     vark = {"V": avg(V), "A": avg(A), "R": avg(R), "K": avg(K)}
 
     return HttpResponse(json.dumps(vark))
+
+
+def students_course_grade(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    id = request.GET.get('id')
+
+    try:
+        course = Course.objects.get(id=id)
+    except:
+        return HttpResponse("failed query.. specify the correct course ID...")
+
+    students = [stu.student for stu in StudentCourse.objects.filter(course=course)]
+
+    student_grades = [{"student": {"username": stu.user.username,
+                                   "firstname": stu.user.firstName,
+                                   "lastname": stu.user.lastName},
+                       "grades": views.construct_student_grades(stu.user.username, True, int(id))}
+                      for stu in students]
+
+    return HttpResponse(json.dumps(student_grades))
