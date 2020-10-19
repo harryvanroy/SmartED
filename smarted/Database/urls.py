@@ -43,4 +43,9 @@ urlpatterns += [
     path('students-at-risk/', teacher_views.students_at_risk, name='students-at-risk'),
     path('course-average-vark/', teacher_views.get_average_vark, name='course-average-vark'),
     path('student-course-grades/', teacher_views.students_course_grade, name='student-grades')
+    
+    path('course-files/<int:course_id>/', views.get_course_files, name='course-files'),
+    path('course-resources/<int:course_id>/', views.get_course_resources, name='course-resources'),
+    path('course-resources/<int:course_id>/<int:file_id>/', views.get_course_resources, name='course-resources-file'),
+    path('course-announcements/<int:course_id>/', views.get_course_announcements, name='course-announcements')
 ]
