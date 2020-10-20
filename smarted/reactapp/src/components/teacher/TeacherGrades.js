@@ -47,6 +47,10 @@ const useRowStyles = makeStyles({
   },
 });
 
+const strToFloat = (str) => {
+  return parseFloat(str).toFixed(1);
+};
+
 function createData(
   studentID,
   name,
@@ -94,8 +98,8 @@ function Row(props) {
         </TableCell>
         <TableCell align="right">{row.name}</TableCell>
         <TableCell align="right">{row.totalCompleted}</TableCell>
-        <TableCell align="right">{row.totalEarnt}</TableCell>
-        <TableCell align="right">{row.currentGrade}</TableCell>
+        <TableCell align="right">{strToFloat(row.totalEarnt)}</TableCell>
+        <TableCell align="right">{strToFloat(row.currentGrade)}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -119,7 +123,7 @@ function Row(props) {
                         {assessmentRow.assessmentName}
                       </TableCell>
                       <TableCell>{assessmentRow.weight}</TableCell>
-                      <TableCell align="right">{assessmentRow.grade}</TableCell>
+                      <TableCell align="right">{strToFloat(assessmentRow.grade)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
