@@ -123,7 +123,9 @@ function Row(props) {
                         {assessmentRow.assessmentName}
                       </TableCell>
                       <TableCell>{assessmentRow.weight}</TableCell>
-                      <TableCell align="right">{strToFloat(assessmentRow.grade)}</TableCell>
+                      <TableCell align="right">
+                        {strToFloat(assessmentRow.grade)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -248,6 +250,7 @@ const TeacherGrades = ({ assessment, course }) => {
           Invalid grade!
         </Alert>
       </Snackbar>
+      <Typography variant="h4">Grades</Typography>
       <Grid
         container
         direction="column"
