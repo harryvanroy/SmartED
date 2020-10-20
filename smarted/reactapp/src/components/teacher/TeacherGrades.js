@@ -88,6 +88,9 @@ function Row(props) {
         </TableCell>
         <TableCell component="th" scope="row">
           {row.studentID}
+          {parseFloat(row.currentGrade) < 50 && (
+            <Button color="secondary">AT RISK</Button>
+          )}
         </TableCell>
         <TableCell align="right">{row.name}</TableCell>
         <TableCell align="right">{row.totalCompleted}</TableCell>
@@ -153,7 +156,6 @@ const TeacherGrades = ({ assessment, course }) => {
   });
   const [studentsCourse, setStudentsCourse] = React.useState([]);
   const [open, setOpen] = React.useState(false);
-  const [openTable, setOpenTable] = React.useState(false);
   const [openErr, setOpenErr] = React.useState(false);
   const [studentGrades, setStudentGrades] = React.useState([]);
   const classes = useRowStyles();
