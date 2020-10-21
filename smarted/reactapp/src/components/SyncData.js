@@ -91,7 +91,7 @@ const SyncData = () => {
         onClose={handleErrClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert onClose={handleErrClose} severity="success">
+        <Alert onClose={handleErrClose} severity="error">
           Error submitting!
         </Alert>
       </Snackbar>
