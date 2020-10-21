@@ -10,6 +10,13 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,7 +57,7 @@ function checkDate(dateString) {
   let month = months.indexOf(splitStr[1]);
   let year = parseInt("20" + splitStr[2]);
   return new Date(year, month, day);
-} 
+}
 
 function Home({ assessment, courses, vark }) {
   const classes = useStyles();
@@ -88,7 +95,7 @@ function Home({ assessment, courses, vark }) {
       </Dialog>
       <Grid container justify="center" spacing={3}>
         <Grid item xs={8}>
-          <Grid container spacing={3}>
+          <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
@@ -106,7 +113,7 @@ function Home({ assessment, courses, vark }) {
           </Grid>
         </Grid>
         <Grid item xs={4}>
-          <Grid container spacing={3}>
+          <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
@@ -134,79 +141,66 @@ function Home({ assessment, courses, vark }) {
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Upcoming assessment</Typography>
-                  <div style={{ fontSize: "12px", color: "rgb(255, 77, 77)" }}>
-                    <Typography variant="h6">
-                      Assessment highlighted red are due in the next week
-                    </Typography>
-                  </div>
                 </div>
-                {courses.map((course) => (
-                  <div key={course.id}>
-                    <Typography variant="h6">{course.name + ":"}</Typography>
-                    {assessment
-                      .filter(
-                        (allAssess) =>
-                          allAssess.course === course.id &&
-                          new Date(
-                            new Date().getFullYear(),
-                            new Date().getMonth(),
-                            new Date().getDate()
-                          ) < checkDate(allAssess.dateDescription)
-                      )
-                      .map((assessCourse) => {
-                        let currentDate = new Date(
-                          new Date().getFullYear(),
-                          new Date().getMonth(),
-                          new Date().getDate()
-                        );
-                        return (
-                          <div key={assessCourse.id}>
-                            {checkDate(assessCourse.dateDescription) <
-                            currentDate.setDate(currentDate.getDate() + 7) ? (
-                              <div style={{ color: "rgb(255, 77, 77)" }}>
-                                <Typography>
-                                  {"-" + assessCourse.name}
-                                </Typography>
-                              </div>
-                            ) : (
-                              <div>
-                                <Typography>
-                                  {"-" + assessCourse.name}
-                                </Typography>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                  </div>
-                ))}
-                {/* <Typography variant="h6">
-                  DECO3801:
-                </Typography>
-                <Typography>
-                  - MVP presentation (07/09/2020)
-                </Typography>
-                <Typography variant="h6">
-                  CSSE1001:
-                </Typography>
-                <Typography>
-                  - HW2 (14/09/2020)
-                </Typography> */}
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
-                  <Typography variant="h5">Daily goals</Typography>
-                </div>
-                <Typography variant="h6">COMP4500:</Typography>
-                <Typography>---</Typography>
-                <Typography variant="h6">DECO3801:</Typography>
-                <Typography>---</Typography>
-                <Typography variant="h6">MATH3204:</Typography>
-                <Typography>---</Typography>
-                <Typography variant="h6">STAT2004:</Typography>
-                <Typography>---</Typography>
+                <Box overflow="auto" flex={1} flexDirection="column">
+                  {courses.map((course) => (
+                    <TableContainer
+                      style={{ marginBottom: 20 }}
+                      key={course.id}
+                      component={Paper}
+                    >
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell align="center">{course.name}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {assessment
+                            .filter(
+                              (allAssess) =>
+                                allAssess.course === course.id &&
+                                new Date(
+                                  new Date().getFullYear(),
+                                  new Date().getMonth(),
+                                  new Date().getDate()
+                                ) < checkDate(allAssess.dateDescription)
+                            )
+                            .map((assessCourse) => {
+                              let currentDate = new Date(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate()
+                              );
+                              return (
+                                <TableRow key={assessCourse.id}>
+                                  {checkDate(assessCourse.dateDescription) <
+                                  currentDate.setDate(
+                                    currentDate.getDate() + 7
+                                  ) ? (
+                                    <TableCell>
+                                      <Typography>
+                                        {assessCourse.name}{" "}
+                                        <Button color="secondary">
+                                          DUE SOON
+                                        </Button>
+                                      </Typography>
+                                    </TableCell>
+                                  ) : (
+                                    <TableCell>
+                                      <Typography>
+                                        {assessCourse.name}
+                                      </Typography>
+                                    </TableCell>
+                                  )}
+                                </TableRow>
+                              );
+                            })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  ))}
+                </Box>
               </Paper>
             </Grid>
           </Grid>
@@ -216,4 +210,4 @@ function Home({ assessment, courses, vark }) {
   );
 }
 
-export {Home, checkDate};
+export { Home, checkDate };

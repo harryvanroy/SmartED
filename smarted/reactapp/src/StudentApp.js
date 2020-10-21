@@ -25,7 +25,7 @@ import HomeIcon from "@material-ui/icons/Home";
 
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
-import Course from "./components/Course"
+import Course from "./components/Course";
 import Feedback from "./components/Feedback";
 import Goals from "./components/Goals";
 import Grades from "./components/Grades";
@@ -88,6 +88,7 @@ const StudentApp = ({ user }) => {
   const [courses, setCourses] = React.useState([]);
   const [currCourse, setCurrCourse] = React.useState();
   const [assessment, setAssessment] = React.useState([]);
+  const [announcements, setAnnouncements] = React.useState([]);
 
   const handleClick = () => {
     setOpen(!open);
@@ -116,6 +117,9 @@ const StudentApp = ({ user }) => {
       setCourses(res.data);
       let resp = [];
       let promises = [];
+
+      let respAnnounce = [];
+      let promisesAnnounce = [];
       res.data.forEach((course) => {
         promises.push(
           axios(url + `/Database/course-assessment/?id=${course.id}`, {
@@ -129,9 +133,20 @@ const StudentApp = ({ user }) => {
             );
           })
         );
+        promisesAnnounce.push(
+          axios(url + `/Database/course-announcements/${course.id}`, {
+            method: "get",
+            withCredentials: true,
+          }).then((resAss) => {
+            respAnnounce.push(res.data);
+          })
+        );
       });
       Promise.all(promises).then(() =>
         setAssessment([].concat.apply([], resp))
+      );
+      Promise.all(promisesAnnounce).then(() =>
+        setAnnouncements([].concat.apply([], res.data))
       );
     });
     axios(url + "/Database/vark/", {
@@ -147,7 +162,7 @@ const StudentApp = ({ user }) => {
       });
     });
   }, []);
-
+  console.log(announcements);
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -189,14 +204,22 @@ const StudentApp = ({ user }) => {
                 {courses
                   .map((a) => a.name)
                   .map((text, index) => {
-                    return <ListItem onClick={() => setCurrCourse(text)} key={index} button className={classes.nested} component={NavLink} to={"/course/" + text}>
-                      <ListItemText
-                        primary={text}
-                        classes={{ primary: classes.listItemText }}
-                      />
-                    </ListItem>
-                  })
-                  }
+                    return (
+                      <ListItem
+                        onClick={() => setCurrCourse(text)}
+                        key={index}
+                        button
+                        className={classes.nested}
+                        component={NavLink}
+                        to={"/course/" + text}
+                      >
+                        <ListItemText
+                          primary={text}
+                          classes={{ primary: classes.listItemText }}
+                        />
+                      </ListItem>
+                    );
+                  })}
               </List>
             </Collapse>
             {[
@@ -204,7 +227,7 @@ const StudentApp = ({ user }) => {
               "Course Goals",
               "My Grades",
               "Resources",
-              "Personal Feedback",
+              "Course Feedback",
               "VARK",
             ].map((text, index) => (
               <ListItem
@@ -245,7 +268,7 @@ const StudentApp = ({ user }) => {
         <Toolbar />
         <Switch>
           <Route path="/course/:name">
-            <Course course={currCourse}/>
+            <Course course={currCourse} />
           </Route>
           <Route path="/assessment">
             <Assessment assessment={assessment} courses={courses} />
