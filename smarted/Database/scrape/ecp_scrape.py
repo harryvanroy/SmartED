@@ -72,13 +72,15 @@ def get_course_assessment(course_code, semester=None, year=None, delivery_mode=N
 
         weight_txt = text[2].replace('\n', '')
         isPassFail = False
-        if "Pass" in weight_txt or "pass" in weight_txt:
+        
+        if "%" in weight_txt:
+            weight = float(weight_txt.split("%")[0])
+        elif "Pass" in weight_txt or "pass" in weight_txt:
             isPassFail = True
             weight = 0
-        elif "%" in weight_txt:
-            weight = float(weight_txt.split("%")[0])
         else:
-            weight = None
+            weight = 0
+        
 
         assessment = {"name": text[0], "date": text[1].replace('\n', ''),
                       "weight": weight, "isPassFail": isPassFail}
