@@ -2,6 +2,7 @@ import json
 import re
 import arrow
 import pytz
+from threading import Thread
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from .scrape.ecp_scrape import get_course_assessment
@@ -589,7 +590,6 @@ def save_announcements(course, announcements):
             "date" : "DAY, DAY# MONTH YEAR hh:mm:ss [AM/PM] AEST"
         )
     """
-
     def format_date(date):
         FORMAT = "D MMMM YYYY"
         split_date = date.split(" ")
@@ -643,21 +643,7 @@ def save_resources(course, resources, assessed):
             )
             resource.save()
 
-@csrf_exempt
-def refresh(request):
-    """
-    Refresh blackboard information for a given user
-
-    Args:
-        request (HttpRequest): post request sent from client side
-    """
-    json_body = json.loads(request.body)
-
-    username = json_body.get("username")
-    password = json_body.get("password")
-    if username is None or password is None:
-        return BAD_REQUEST
-
+def asynchronous_refresh(username, password):
     courses = refresh_content(username, password)
 
     for course in courses.keys():
@@ -666,7 +652,29 @@ def refresh(request):
         save_announcements(subject, courses[course]['announcements'])
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
+    
+    return # Thread dies here
 
+@csrf_exempt
+def refresh(request):
+    """
+    Refresh blackboard information for a given user
+
+    Args:
+        request (HttpRequest): post request sent from client side
+    """
+    BAD_REQUEST = HttpResponse('This aint it chief')
+    if request.method != 'POST':
+        return BAD_REQUEST    
+    json_body = json.loads(request.body)
+
+    username = json_body.get("username")
+    password = json_body.get("password")
+    if username is None or password is None:
+        return BAD_REQUEST
+    p = Thread(target=asynchronous_refresh, args=(username, password))
+    p.daemon = True # Thread is god
+    p.start()
     return HttpResponse("SUCCESS")
 
 @api_view(['GET'])
