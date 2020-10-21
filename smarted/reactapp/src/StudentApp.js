@@ -126,8 +126,6 @@ const StudentApp = ({ user }) => {
             After providing your UQ username and password, all your UQ learning
             resources and announcements data will be pulled from blackboard so
             they can be displayed here!
-            <br></br>
-            <br></br>
             <SyncData />
           </DialogContentText>
         </DialogContent>

@@ -28,6 +28,10 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
 console.log("location: " + url);
 //
 
+const Alert = (props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+};
+
 const SyncData = () => {
   const [values, setValues] = React.useState({
     username: "",
@@ -36,6 +40,7 @@ const SyncData = () => {
     syncing: false,
     done: false,
   });
+  const [openErr, setOpenErr] = React.useState(false);
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -49,6 +54,14 @@ const SyncData = () => {
     event.preventDefault();
   };
 
+  const handleErrClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenErr(false);
+  };
+
   const handleSubmit = () => {
     setValues({ ...values, syncing: true });
 
@@ -59,15 +72,29 @@ const SyncData = () => {
         password: values.password,
       },
       withCredentials: true,
-    }).then((res) => {
-      console.log(res);
-      setValues({ ...values, syncing: false });
-      setValues({ ...values, done: true });
-    });
+    })
+      .then((res) => {
+        console.log(res);
+        setValues({ ...values, syncing: false });
+        setValues({ ...values, done: true });
+      })
+      .catch((err) => {
+        setOpenErr(true);
+      });
   };
 
   return (
     <Box display="flex" justifyContent="center">
+      <Snackbar
+        open={openErr}
+        autoHideDuration={2000}
+        onClose={handleErrClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleErrClose} severity="success">
+          Error submitting!
+        </Alert>
+      </Snackbar>
       {values.done ? (
         <h4>Done Syncing!</h4>
       ) : values.syncing ? (
