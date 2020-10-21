@@ -146,7 +146,7 @@ const StudentApp = ({ user }) => {
         setAssessment([].concat.apply([], resp))
       );
       Promise.all(promisesAnnounce).then(() =>
-        setAnnouncements([].concat.apply([], res.data))
+        setAnnouncements([].concat.apply([], respAnnounce))
       );
     });
     axios(url + "/Database/vark/", {
