@@ -104,6 +104,7 @@ function Assessment({ assessment, courses }) {
                 style={{ marginBottom: 10, marginTop: 10, width: "100%" }}
                 component={Paper}
                 elavation={3}
+                variant="outlined"
               >
                 <Table className={classes.table}>
                   <TableHead>

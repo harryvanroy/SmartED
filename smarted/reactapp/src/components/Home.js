@@ -18,6 +18,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Box from "@material-ui/core/Box";
+import ButtonBase from "@material-ui/core/ButtonBase";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -60,10 +61,12 @@ function checkDate(dateString) {
   return new Date(year, month, day);
 }
 
-function Home({ assessment, courses, vark }) {
+function Home({ assessment, courses, vark, announcements }) {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [dialogAnn, setDialogAnn] = React.useState({});
   const [altOpen, setAltOpen] = React.useState(false);
 
   const handleVarkOpen = () => {
@@ -72,6 +75,18 @@ function Home({ assessment, courses, vark }) {
 
   const handleVarkClose = () => {
     setOpen(false);
+  };
+
+  const handleOpenDialog = (ann) => {
+    return function () {
+      setOpenDialog(true);
+      setDialogAnn(ann);
+    };
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDialogAnn({});
   };
 
   const handleAltOpen = () => {
@@ -84,6 +99,21 @@ function Home({ assessment, courses, vark }) {
 
   return (
     <div>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          {dialogAnn.title}
+          <Typography color="primary">
+            Posted on {dialogAnn.dateAdded}
+          </Typography>
+        </DialogTitle>
+        <DialogContent style={{ marginBottom: 20 }}>
+          <Typography>{dialogAnn.content}</Typography>
+        </DialogContent>
+      </Dialog>
       <Dialog
         open={open}
         onClose={handleVarkClose}
@@ -123,20 +153,62 @@ function Home({ assessment, courses, vark }) {
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Announcements</Typography>
                 </div>
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
-                  <Typography variant="h5">Personalised feedback</Typography>
-                </div>
+                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
+                  {announcements
+                    .sort(
+                      (a, b) =>
+                        Date.parse(b.dateAdded) - Date.parse(a.dateAdded)
+                    )
+                    .map((ann) => (
+                      <ButtonBase key={ann.id} style={{ width: "100%" }}>
+                        <Paper
+                          onClick={handleOpenDialog(ann)}
+                          square
+                          style={{
+                            minHeight: 50,
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                          }}
+                          key={ann.id}
+                          variant="outlined"
+                        >
+                          <Typography
+                            style={{
+                              flexGrow: 1,
+                              textAlign: "left",
+                              margin: 10,
+                            }}
+                          >
+                            {ann.title}
+                          </Typography>
+                          <Typography
+                            style={{
+                              margin: 10,
+                              color: "#51237a",
+                            }}
+                          >
+                            {
+                              courses.filter(
+                                (course) => course.id === ann.course
+                              )[0].name
+                            }
+                          </Typography>
+                          <Typography style={{ margin: 10 }}>
+                            {ann.dateAdded.slice(0, 10)}
+                          </Typography>
+                        </Paper>
+                      </ButtonBase>
+                    ))}
+                </Box>
               </Paper>
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={4}>
           <Grid container direction="column" spacing={3}>
-            <Grid item xs={12} style={{ textAlign: 'center' }}>
+            <Grid item xs={12} style={{ textAlign: "center" }}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">
@@ -155,13 +227,19 @@ function Home({ assessment, courses, vark }) {
                     Please complete vark quiz
                   </Typography>
                 ) : (
-                    <div>
-                      <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
-                      <Button size='large' variant='contained' color='primary' style={{ marginTop: 12 }} onClick={handleAltOpen}>
-                        My VARK Score
+                  <div>
+                    <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                    <Button
+                      size="large"
+                      variant="contained"
+                      color="primary"
+                      style={{ marginTop: 12 }}
+                      onClick={handleAltOpen}
+                    >
+                      My VARK Score
                     </Button>
-                    </div>
-                  )}
+                  </div>
+                )}
               </Paper>
             </Grid>
             <Grid item xs={12}>
@@ -169,12 +247,17 @@ function Home({ assessment, courses, vark }) {
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Upcoming assessment</Typography>
                 </div>
-                <Box overflow="auto" flex={1} flexDirection="column">
+                <Box
+                  style={{ maxHeight: 655, overflow: "auto" }}
+                  flex={1}
+                  flexDirection="column"
+                >
                   {courses.map((course) => (
                     <TableContainer
                       style={{ marginBottom: 20 }}
                       key={course.id}
                       component={Paper}
+                      variant="outlined"
                     >
                       <Table aria-label="simple table">
                         <TableHead>
@@ -202,24 +285,24 @@ function Home({ assessment, courses, vark }) {
                               return (
                                 <TableRow key={assessCourse.id}>
                                   {checkDate(assessCourse.dateDescription) <
-                                    currentDate.setDate(
-                                      currentDate.getDate() + 7
-                                    ) ? (
-                                      <TableCell>
-                                        <Typography>
-                                          {assessCourse.name}{" "}
-                                          <Button color="secondary">
-                                            DUE SOON
+                                  currentDate.setDate(
+                                    currentDate.getDate() + 7
+                                  ) ? (
+                                    <TableCell>
+                                      <Typography>
+                                        {assessCourse.name}{" "}
+                                        <Button color="secondary">
+                                          DUE SOON
                                         </Button>
-                                        </Typography>
-                                      </TableCell>
-                                    ) : (
-                                      <TableCell>
-                                        <Typography>
-                                          {assessCourse.name}
-                                        </Typography>
-                                      </TableCell>
-                                    )}
+                                      </Typography>
+                                    </TableCell>
+                                  ) : (
+                                    <TableCell>
+                                      <Typography>
+                                        {assessCourse.name}
+                                      </Typography>
+                                    </TableCell>
+                                  )}
                                 </TableRow>
                               );
                             })}

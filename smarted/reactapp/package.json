@@ -13,6 +13,7 @@
     "canvasjs-react-charts": "^1.0.5",
     "dotenv": "^8.2.0",
     "js-cookie": "^2.2.1",
+    "rainbowvis.js": "^1.0.1",
     "react": "^16.13.1",
     "react-circle-progress-bar": "^0.1.4",
     "react-dom": "^16.13.1",
