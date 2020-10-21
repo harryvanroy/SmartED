@@ -1,6 +1,6 @@
 import React from "react";
 import Cookies from "js-cookie";
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -17,11 +17,11 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import Button from "@material-ui/core/Button";
-import Latex from 'react-latex';
+import Latex from "react-latex";
 
 //DETERMINE LOCATION
 var url;
-if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
@@ -29,7 +29,6 @@ if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
   url = "http://localhost:8000";
 }
 console.log("location: " + url);
-
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -40,8 +39,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1.5em",
     paddingBottom: "15px",
   },
-  table: {
-  },
+  table: {},
 }));
 
 let currentDate = new Date(
@@ -51,9 +49,11 @@ let currentDate = new Date(
 );
 
 function calculatePriority(item) {
-  return (item.weight / (1 + Math.log(checkDate(item.dateDescription) - currentDate.getDate())));
+  return (
+    item.weight /
+    Math.log(checkDate(item.dateDescription) - currentDate.getDate() + 1)
+  );
 }
-
 
 function Assessment({ assessment, courses }) {
   const classes = useStyles();
@@ -69,7 +69,6 @@ function Assessment({ assessment, courses }) {
   };
 
   return (
-
     <div>
       <Dialog
         open={open}
@@ -79,9 +78,11 @@ function Assessment({ assessment, courses }) {
         <DialogTitle id="form-dialog-title">Priority</DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
-            The priority value is calcuated with consideration for the weighting and due date of the assessment.
-            An assignment with a higher priority value indicates a more crucial upcoming assignment.
-            <br></br><br></br>
+            The priority value is calcuated with consideration for the weighting
+            and due date of the assessment. An assignment with a higher priority
+            value indicates a more crucial upcoming assignment.
+            <br></br>
+            <br></br>
             The priority is calculated with the following:
             <br></br>
           </DialogContentText>
@@ -103,18 +104,20 @@ function Assessment({ assessment, courses }) {
                 style={{ marginBottom: 10, marginTop: 10, width: "100%" }}
                 component={Paper}
                 elavation={3}
+                variant="outlined"
               >
                 <Table className={classes.table}>
                   <TableHead>
                     <TableRow>
                       <TableCell align="left">
-                        <Button align="left"
+                        <Button
+                          align="left"
                           style={{ marginLeft: 5, textTransform: "none" }}
                           color="primary"
                           onClick={handlePriorityOpen}
                         >
                           Priority
-                    </Button>
+                        </Button>
                       </TableCell>
                       <TableCell style={{ width: "40%" }}>Assessment</TableCell>
                       <TableCell align="center">Weight</TableCell>
@@ -131,20 +134,23 @@ function Assessment({ assessment, courses }) {
                             new Date().getMonth(),
                             new Date().getDate()
                           ) < checkDate(allAssess.dateDescription)
-                      ).sort(function (a, b) { return calculatePriority(b) - calculatePriority(a) })
+                      )
+                      .sort(function (a, b) {
+                        return calculatePriority(b) - calculatePriority(a);
+                      })
                       .map((item) => (
-                        <TableRow
-                          key={item.id}
-                        >
+                        <TableRow key={item.id}>
                           <TableCell align="center">
                             {Math.round(100 * calculatePriority(item)) / 100}
                           </TableCell>
-                          <TableCell component="th" scope="row" style={{ width: "50%" }}>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            style={{ width: "50%" }}
+                          >
                             {item.name}
                           </TableCell>
-                          <TableCell align="center">
-                            {item.weight}%
-                          </TableCell>
+                          <TableCell align="center">{item.weight}%</TableCell>
                           <TableCell align="right">
                             {item.dateDescription}
                           </TableCell>
@@ -166,15 +172,15 @@ function Assessment({ assessment, courses }) {
                           key={item.id}
                           style={{ backgroundColor: "rgba(0, 255, 0, 0.05)" }}
                         >
-                          <TableCell align="center">
-                            N/A
-                          </TableCell>
-                          <TableCell component="th" scope="row" style={{ width: "40%" }}>
+                          <TableCell align="center">N/A</TableCell>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            style={{ width: "40%" }}
+                          >
                             {item.name}
                           </TableCell>
-                          <TableCell align="center">
-                            {item.weight}%
-                          </TableCell>
+                          <TableCell align="center">{item.weight}%</TableCell>
                           <TableCell align="right" style={{ width: "30%" }}>
                             {item.dateDescription}
                           </TableCell>
@@ -189,6 +195,6 @@ function Assessment({ assessment, courses }) {
       </Grid>
     </div>
   );
-};
+}
 
 export default Assessment;

@@ -99,9 +99,9 @@ function Grades({ courses, assessment }) {
                     ]}
                     hideBall
                   />
-                  <Typography 
-                  style={{ marginRight: 30 }}
-                  variant="h6">Out of {grade.assessmentInfo.total_completed}%</Typography>
+                  <Typography
+                    style={{ marginRight: 30 }}
+                    variant="h6">Out of {grade.assessmentInfo.total_completed}%</Typography>
                 </Box>
                 <TableContainer
                   style={{ marginBottom: 10, marginTop: 10 }}

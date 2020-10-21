@@ -1,10 +1,10 @@
 import React from 'react';
 import { PieChart } from 'react-minimal-pie-chart';
- 
-const VarkChart = ({ V, A, R, K}) => {
+
+const VarkChart = ({ V, A, R, K }) => {
   return (
     <PieChart
-      style={{blockSize: 200}}
+      style={{ blockSize: 200 }}
       animate={true}
       viewBoxSize={[300, 300]}
       center={[150, 150]}

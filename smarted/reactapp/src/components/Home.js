@@ -5,11 +5,20 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import VarkChart from "./VarkChart";
+import VarkBreakdown from "./VarkBreakdown";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Box from "@material-ui/core/Box";
+import ButtonBase from "@material-ui/core/ButtonBase";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,12 +59,15 @@ function checkDate(dateString) {
   let month = months.indexOf(splitStr[1]);
   let year = parseInt("20" + splitStr[2]);
   return new Date(year, month, day);
-} 
+}
 
-function Home({ assessment, courses, vark }) {
+function Home({ assessment, courses, vark, announcements }) {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [dialogAnn, setDialogAnn] = React.useState({});
+  const [altOpen, setAltOpen] = React.useState(false);
 
   const handleVarkOpen = () => {
     setOpen(true);
@@ -65,8 +77,43 @@ function Home({ assessment, courses, vark }) {
     setOpen(false);
   };
 
+  const handleOpenDialog = (ann) => {
+    return function () {
+      setOpenDialog(true);
+      setDialogAnn(ann);
+    };
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setDialogAnn({});
+  };
+
+  const handleAltOpen = () => {
+    setAltOpen(true);
+  };
+
+  const handleAltClose = () => {
+    setAltOpen(false);
+  };
+
   return (
     <div>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">
+          {dialogAnn.title}
+          <Typography color="primary">
+            Posted on {dialogAnn.dateAdded}
+          </Typography>
+        </DialogTitle>
+        <DialogContent style={{ marginBottom: 20 }}>
+          <Typography>{dialogAnn.content}</Typography>
+        </DialogContent>
+      </Dialog>
       <Dialog
         open={open}
         onClose={handleVarkClose}
@@ -86,37 +133,82 @@ function Home({ assessment, courses, vark }) {
           </DialogContentText>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={altOpen}
+        onClose={handleAltClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">VARK score breakdown</DialogTitle>
+        <DialogContent>
+          <VarkBreakdown V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+        </DialogContent>
+      </Dialog>
+
       <Grid container justify="center" spacing={3}>
         <Grid item xs={8}>
-          <Grid container spacing={3}>
+          <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Announcements</Typography>
                 </div>
-                <Typography variant="h6">DECO3801:</Typography>
-                <Typography>
-                  - Reminder to check schedule for Monday morning!
-                </Typography>
-                <Typography variant="h6">INFS1200:</Typography>
-                <Typography>
-                  - Course content added: Lecture 04/09/2020
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
-                  <Typography variant="h5">Personalised feedback</Typography>
-                </div>
-                Smooth sailing, keep it up!
+                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
+                  {announcements
+                    .sort(
+                      (a, b) =>
+                        Date.parse(b.dateAdded) - Date.parse(a.dateAdded)
+                    )
+                    .map((ann) => (
+                      <ButtonBase key={ann.id} style={{ width: "100%" }}>
+                        <Paper
+                          onClick={handleOpenDialog(ann)}
+                          square
+                          style={{
+                            minHeight: 50,
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                          }}
+                          key={ann.id}
+                          variant="outlined"
+                        >
+                          <Typography
+                            style={{
+                              flexGrow: 1,
+                              textAlign: "left",
+                              margin: 10,
+                            }}
+                          >
+                            {ann.title}
+                          </Typography>
+                          <Typography
+                            style={{
+                              margin: 10,
+                              color: "#51237a",
+                            }}
+                          >
+                            {
+                              courses.filter(
+                                (course) => course.id === ann.course
+                              )[0].name
+                            }
+                          </Typography>
+                          <Typography style={{ margin: 10 }}>
+                            {ann.dateAdded.slice(0, 10)}
+                          </Typography>
+                        </Paper>
+                      </ButtonBase>
+                    ))}
+                </Box>
               </Paper>
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={4}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
+          <Grid container direction="column" spacing={3}>
+            <Grid item xs={12} style={{ textAlign: "center" }}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">
@@ -135,7 +227,18 @@ function Home({ assessment, courses, vark }) {
                     Please complete vark quiz
                   </Typography>
                 ) : (
-                  <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                  <div>
+                    <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                    <Button
+                      size="large"
+                      variant="contained"
+                      color="primary"
+                      style={{ marginTop: 12 }}
+                      onClick={handleAltOpen}
+                    >
+                      My VARK Score
+                    </Button>
+                  </div>
                 )}
               </Paper>
             </Grid>
@@ -143,79 +246,71 @@ function Home({ assessment, courses, vark }) {
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Upcoming assessment</Typography>
-                  <div style={{ fontSize: "12px", color: "rgb(255, 77, 77)" }}>
-                    <Typography variant="h6">
-                      Assessment highlighted red are due in the next week
-                    </Typography>
-                  </div>
                 </div>
-                {courses.map((course) => (
-                  <div key={course.id}>
-                    <Typography variant="h6">{course.name + ":"}</Typography>
-                    {assessment
-                      .filter(
-                        (allAssess) =>
-                          allAssess.course === course.id &&
-                          new Date(
-                            new Date().getFullYear(),
-                            new Date().getMonth(),
-                            new Date().getDate()
-                          ) < checkDate(allAssess.dateDescription)
-                      )
-                      .map((assessCourse) => {
-                        let currentDate = new Date(
-                          new Date().getFullYear(),
-                          new Date().getMonth(),
-                          new Date().getDate()
-                        );
-                        return (
-                          <div key={assessCourse.id}>
-                            {checkDate(assessCourse.dateDescription) <
-                            currentDate.setDate(currentDate.getDate() + 7) ? (
-                              <div style={{ color: "rgb(255, 77, 77)" }}>
-                                <Typography>
-                                  {"-" + assessCourse.name}
-                                </Typography>
-                              </div>
-                            ) : (
-                              <div>
-                                <Typography>
-                                  {"-" + assessCourse.name}
-                                </Typography>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                  </div>
-                ))}
-                {/* <Typography variant="h6">
-                  DECO3801:
-                </Typography>
-                <Typography>
-                  - MVP presentation (07/09/2020)
-                </Typography>
-                <Typography variant="h6">
-                  CSSE1001:
-                </Typography>
-                <Typography>
-                  - HW2 (14/09/2020)
-                </Typography> */}
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
-                  <Typography variant="h5">Daily goals</Typography>
-                </div>
-                <Typography variant="h6">COMP4500:</Typography>
-                <Typography>---</Typography>
-                <Typography variant="h6">DECO3801:</Typography>
-                <Typography>---</Typography>
-                <Typography variant="h6">MATH3204:</Typography>
-                <Typography>---</Typography>
-                <Typography variant="h6">STAT2004:</Typography>
-                <Typography>---</Typography>
+                <Box
+                  style={{ maxHeight: 655, overflow: "auto" }}
+                  flex={1}
+                  flexDirection="column"
+                >
+                  {courses.map((course) => (
+                    <TableContainer
+                      style={{ marginBottom: 20 }}
+                      key={course.id}
+                      component={Paper}
+                      variant="outlined"
+                    >
+                      <Table aria-label="simple table">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell align="center">{course.name}</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {assessment
+                            .filter(
+                              (allAssess) =>
+                                allAssess.course === course.id &&
+                                new Date(
+                                  new Date().getFullYear(),
+                                  new Date().getMonth(),
+                                  new Date().getDate()
+                                ) < checkDate(allAssess.dateDescription)
+                            )
+                            .map((assessCourse) => {
+                              let currentDate = new Date(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate()
+                              );
+                              return (
+                                <TableRow key={assessCourse.id}>
+                                  {checkDate(assessCourse.dateDescription) <
+                                  currentDate.setDate(
+                                    currentDate.getDate() + 7
+                                  ) ? (
+                                    <TableCell>
+                                      <Typography>
+                                        {assessCourse.name}{" "}
+                                        <Button color="secondary">
+                                          DUE SOON
+                                        </Button>
+                                      </Typography>
+                                    </TableCell>
+                                  ) : (
+                                    <TableCell>
+                                      <Typography>
+                                        {assessCourse.name}
+                                      </Typography>
+                                    </TableCell>
+                                  )}
+                                </TableRow>
+                              );
+                            })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  ))}
+                </Box>
               </Paper>
             </Grid>
           </Grid>
@@ -225,4 +320,4 @@ function Home({ assessment, courses, vark }) {
   );
 }
 
-export {Home, checkDate};
+export { Home, checkDate };

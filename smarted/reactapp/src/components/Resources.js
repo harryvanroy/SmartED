@@ -1,14 +1,7 @@
-import React from 'react';
-import { Box, Typography } from '@material-ui/core';
+import React from "react";
 
 function Resources() {
-  return (
-    <Box width="80%">
-      <Typography variant="h4">
-        Resources
-      </Typography>
-    </Box>
-  );
-};
+  return <div>Resources page.</div>;
+}
 
 export default Resources;
