@@ -134,7 +134,7 @@ const StudentApp = ({ user }) => {
           })
         );
         promisesAnnounce.push(
-          axios(url + `/Database/course-announcements/${course.id}`, {
+          axios(url + `/Database/course-announcements/${course.id}/`, {
             method: "get",
             withCredentials: true,
           }).then((res) => {
