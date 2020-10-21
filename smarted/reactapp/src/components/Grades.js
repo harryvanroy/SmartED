@@ -13,6 +13,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import Button from "@material-ui/core/Button";
 
 // DETERMINE LOCATION
 var url;
@@ -88,7 +89,12 @@ function Grades({ courses, assessment }) {
                 <Typography variant="h5">{grade.courseInfo.name}</Typography>
               </div>
               <Box display="flex" justifyContent="center" alignItems="center">
-                <Box display="flex" justifyContent="center" flexDirection="column" alignItems="center">
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  flexDirection="column"
+                  alignItems="center"
+                >
                   <Progress
                     style={{ marginRight: 30 }}
                     subtitle={`Progress for ${grade.courseInfo.name}`}
@@ -99,9 +105,9 @@ function Grades({ courses, assessment }) {
                     ]}
                     hideBall
                   />
-                  <Typography
-                    style={{ marginRight: 30 }}
-                    variant="h6">Out of {grade.assessmentInfo.total_completed}%</Typography>
+                  <Typography style={{ marginRight: 30 }} variant="h6">
+                    Out of {grade.assessmentInfo.total_completed}%
+                  </Typography>
                 </Box>
                 <TableContainer
                   style={{ marginBottom: 10, marginTop: 10 }}
@@ -117,16 +123,14 @@ function Grades({ courses, assessment }) {
                     </TableHead>
                     <TableBody>
                       {grade.assessmentInfo.items.map((item) => (
-                        <TableRow
-                          style={
-                            parseInt(item.grade) < 50
-                              ? { backgroundColor: "rgba(255, 0, 0, 0.05)" }
-                              : { backgroundColor: "rgba(0, 255, 0, 0.05)" }
-                          }
-                          key={item.assessment.name}
-                        >
+                        <TableRow key={item.assessment.name}>
                           <TableCell component="th" scope="row">
-                            {item.assessment.name}
+                            {item.assessment.name}{" "}
+                            {parseInt(item.grade) < 50 ? (
+                              <Button color="secondary">FAILED</Button>
+                            ) : (
+                              <Button color="primary">PASSED</Button>
+                            )}
                           </TableCell>
                           <TableCell align="right">
                             <Typography>

@@ -168,11 +168,10 @@ function Assessment({ assessment, courses }) {
                           ) >= checkDate(allAssess.dateDescription)
                       )
                       .map((item) => (
-                        <TableRow
-                          key={item.id}
-                          style={{ backgroundColor: "rgba(0, 255, 0, 0.05)" }}
-                        >
-                          <TableCell align="center">N/A</TableCell>
+                        <TableRow key={item.id}>
+                          <TableCell align="center">
+                            <Button color="primary">Completed</Button>
+                          </TableCell>
                           <TableCell
                             component="th"
                             scope="row"

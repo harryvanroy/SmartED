@@ -118,9 +118,9 @@ const Feedback = ({ courses }) => {
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Snackbar onClose={handleClose} severity="success">
+        <Alert onClose={handleClose} severity="success">
           Feedback submitted!
-        </Snackbar>
+        </Alert>
       </Snackbar>
       <Snackbar
         open={openSpam}

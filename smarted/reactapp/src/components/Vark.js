@@ -225,7 +225,7 @@ export default function Vark(props) {
   return (
     <Box width="80%">
 
-      <Box m={3}>
+      <Box>
         <Snackbar 
           open={open} 
           autoHideDuration={2000}

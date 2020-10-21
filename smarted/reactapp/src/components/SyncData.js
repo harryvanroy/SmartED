@@ -1,5 +1,4 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { Button, Box, Typography } from "@material-ui/core";
 
 import IconButton from "@material-ui/core/IconButton";
@@ -14,6 +13,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 import Cookies from "js-cookie";
 import axios from "axios";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 // DETERMINE LOCATION
 var url;
@@ -27,7 +28,11 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
 console.log("location: " + url);
 //
 
-function SyncData() {
+const Alert = (props) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+};
+
+const SyncData = () => {
   const [values, setValues] = React.useState({
     username: "",
     password: "",
@@ -35,6 +40,7 @@ function SyncData() {
     syncing: false,
     done: false,
   });
+  const [openErr, setOpenErr] = React.useState(false);
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
@@ -48,8 +54,15 @@ function SyncData() {
     event.preventDefault();
   };
 
+  const handleErrClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenErr(false);
+  };
+
   const handleSubmit = () => {
-    //console.log(values.username, values.password);
     setValues({ ...values, syncing: true });
 
     axios(url + "/Database/refresh/", {
@@ -59,15 +72,29 @@ function SyncData() {
         password: values.password,
       },
       withCredentials: true,
-    }).then((res) => {
-      console.log(res);
-      setValues({ ...values, syncing: false });
-      setValues({ ...values, done: true });
-    });
+    })
+      .then((res) => {
+        console.log(res);
+        setValues({ ...values, syncing: false });
+        setValues({ ...values, done: true });
+      })
+      .catch((err) => {
+        setOpenErr(true);
+      });
   };
 
   return (
     <Box display="flex" justifyContent="center">
+      <Snackbar
+        open={openErr}
+        autoHideDuration={2000}
+        onClose={handleErrClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert onClose={handleErrClose} severity="success">
+          Error submitting!
+        </Alert>
+      </Snackbar>
       {values.done ? (
         <h4>Done Syncing!</h4>
       ) : values.syncing ? (
@@ -76,7 +103,7 @@ function SyncData() {
           <h4>Syncing... This may take awhile, please wait...</h4>
         </Box>
       ) : (
-        <div>
+        <>
           <FormControl fullWidth>
             <Input
               style={{ margin: 12 }}
@@ -113,10 +140,10 @@ function SyncData() {
           >
             Sync
           </Button>
-        </div>
+        </>
       )}
     </Box>
   );
-}
+};
 
 export default SyncData;
