@@ -152,12 +152,12 @@ function Goals({ courses, assessment }) {
     setOpen(false);
   };
 
-  function handleOpenDialog(text) {
+  const handleOpenDialog = (text) => {
     return function () {
       setOpenDialog(true);
       setDialogText(text);
     };
-  }
+  };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);

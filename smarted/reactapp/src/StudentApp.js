@@ -289,7 +289,12 @@ const StudentApp = ({ user }) => {
             <Vark parentVark={vark} setParentVarkScore={setParentVarkScore} />
           </Route>
           <Route path="/">
-            <Home vark={vark} assessment={assessment} courses={courses} />
+            <Home
+              vark={vark}
+              assessment={assessment}
+              courses={courses}
+              announcements={announcements}
+            />
           </Route>
         </Switch>
       </main>
