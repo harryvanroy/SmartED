@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import VarkChart from "./VarkChart";
+import VarkBreakdown from "./VarkBreakdown";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -63,6 +64,7 @@ function Home({ assessment, courses, vark }) {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
+  const [altOpen, setAltOpen] = React.useState(false);
 
   const handleVarkOpen = () => {
     setOpen(true);
@@ -70,6 +72,14 @@ function Home({ assessment, courses, vark }) {
 
   const handleVarkClose = () => {
     setOpen(false);
+  };
+
+  const handleAltOpen = () => {
+    setAltOpen(true);
+  };
+
+  const handleAltClose = () => {
+    setAltOpen(false);
   };
 
   return (
@@ -93,6 +103,18 @@ function Home({ assessment, courses, vark }) {
           </DialogContentText>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={altOpen}
+        onClose={handleAltClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">VARK score breakdown</DialogTitle>
+        <DialogContent>
+          <VarkBreakdown V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+        </DialogContent>
+      </Dialog>
+
       <Grid container justify="center" spacing={3}>
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
@@ -114,7 +136,7 @@ function Home({ assessment, courses, vark }) {
         </Grid>
         <Grid item xs={4}>
           <Grid container direction="column" spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ textAlign: 'center' }}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">
@@ -133,8 +155,13 @@ function Home({ assessment, courses, vark }) {
                     Please complete vark quiz
                   </Typography>
                 ) : (
-                  <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
-                )}
+                    <div>
+                      <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                      <Button size='large' variant='contained' color='primary' style={{ marginTop: 12 }} onClick={handleAltOpen}>
+                        My VARK Score
+                    </Button>
+                    </div>
+                  )}
               </Paper>
             </Grid>
             <Grid item xs={12}>
@@ -175,24 +202,24 @@ function Home({ assessment, courses, vark }) {
                               return (
                                 <TableRow key={assessCourse.id}>
                                   {checkDate(assessCourse.dateDescription) <
-                                  currentDate.setDate(
-                                    currentDate.getDate() + 7
-                                  ) ? (
-                                    <TableCell>
-                                      <Typography>
-                                        {assessCourse.name}{" "}
-                                        <Button color="secondary">
-                                          DUE SOON
+                                    currentDate.setDate(
+                                      currentDate.getDate() + 7
+                                    ) ? (
+                                      <TableCell>
+                                        <Typography>
+                                          {assessCourse.name}{" "}
+                                          <Button color="secondary">
+                                            DUE SOON
                                         </Button>
-                                      </Typography>
-                                    </TableCell>
-                                  ) : (
-                                    <TableCell>
-                                      <Typography>
-                                        {assessCourse.name}
-                                      </Typography>
-                                    </TableCell>
-                                  )}
+                                        </Typography>
+                                      </TableCell>
+                                    ) : (
+                                      <TableCell>
+                                        <Typography>
+                                          {assessCourse.name}
+                                        </Typography>
+                                      </TableCell>
+                                    )}
                                 </TableRow>
                               );
                             })}
