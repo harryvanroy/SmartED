@@ -70,17 +70,32 @@ const classifier = ({ V, A, R, K }) => {
 }
 
 const majorTypeBreakdown = (major) => {
-    return (
-        <Box>
-            <Typography variant="h4">
-                Primary: {types[major]}
-            </Typography>
-            <Typography variant="subtitle1">
-                {majorTypes[major]}. You may find the following resources useful: {resources[major]}.
-                Try to {techniques[major]} to get the best learning outcomes.
-            </Typography>
-        </Box>
-    );
+    if (major === '') {
+        return (
+            <Box>
+                <Typography variant="h4">
+                    Multi Learner
+                </Typography>
+                <Typography variant="subtitle1">
+                    You don't let any single learning type define you, and benefit equally from Visual,
+                    Auditory, Written and Kinesthetic stimuli. Use a variety of course resources as much
+                    as possible, and supplement with further learning through external sources.
+                </Typography>
+            </Box>
+        );
+    } else {
+        return (
+            <Box>
+                <Typography variant="h4">
+                    Primary: {types[major]}
+                </Typography>
+                <Typography variant="subtitle1">
+                    {majorTypes[major]}. You may find the following resources useful: {resources[major]}.
+                    Try to {techniques[major]} to get the best learning outcomes.
+                </Typography>
+            </Box>
+        );
+    }
 }
 
 const minorTypeBreakdown = (minor) => {
