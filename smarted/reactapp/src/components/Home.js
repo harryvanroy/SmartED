@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import VarkChart from "./VarkChart";
+import VarkBreakdown from "./VarkBreakdown";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -18,7 +19,6 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Box from "@material-ui/core/Box";
 import ButtonBase from "@material-ui/core/ButtonBase";
-import Rainbow from "rainbowvis.js";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -67,6 +67,7 @@ function Home({ assessment, courses, vark, announcements }) {
   const [open, setOpen] = React.useState(false);
   const [openDialog, setOpenDialog] = React.useState(false);
   const [dialogAnn, setDialogAnn] = React.useState({});
+  const [altOpen, setAltOpen] = React.useState(false);
 
   const handleVarkOpen = () => {
     setOpen(true);
@@ -86,6 +87,14 @@ function Home({ assessment, courses, vark, announcements }) {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setDialogAnn({});
+  };
+
+  const handleAltOpen = () => {
+    setAltOpen(true);
+  };
+
+  const handleAltClose = () => {
+    setAltOpen(false);
   };
 
   return (
@@ -124,6 +133,18 @@ function Home({ assessment, courses, vark, announcements }) {
           </DialogContentText>
         </DialogContent>
       </Dialog>
+
+      <Dialog
+        open={altOpen}
+        onClose={handleAltClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">VARK score breakdown</DialogTitle>
+        <DialogContent>
+          <VarkBreakdown V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+        </DialogContent>
+      </Dialog>
+
       <Grid container justify="center" spacing={3}>
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
@@ -132,7 +153,7 @@ function Home({ assessment, courses, vark, announcements }) {
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">Announcements</Typography>
                 </div>
-                <Box style={{ maxHeight: 1000, overflow: "auto" }}>
+                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
                   {announcements
                     .sort(
                       (a, b) =>
@@ -187,7 +208,7 @@ function Home({ assessment, courses, vark, announcements }) {
         </Grid>
         <Grid item xs={4}>
           <Grid container direction="column" spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ textAlign: "center" }}>
               <Paper elevation={3} className={classes.paper}>
                 <div className={classes.paperTitle}>
                   <Typography variant="h5">
@@ -206,7 +227,18 @@ function Home({ assessment, courses, vark, announcements }) {
                     Please complete vark quiz
                   </Typography>
                 ) : (
-                  <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                  <div>
+                    <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                    <Button
+                      size="large"
+                      variant="contained"
+                      color="primary"
+                      style={{ marginTop: 12 }}
+                      onClick={handleAltOpen}
+                    >
+                      My VARK Score
+                    </Button>
+                  </div>
                 )}
               </Paper>
             </Grid>
