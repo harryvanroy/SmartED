@@ -119,7 +119,7 @@ const StudentApp = ({ user }) => {
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title">
-          Syncronise Your UQ Data
+          Synchronise Your UQ Data
         </DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
