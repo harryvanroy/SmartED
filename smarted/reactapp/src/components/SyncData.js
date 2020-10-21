@@ -1,5 +1,4 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import { Button, Box, Typography } from "@material-ui/core";
 
 import IconButton from "@material-ui/core/IconButton";
@@ -14,6 +13,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 import Cookies from "js-cookie";
 import axios from "axios";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 // DETERMINE LOCATION
 var url;
@@ -27,7 +28,7 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
 console.log("location: " + url);
 //
 
-function SyncData() {
+const SyncData = () => {
   const [values, setValues] = React.useState({
     username: "",
     password: "",
@@ -49,7 +50,6 @@ function SyncData() {
   };
 
   const handleSubmit = () => {
-    //console.log(values.username, values.password);
     setValues({ ...values, syncing: true });
 
     axios(url + "/Database/refresh/", {
@@ -76,7 +76,7 @@ function SyncData() {
           <h4>Syncing... This may take awhile, please wait...</h4>
         </Box>
       ) : (
-        <div>
+        <>
           <FormControl fullWidth>
             <Input
               style={{ margin: 12 }}
@@ -113,10 +113,10 @@ function SyncData() {
           >
             Sync
           </Button>
-        </div>
+        </>
       )}
     </Box>
   );
-}
+};
 
 export default SyncData;

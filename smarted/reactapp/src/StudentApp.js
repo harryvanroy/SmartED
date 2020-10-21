@@ -22,7 +22,7 @@ import SchoolIcon from "@material-ui/icons/School";
 import ClassIcon from "@material-ui/icons/Class";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import HomeIcon from "@material-ui/icons/Home";
-import SyncIcon from '@material-ui/icons/Sync';
+import SyncIcon from "@material-ui/icons/Sync";
 
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
@@ -44,7 +44,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
 import SyncData from "./components/SyncData";
-
 
 const drawerWidth = 200;
 
@@ -119,17 +118,21 @@ const StudentApp = ({ user }) => {
         onClose={handleSyncClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Syncronise Your UQ Data</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          Syncronise Your UQ Data
+        </DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
-            After providing your UQ username and password, all your UQ learning resources
-            and announcements data will be pulled from blackboard so they can be displayed here!
-            <br></br><br></br>
+            After providing your UQ username and password, all your UQ learning
+            resources and announcements data will be pulled from blackboard so
+            they can be displayed here!
+            <br></br>
+            <br></br>
             <SyncData />
           </DialogContentText>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   const setParentVarkScore = (score) => {
@@ -203,7 +206,6 @@ const StudentApp = ({ user }) => {
   console.log(announcements);
   return (
     <div className={classes.root}>
-
       {syncDialog()}
 
       <CssBaseline />
@@ -303,13 +305,12 @@ const StudentApp = ({ user }) => {
               </ListItem>
             ))}
 
-            <ListItem button onClick = {handleSyncOpen}> 
+            <ListItem button onClick={handleSyncOpen}>
               <ListItemIcon>
                 <SyncIcon />
               </ListItemIcon>
               <ListItemText primary="Sync UQ Data" />
             </ListItem>
-
           </List>
         </div>
       </Drawer>

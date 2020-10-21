@@ -150,7 +150,10 @@ function Home({ assessment, courses, vark, announcements }) {
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
+                <div
+                  style={{ display: "flex", justifyContent: "center" }}
+                  className={classes.paperTitle}
+                >
                   <Typography variant="h5">Announcements</Typography>
                 </div>
                 <Box style={{ maxHeight: 1052, overflow: "auto" }}>
