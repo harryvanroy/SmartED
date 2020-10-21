@@ -22,6 +22,7 @@ import SchoolIcon from "@material-ui/icons/School";
 import ClassIcon from "@material-ui/icons/Class";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import HomeIcon from "@material-ui/icons/Home";
+import SyncIcon from '@material-ui/icons/Sync';
 
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
@@ -36,6 +37,14 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 import Study from "./components/StudySesh";
+
+import Dialog from "@material-ui/core/Dialog";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContentText from "@material-ui/core/DialogContentText";
+
+import SyncData from "./components/SyncData";
+
 
 const drawerWidth = 200;
 
@@ -84,6 +93,7 @@ const useStyles = makeStyles((theme) => ({
 const StudentApp = ({ user }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const [syncOpen, setSyncOpen] = React.useState(false);
   const [vark, setVark] = React.useState({});
   const [courses, setCourses] = React.useState([]);
   const [currCourse, setCurrCourse] = React.useState();
@@ -93,6 +103,34 @@ const StudentApp = ({ user }) => {
   const handleClick = () => {
     setOpen(!open);
   };
+
+  const handleSyncOpen = () => {
+    setSyncOpen(true);
+  };
+
+  const handleSyncClose = () => {
+    setSyncOpen(false);
+  };
+
+  function syncDialog() {
+    return (
+      <Dialog
+        open={syncOpen}
+        onClose={handleSyncClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">Syncronise Your UQ Data</DialogTitle>
+        <DialogContent>
+          <DialogContentText style={{ color: "black" }}>
+            After providing your UQ username and password, all your UQ learning resources
+            and announcements data will be pulled from blackboard so they can be displayed here!
+            <br></br><br></br>
+            <SyncData />
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   const setParentVarkScore = (score) => {
     setVark(score);
@@ -165,6 +203,9 @@ const StudentApp = ({ user }) => {
   console.log(announcements);
   return (
     <div className={classes.root}>
+
+      {syncDialog()}
+
       <CssBaseline />
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
@@ -261,6 +302,14 @@ const StudentApp = ({ user }) => {
                 <ListItemText primary={text} />
               </ListItem>
             ))}
+
+            <ListItem button onClick = {handleSyncOpen}> 
+              <ListItemIcon>
+                <SyncIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sync UQ Data" />
+            </ListItem>
+
           </List>
         </div>
       </Drawer>
