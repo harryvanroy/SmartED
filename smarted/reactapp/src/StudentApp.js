@@ -137,7 +137,7 @@ const StudentApp = ({ user }) => {
           axios(url + `/Database/course-announcements/${course.id}`, {
             method: "get",
             withCredentials: true,
-          }).then((resAss) => {
+          }).then((res) => {
             respAnnounce.push(res.data);
           })
         );
