@@ -2,6 +2,7 @@ import json
 import re
 import arrow
 import pytz
+import time
 from threading import Thread
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -14,7 +15,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = True
+is_local = False
 FORCE_TEACHER = False
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
@@ -650,6 +651,13 @@ def save_resources(course, resources, assessed):
             resource.save()
 
 def asynchronous_refresh(username, password):
+    """
+    Refresh blackboard information for a given user
+
+    Args:
+        request (HttpRequest): post request sent from client side
+    """
+    start = time.time()
     courses = refresh_content(username, password)
 
     for course in courses.keys():
@@ -658,7 +666,7 @@ def asynchronous_refresh(username, password):
         save_announcements(subject, courses[course]['announcements'])
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
-    
+    print("Thread took ", time.time() - start)
     return # Thread dies here
 
 @csrf_exempt
@@ -678,9 +686,9 @@ def refresh(request):
     password = json_body.get("password")
     if username is None or password is None:
         return BAD_REQUEST
-    p = Thread(target=asynchronous_refresh, args=(username, password))
-    p.daemon = True # Thread is god
-    p.start()
+        
+    asynchronous_refresh(username, password)
+
     return HttpResponse("SUCCESS")
 
 @api_view(['GET'])
