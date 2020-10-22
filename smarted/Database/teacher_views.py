@@ -279,6 +279,27 @@ def get_average_vark(request):
 
     return HttpResponse(json.dumps(vark))
 
+def get_student_vark(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    username = request.GET.get('username')
+
+    try:
+        student = Student.objects.get(user=User.objects.get(username=username))
+    except:
+        return HttpResponse("failed query.. specify the correct student id...")
+
+    # todo: check student in teachers course
+
+    json_vark = {"V": str(student.V), "A": str(student.A),
+     "R": str(student.R), "K": str(student.K)}
+
+    return HttpResponse(json.dumps(json_vark))
 
 def students_course_grade(request):
     json_header = request.headers

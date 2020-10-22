@@ -42,6 +42,7 @@ urlpatterns += [
     path('get-course-feedback/', teacher_views.get_course_feedback, name='get-course-feedback'),
     path('students-at-risk/', teacher_views.students_at_risk, name='students-at-risk'),
     path('course-average-vark/', teacher_views.get_average_vark, name='course-average-vark'),
+    path('get-student-vark/', teacher_views.get_student_vark, name='get-student-vark'),
     path('student-course-grades/', teacher_views.students_course_grade, name='student-grades'),
     
     path('course-files/<int:course_id>/', views.get_course_files, name='course-files'),
