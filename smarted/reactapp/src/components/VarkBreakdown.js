@@ -1,5 +1,9 @@
 import React from "react";
 import { Typography, Box } from "@material-ui/core";
+import VisibilityOutlinedIcon  from "@material-ui/icons/VisibilityOutlined";
+import HearingOutlinedIcon from "@material-ui/icons/HearingOutlined"
+import TouchAppOutlinedIcon from "@material-ui/icons/TouchAppOutlined"
+import CreateOutlinedIcon from "@material-ui/icons/CreateOutlined";
 
 const types = {
   V: "Visual learner",
@@ -8,25 +12,25 @@ const types = {
   K: "Kinesthetic learner",
 };
 
-const majorTypes = {
-  V: "Your primary learning style is visual",
-  A: "Your primary learning style is auditory",
-  R: "Your primary learning style is read-write",
-  K: "Your primary learning style is kinesthetic",
+const minorTypes = {
+  V: "visual",
+  A: "auditory",
+  R: "read-write",
+  K: "is kinesthetic",
 };
 
-const minorTypes = {
-  V: "Your secondary learning style is visual",
-  A: "Your secondary learning style is auditory",
-  R: "Your secondary learning style is read-write",
-  K: "Your secondary learning style is kinesthetic",
-};
+const descriptor = {
+  V: "respond positively to visual stimuli, especially shapes and patterns",
+  A: "respond positively to auditory stimuli such as sounds, however this also includes both spoken and written communication",
+  R: "respond positively to written stimuli, where information is displayed as words",
+  K: "have a perceptual preference related to the use of experience or practice, both real or simulated",
+}
 
 const resources = {
-  V: "lecture slides, diagrams, YouTube videos",
-  A: "lectures, seminars, podcasts, tutorials",
-  R: "textbooks, problem sets and past exams, articles",
-  K: "practicals, demonstration videos, practicals, hands on examples",
+  V: "lecture slides, diagrams and YouTube videos",
+  A: "lectures, seminars, podcasts and tutorials",
+  R: "textbooks, articles and problem sets and past exams",
+  K: "practicals, demonstration videos, practicals and hands on examples",
 };
 
 const techniques = {
@@ -35,6 +39,53 @@ const techniques = {
   R: "spend time to write efficient yet detailed summaries of the content",
   K: "seek out practical applications of the topics",
 };
+
+const majorIcon = (major) => {
+  if (major === "") {
+    return(
+        [<VisibilityOutlinedIcon style={{ fontSize : 30 }}></VisibilityOutlinedIcon>,
+        <HearingOutlinedIcon style={{ fontSize : 30 }}></HearingOutlinedIcon>,
+        <CreateOutlinedIcon style={{ fontSize : 30 }}></CreateOutlinedIcon>,
+        <TouchAppOutlinedIcon style={{ fontSize : 30 }}></TouchAppOutlinedIcon>]
+    )
+  } else if (major === "V") {
+    return(
+      <VisibilityOutlinedIcon style={{ fontSize : 30 }}></VisibilityOutlinedIcon>
+    )
+  } else if (major === "A") {
+    return(
+      <HearingOutlinedIcon style={{ fontSize : 30 }}></HearingOutlinedIcon>
+    )
+  } else if (major === "R") {
+    return(
+      <CreateOutlinedIcon style={{ fontSize : 30 }}></CreateOutlinedIcon>
+    )
+  } else if (major === "K") {
+    return(
+      <TouchAppOutlinedIcon style={{ fontSize : 30 }}></TouchAppOutlinedIcon>
+    )
+  }
+}
+
+const minorIcon = (minor) => {
+  if (minor === "V") {
+    return(
+      <VisibilityOutlinedIcon style={{ fontSize : 24 }}></VisibilityOutlinedIcon>
+    )
+  } else if (minor === "A") {
+    return(
+      <HearingOutlinedIcon style={{ fontSize : 24 }}></HearingOutlinedIcon>
+    )
+  } else if (minor === "R") {
+    return(
+      <CreateOutlinedIcon style={{ fontSize : 24 }}></CreateOutlinedIcon>
+    )
+  } else if (minor === "K") {
+    return(
+      <TouchAppOutlinedIcon style={{ fontSize : 24 }}></TouchAppOutlinedIcon>
+    )
+  }
+}
 
 const classifier = ({ V, A, R, K }) => {
   if (V < 0.3 && A < 0.3 && R < 0.3 && K < 0.3) {
@@ -51,17 +102,14 @@ const classifier = ({ V, A, R, K }) => {
     var varkArray = [V, A, R, K];
     var labels = ["V", "A", "R", "K"];
     var a1 = -Infinity;
-    var a2 = -Infinity;
     var b1 = -1;
     var b2 = -1;
     for (var i = 0; i < varkArray.length; i++) {
       if (varkArray[i] > a1) {
-        a2 = a1;
         b2 = b1;
         a1 = varkArray[i];
         b1 = i;
       } else if (varkArray[i] === a1) {
-        a2 = varkArray[i];
         b2 = i;
       }
     }
@@ -72,8 +120,8 @@ const classifier = ({ V, A, R, K }) => {
 const majorTypeBreakdown = (major) => {
   if (major === "") {
     return (
-      <Box>
-        <Typography variant="h4">Multi Learner</Typography>
+      <Box style={{marginBottom : 24}}>
+        <Typography variant="h4">Multi Learner {majorIcon(major)}</Typography>
         <Typography variant="subtitle1">
           You don't let any single learning type define you, and benefit equally
           from Visual, Auditory, Written and Kinesthetic stimuli. Use a variety
@@ -84,11 +132,12 @@ const majorTypeBreakdown = (major) => {
     );
   } else {
     return (
-      <Box>
-        <Typography variant="h4">Primary: {types[major]}</Typography>
+      <Box style={{marginBottom : 24}}>
+        <Typography variant="h4">Primary: {types[major]} {majorIcon(major)}</Typography>
         <Typography variant="subtitle1">
-          {majorTypes[major]}. You may find the following resources useful:{" "}
-          {resources[major]}. Try to {techniques[major]} to get the best
+          Your primary learning style is {minorTypes[major]}. This means you 
+          {" "}{descriptor[major]}. You may find the following resources useful: 
+          {" "}{resources[major]}. Try to {" "}{techniques[major]} to get the best
           learning outcomes.
         </Typography>
       </Box>
@@ -98,11 +147,11 @@ const majorTypeBreakdown = (major) => {
 
 const minorTypeBreakdown = (minor) => {
   return (
-    <Box>
-      <Typography variant="h5">Secondary: {types[minor]}</Typography>
+    <Box style={{marginBottom : 24}}>
+      <Typography variant="h5">Secondary: {types[minor]} {minorIcon(minor)}</Typography>
       <Typography variant="subtitle1">
-        {minorTypes[minor]}. Supplement the above resources with{" "}
-        {resources[minor]}. Also try to {techniques[minor]}.
+        Your secondary style is {minorTypes[minor]}. Supplement the above 
+        resources with {" "}{resources[minor]}. Also try to {techniques[minor]}.
       </Typography>
     </Box>
   );
@@ -112,7 +161,11 @@ const breakdown = ({ major, minor }) => {
   console.log(major);
   console.log(minor);
   if (minor === "") {
-    return majorTypeBreakdown(major);
+    return (
+      <div>
+        {majorTypeBreakdown(major)}
+      </div>
+    );
   } else {
     return (
       <div>
