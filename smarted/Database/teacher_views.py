@@ -90,8 +90,10 @@ def get_teacher_courses(request):
     if not auth:
         return HttpResponse("failed teacher auth...")
 
-    course_list = [staff_course.course for staff_course in StaffCourse.objects.all()
-                   if staff_course.staff.user.username == username]
+    staff = Staff.objects.get(user=User.objects.get(username=username))
+
+    course_list = [staff_course.course for staff_course
+                   in StaffCourse.objects.filter(staff=staff)]
 
     json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
                      "semester": x.semester, "year": x.year}
@@ -187,9 +189,11 @@ def students_at_risk(request):
     students_at_risk = []
 
     for student in students_in_course:
+        
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment.course == course]
+                  if grade.assessment is not None 
+                  and grade.assessment.course == course]
 
         total_weight = sum([float(grade.assessment.weight)
                             for grade in grades])
@@ -291,7 +295,8 @@ def students_course_grade(request):
     except:
         return HttpResponse("failed query.. specify the correct course ID...")
 
-    students = [stu.student for stu in StudentCourse.objects.filter(course=course)]
+    students = [
+        stu.student for stu in StudentCourse.objects.filter(course=course)]
 
     student_grades = [{"student": {"username": stu.user.username,
                                    "firstname": stu.user.firstName,
