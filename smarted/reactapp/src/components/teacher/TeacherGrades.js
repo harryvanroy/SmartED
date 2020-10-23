@@ -256,6 +256,7 @@ const TeacherGrades = ({ assessment, course }) => {
         direction="column"
         justify="flex-start"
         alignItems="center"
+        style={{ minWidth: 550 }}
       >
         <Grid item style={{ width: "100%", marginBottom: 20 }}>
           <Typography style={{ marginBottom: 5, textAlign: "center" }}>

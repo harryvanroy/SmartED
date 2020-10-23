@@ -34,7 +34,7 @@ console.log("location: " + url);
 
 const useStyles = makeStyles((theme) => ({
   table: {
-    minWidth: 650,
+    minWidth: 550,
   },
 }));
 
