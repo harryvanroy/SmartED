@@ -311,9 +311,10 @@ def get_student_courses(request):
     except:
         username = DEFAULT_USER
 
+    student = Student.objects.get(user=(User.objects.get(username=username)))
+
     course_list = [student_course.course for student_course
-                   in StudentCourse.objects.all()
-                   if student_course.student.user.username == username]
+                   in StudentCourse.objects.filter(student=student)]
 
     json_courses = [{"id": x.id, "name": x.name, "mode": x.mode,
                      "semester": x.semester, "year": x.year}
@@ -324,12 +325,14 @@ def get_student_courses(request):
 
 def construct_student_grades(username, course_filter, courseID):
     student = Student.objects.get(user=User.objects.get(username=username))
-
+    course = Course.objects.get(id=courseID)
     if course_filter:
-        print(courseID)
+
+        # makes several null checks
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment.course.id == courseID]
+                  if grade.assessment is not None 
+                  and grade.assessment.course == course]
     else:
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)]
