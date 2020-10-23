@@ -33,6 +33,8 @@ import Grades from "./components/Grades";
 import Resources from "./components/Resources";
 import { Home, checkDate } from "./components/Home";
 import Vark from "./components/Vark";
+import CourseAnnouncements from "./components/CourseAnnouncements";
+import CourseResources from "./components/CourseResources";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -316,7 +318,7 @@ const StudentApp = ({ user }) => {
         <Toolbar />
         <Switch>
           <Route path="/course/:name">
-            <Course course={currCourse} />
+            <Course course={currCourse} assessment={assessment} resources={null} announcements={announcements} />
           </Route>
           <Route path="/assessment">
             <Assessment assessment={assessment} courses={courses} />
