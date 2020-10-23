@@ -224,7 +224,7 @@ def vark(request):
         return HttpResponse(json.dumps(json_response))
 
 
-def course_assessment(request):
+def course_assessment(request=None, courseID=None):
     """
     A view for handling a get request for a courses assessment.
     This function reads the GET request's URL to determine the requested
@@ -236,7 +236,10 @@ def course_assessment(request):
 
     (see https://github.com/harryvanroy/SmartED/wiki)
     """
-    id = request.GET.get('id')
+    if courseID is None:
+        id = request.GET.get('id')
+    else:
+        id = courseID
 
     try:
         id = int(id)
