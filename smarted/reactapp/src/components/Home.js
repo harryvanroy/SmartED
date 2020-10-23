@@ -145,7 +145,7 @@ function Home({ assessment, courses, vark, announcements }) {
         </DialogContent>
       </Dialog>
 
-      <Grid container justify="center" spacing={3}>
+      <Grid container justify="center" spacing={3} style={{ minWidth: 550 }}>
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
@@ -156,7 +156,7 @@ function Home({ assessment, courses, vark, announcements }) {
                 >
                   <Typography variant="h5">Announcements</Typography>
                 </div>
-                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
+                <Box style={{ maxHeight: 698, overflow: "auto" }}>
                   {announcements
                     .sort(
                       (a, b) =>
@@ -184,7 +184,7 @@ function Home({ assessment, courses, vark, announcements }) {
                               margin: 10,
                             }}
                           >
-                            {ann.title}
+                            {ann.title.slice(0, 25) + "..."}
                           </Typography>
                           <Typography
                             style={{
@@ -230,19 +230,19 @@ function Home({ assessment, courses, vark, announcements }) {
                     Please complete vark quiz
                   </Typography>
                 ) : (
-                  <div>
-                    <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
-                    <Button
-                      size="large"
-                      variant="contained"
-                      color="primary"
-                      style={{ marginTop: 12 }}
-                      onClick={handleAltOpen}
-                    >
-                      My VARK Score
+                    <div>
+                      <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+                      <Button
+                        size="large"
+                        variant="contained"
+                        color="primary"
+                        style={{ marginTop: 12 }}
+                        onClick={handleAltOpen}
+                      >
+                        My VARK Score
                     </Button>
-                  </div>
-                )}
+                    </div>
+                  )}
               </Paper>
             </Grid>
             <Grid item xs={12}>
@@ -251,7 +251,7 @@ function Home({ assessment, courses, vark, announcements }) {
                   <Typography variant="h5">Upcoming assessment</Typography>
                 </div>
                 <Box
-                  style={{ maxHeight: 655, overflow: "auto" }}
+                  style={{ maxHeight: 300, overflow: "auto" }}
                   flex={1}
                   flexDirection="column"
                 >
@@ -288,24 +288,24 @@ function Home({ assessment, courses, vark, announcements }) {
                               return (
                                 <TableRow key={assessCourse.id}>
                                   {checkDate(assessCourse.dateDescription) <
-                                  currentDate.setDate(
-                                    currentDate.getDate() + 7
-                                  ) ? (
-                                    <TableCell>
-                                      <Typography>
-                                        {assessCourse.name}{" "}
-                                        <Button color="secondary">
-                                          DUE SOON
+                                    currentDate.setDate(
+                                      currentDate.getDate() + 7
+                                    ) ? (
+                                      <TableCell>
+                                        <Typography>
+                                          {assessCourse.name}{" "}
+                                          <Button color="secondary">
+                                            DUE SOON
                                         </Button>
-                                      </Typography>
-                                    </TableCell>
-                                  ) : (
-                                    <TableCell>
-                                      <Typography>
-                                        {assessCourse.name}
-                                      </Typography>
-                                    </TableCell>
-                                  )}
+                                        </Typography>
+                                      </TableCell>
+                                    ) : (
+                                      <TableCell>
+                                        <Typography>
+                                          {assessCourse.name}
+                                        </Typography>
+                                      </TableCell>
+                                    )}
                                 </TableRow>
                               );
                             })}

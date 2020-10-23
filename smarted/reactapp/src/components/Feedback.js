@@ -144,7 +144,7 @@ const Feedback = ({ courses }) => {
       </Snackbar>
       <Typography variant="h4">Course Feedback</Typography>
 
-      <Box m={2}>
+      <Box style={{ minWidth: 550 }} m={2}>
         <FormControl
           style={{ marginBottom: 12 }}
           variant="outlined"

@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: "15px",
   },
   table: {
-    minWidth: 650,
+    minWidth: 400,
   },
 }));
 
@@ -83,7 +83,12 @@ function Grades({ courses, assessment }) {
       <Typography variant="h4">My Grades</Typography>
       <Grid style={{ marginTop: 5 }} container spacing={3}>
         {grades.map((grade) => (
-          <Grid key={grade.courseInfo.id} item xs={12}>
+          <Grid
+            key={grade.courseInfo.id}
+            style={{ minWidth: 550 }}
+            item
+            xs={12}
+          >
             <Paper className={classes.paper} elavation={3}>
               <div className={classes.paperTitle}>
                 <Typography variant="h5">{grade.courseInfo.name}</Typography>
