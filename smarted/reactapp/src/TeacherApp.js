@@ -201,9 +201,10 @@ const TeacherApp = ({ user }) => {
                     button
                     key={text}
                     component={NavLink}
+                    exact
                     to={
                       [
-                        "/teacherstudents",
+                        "/",
                         "/teacherresources",
                         "/teachergrades",
                         "/teacherfeedback",
@@ -231,9 +232,6 @@ const TeacherApp = ({ user }) => {
         <main className={classes.content}>
           <Toolbar />
           <Switch>
-            <Route path="/teacherstudents">
-              <Students course={currentCourse} />
-            </Route>
             <Route path="/teacherresources">
               <TeacherResources course={currentCourse} />
             </Route>
@@ -244,7 +242,7 @@ const TeacherApp = ({ user }) => {
               <TeacherFeedback feedback={feedback} />
             </Route>
             <Route path="/">
-              <TeacherHome course={currentCourse} />
+              <Students course={currentCourse} />
             </Route>
           </Switch>
         </main>
