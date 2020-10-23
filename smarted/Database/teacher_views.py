@@ -58,7 +58,7 @@ def initialize_teacher_courses(header, staff):
         UQ.save()
 
     # initializes with these default courses, feel free to add more
-    courses = ['COMP3301', "DECO3801", "COMP3506", "COMS4200", "COMP3710"]
+    courses = ["DECO3801"]
 
     for course in courses:
         if len(Course.objects.filter(name=course, mode=mode,

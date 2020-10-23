@@ -4,7 +4,7 @@ import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
+import { Button, Box, Typography } from "@material-ui/core";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -22,9 +22,18 @@ import TeacherGrades from "./components/teacher/TeacherGrades";
 import TeacherHome from "./components/teacher/TeacherHome";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import HomeIcon from "@material-ui/icons/Home";
+import DeleteIcon from "@material-ui/icons/Delete";
+
+import Dialog from "@material-ui/core/Dialog";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContentText from "@material-ui/core/DialogContentText";
+
+import FormControl from "@material-ui/core/FormControl";
+import Input from "@material-ui/core/Input";
+
 import axios from "axios";
 
 const drawerWidth = 200;
@@ -77,6 +86,8 @@ const useStyles = makeStyles((theme) => ({
 
 const TeacherApp = ({ user }) => {
   const classes = useStyles();
+  const [editCourseOpen, setEditCourseOpen] = React.useState(false);
+  const [addCourseCode, setAddCourseCode] = React.useState(null);
   const [courses, setCourses] = React.useState([]);
   const [feedback, setFeedback] = React.useState([]);
   const [currentCourse, setCurrentCourse] = React.useState(
@@ -128,9 +139,95 @@ const TeacherApp = ({ user }) => {
       });
   }, [currentCourse]);
 
+  const handleEditCourseOpen = () => {
+    setEditCourseOpen(true);
+  };
+
+  const handleEditCourseClose = () => {
+    setEditCourseOpen(false);
+  };
+
+  const handleAddCourseChange = (event) => {
+    setAddCourseCode(event.target.value);
+  };
+
+  const handleAddCourseSubmit = () => {
+    console.log(addCourseCode);
+    axios(url + "/Database/add-teacher-course/", {
+      method: "post",
+      data: { course: addCourseCode },
+      withCredentials: true,
+    }).then((res) => {
+      console.log("successfully added");
+    });
+    //todo: catch error and maybe adding... progress 
+    // and update courses immediately
+  };
+
+  const handleDeleteCourse = (a) => {
+    axios(url + "/Database/delete-teacher-course/?id=" + String(a.id), {
+      method: "delete",
+      withCredentials: true,
+    }).then((res) => {
+      console.log("successfully deleted");
+      courses.filter((course) => course.id !== a.id);
+    });
+    //todo: update courses immediately
+  };
+
+  function editCoursesDialog() {
+    return (
+      <Dialog
+        open={editCourseOpen}
+        onClose={handleEditCourseClose}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">Edit Courses</DialogTitle>
+        <DialogContent>
+          {courses.map((a) => (
+            <Box display="flex" justifyContent="spaceBetween">
+              <MenuItem style={{ width: "80%" }}>{a.name}</MenuItem>
+              <MenuItem
+                value="del"
+                value={a}
+                onClick={() => handleDeleteCourse(a)}
+              >
+                <DeleteIcon value="del" />
+              </MenuItem>
+            </Box>
+          ))}
+          <DialogContentText style={{ color: "black" }}>
+            <Box display="flex" justifyContent="center">
+              <FormControl fullWidth>
+                <Input
+                  style={{ margin: 12 }}
+                  placeholder="Course code"
+                  variant="outlined"
+                  onChange={handleAddCourseChange}
+                />
+              </FormControl>
+              <Button
+                style={{ margin: 12 }}
+                onClick={handleAddCourseSubmit}
+                variant="contained"
+              >
+                Add
+              </Button>
+            </Box>
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   const handleCourseChange = (e) => {
-    localStorage.setItem("currentCourse", JSON.stringify(e.target.value));
-    setCurrentCourse(e.target.value);
+    console.log(e);
+    if (e.target.value === "edit") {
+      handleEditCourseOpen();
+    } else {
+      localStorage.setItem("currentCourse", JSON.stringify(e.target.value));
+      setCurrentCourse(e.target.value);
+    }
   };
 
   if (!currentCourse) {
@@ -139,6 +236,7 @@ const TeacherApp = ({ user }) => {
   return (
     <div>
       <div className={classes.root}>
+        {editCoursesDialog()}
         <CssBaseline />
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
@@ -178,6 +276,9 @@ const TeacherApp = ({ user }) => {
                     {a.name}
                   </MenuItem>
                 ))}
+                <MenuItem key="edit" value="edit">
+                  Edit Courses
+                </MenuItem>
               </Select>
             </FormControl>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
