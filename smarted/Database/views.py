@@ -15,7 +15,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
@@ -644,14 +644,11 @@ def save_resources(course, resources, assessed):
             course=course
         )
         folder.save()
-        for link in resources[item_id]['links']:
+        for link, title in resources[item_id]['links'].items():
             resource = Resource(
-                title="",  # TODO: scrape this
-                description="",  # TODO: scrape this
+                title=title,  
                 isBlackboardGenerated=True,
                 blackboardLink=link,
-                dateAdded="2020-10-15",  # TODO: scrape this
-                week=1,  # TODO: scrape this
                 folder=folder
             )
             resource.save()
