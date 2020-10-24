@@ -110,6 +110,10 @@ class Resource(models.Model):
     # dateAdded = models.DateTimeField('date published')
     # week = models.IntegerField()
     folder = models.ForeignKey(File, on_delete=models.SET_NULL, blank=True, null=True)
+    V = models.BooleanField(null=True)
+    A = models.BooleanField(null=True)
+    R = models.BooleanField(null=True)
+    K = models.BooleanField(null=True)
 
     def __str__(self):
         return f"{self.title} {self.isBlackboardGenerated} {self.blackboardLink} {self.folder}"

@@ -405,3 +405,25 @@ def students_course_grade(request):
                       for stu in students]
 
     return HttpResponse(json.dumps(student_grades))
+
+
+@csrf_exempt
+def assign_resource_vark(request):
+    json_body = json.loads(request.body)
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    # todo: check staff has access to course here
+
+    resource = Resource.objects.get(blackboardLink=json_body.get("link"))
+
+    resource.V, resource.A, resource.R, resource.K = json_body.get("V"), \
+        json_body.get("A"), json_body.get("R"), json_body.get("K")
+
+    resource.save()
+
+    return HttpResponse("")

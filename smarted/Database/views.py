@@ -15,7 +15,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
@@ -664,8 +664,12 @@ def asynchronous_refresh(username, password):
     courses = refresh_content(username, password)
 
     for course in courses.keys():
-        subject = Course.objects.get(
-            name=courses[course]['code'].split("/")[0])
+        try:
+            subject = Course.objects.get(
+                name=courses[course]['code'].split("/")[0])
+        except:
+            # edge case where user logs in with someone elses account
+            continue
         save_announcements(subject, courses[course]['announcements'])
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
