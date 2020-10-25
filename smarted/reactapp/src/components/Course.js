@@ -237,7 +237,7 @@ const Course = ({ currCourse, assessment, courses }) => {
                   flexDirection="column"
                 >
                   {courses
-                    .filter((course) => course.name === currCourse)
+                    .filter((course) => course.name === currCourse.name)
                     .map((course) => (
                       <TableContainer
                         style={{ marginBottom: 20 }}
@@ -302,3 +302,4 @@ const Course = ({ currCourse, assessment, courses }) => {
 };
 
 export default Course;
+
