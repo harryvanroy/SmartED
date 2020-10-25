@@ -134,8 +134,8 @@ function Grades({ courses, assessment }) {
                             {parseInt(item.grade) < 50 ? (
                               <Button color="secondary">FAILED</Button>
                             ) : (
-                              <Button color="primary">PASSED</Button>
-                            )}
+                                <Button color="primary">PASSED</Button>
+                              )}
                           </TableCell>
                           <TableCell align="right">
                             <Typography>
