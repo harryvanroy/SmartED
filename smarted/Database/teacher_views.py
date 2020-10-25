@@ -144,7 +144,7 @@ def add_teacher_course(request):
     staff = Staff.objects.get(user=User.objects.get(username=username))
 
     try:
-        course = json_body.get("course")
+        course = json_body.get("course").upper()
         mode = "EXTERNAL"
         sem = 2
         year = 2020
