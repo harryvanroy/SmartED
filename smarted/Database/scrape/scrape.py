@@ -87,14 +87,17 @@ class UQBlackboardScraper:
             soup (BeautifulSoup): soup class containing some html
 
         Returns:
-            links (Set<String>): list of href.a
+            links (Set<String>): list of href.a and titles
         """
-        links = set()
+        links = {}
         for link in soup.find_all('a', href=True):
-            if self.BLACKBOARD_URL in link['href']:
-                links.add(link['href'])
+            if "contextMenu" in link['href']:
+                continue
+            elif "http" in link['href']:
+                url = link['href']
             else:
-                links.add(self.BLACKBOARD_URL[:-1] + link['href'])
+                url = self.BLACKBOARD_URL[:-1] + link['href']
+            links[url] = link.get_text()
         return links
 
     def read_page(self, course_id, resources):
@@ -247,9 +250,10 @@ if __name__ == "__main__":
     print(courses)
     for course in courses.keys():
         print("\nNEXT COURSE = %s \n" % courses[course])
-        resources = scraper.get_course_announcements(course)
-        print(resources)
+        # resources = scraper.get_course_announcements(course)
+        # print(resources)
         resources = scraper.get_learning_resources(course)
         print(resources)
         resources = scraper.get_course_assessment(course)
         print(resources)
+        break

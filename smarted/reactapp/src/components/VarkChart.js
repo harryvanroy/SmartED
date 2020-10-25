@@ -2,6 +2,11 @@ import React from 'react';
 import { PieChart } from 'react-minimal-pie-chart';
 
 const VarkChart = ({ V, A, R, K }) => {
+  V = Math.round(1000 * V) / 1000
+  A = Math.round(1000 * A) / 1000
+  R = Math.round(1000 * R) / 1000
+  K = Math.round(1000 * K) / 1000
+
   return (
     <PieChart
       style={{ blockSize: 200 }}
