@@ -368,7 +368,7 @@ const TeacherGrades = ({ assessment, course }) => {
                   console.log('hi');
                   console.log(row);
                   console.log(row.currentGrade);
-                  return <Row key={index} row={row} color={riskOfFailure(row.currentGrade)} />;
+                  return <Row key={index} row={row} />;
                 })}
             </TableBody>
           </Table>

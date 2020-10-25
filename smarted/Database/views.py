@@ -16,7 +16,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = True
+is_local = False
 FORCE_TEACHER = False
 
 
@@ -431,6 +431,29 @@ def post_course_feedback(request):
 
     return HttpResponse("")
 
+
+@csrf_exempt
+def post_resource_feedback(request):
+    json_header = request.headers
+    try:
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
+    except:
+        username = DEFAULT_USER
+
+    json_body = json.loads(request.body)
+
+    user = User.objects.get(username=username)
+    resource = Resource.objects.get(id=json_body.get("id"))
+    feedback = json_body.get("feedback")
+
+    resourcefeedback = ResourceFeedback(
+        user=user, resource=resource, feedback=feedback)
+    
+    resourcefeedback.save()
+
+    return HttpResponse("")
+
+
 ################ GOALS #################
 @csrf_exempt
 def post_goals(request, username):
@@ -652,7 +675,10 @@ def save_resources(course, resources, assessed):
                 blackboardLink=link,
                 folder=folder
             )
-            resource.save()
+            try:
+                resource.save()
+            except:
+                pass # duplicate probably...
 
 
 def asynchronous_refresh(username, password):
@@ -768,5 +794,3 @@ def get_course_announcements(request, course_id):
     course_announcements = Announcement.objects.filter(course=course)
     serializer = AnnouncementSerializer(course_announcements, many=True)
     return Response(serializer.data)
-
-##############################################
