@@ -43,6 +43,7 @@ const useRowStyles = makeStyles({
   root: {
     "& > *": {
       borderBottom: "unset",
+
     },
   },
 });
@@ -80,7 +81,7 @@ function Row(props) {
 
   return (
     <React.Fragment>
-      <TableRow className={classes.root}>
+      <TableRow className={classes.root} style={{ backgroundColor: props.color }}>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -210,6 +211,20 @@ const TeacherGrades = ({ assessment, course }) => {
         setOpenErr(true);
       });
   };
+
+  const riskOfFailure = (grade) => {
+    if (grade > 75) {
+      return 'lightgreen';
+    } else if (grade > 55) {
+      return 'yellow'
+    } else if (grade > 45) {
+      return 'orange';
+    } else if (grade > 35) {
+      return 'tomato';
+    } else {
+      return 'red';
+    }
+  }
 
   useEffect(() => {
     axios(url + `/Database/students-in-course/?id=${course.id}`, {
@@ -350,8 +365,10 @@ const TeacherGrades = ({ assessment, course }) => {
                   );
                 })
                 .map((row, index) => {
+                  console.log('hi');
                   console.log(row);
-                  return <Row key={index} row={row} />;
+                  console.log(row.currentGrade);
+                  return <Row key={index} row={row} color={riskOfFailure(row.currentGrade)} />;
                 })}
             </TableBody>
           </Table>

@@ -236,7 +236,7 @@ const StudentApp = ({ user }) => {
               <ListItemIcon>
                 <ClassIcon />
               </ListItemIcon>
-              <ListItemText primary="Courses" />
+              <ListItemText primary="My Courses" />
               {open ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
@@ -308,7 +308,11 @@ const StudentApp = ({ user }) => {
         <Toolbar />
         <Switch>
           <Route path="/course/:name">
-            <Course course={currCourse} />
+            <Course
+              currCourse={currCourse}
+              assessment={assessment}
+              courses={courses}
+            />
           </Route>
           <Route path="/assessment">
             <Assessment assessment={assessment} courses={courses} />
