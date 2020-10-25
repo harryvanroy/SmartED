@@ -1,3 +1,4 @@
+from . import teacher_views  # must be down here to avoid circular import error
 import json
 import re
 import arrow
@@ -30,7 +31,6 @@ DEFAULT_USER = DEFAULT_USERS[INDEX]
 DEFAULT_FIRST_NAME = DEFAULT_FIRST_NAMES[INDEX]
 DEFAULT_LAST_NAME = "Sanderlands"
 
-from . import teacher_views  # must be down here to avoid circular import error
 
 @csrf_exempt
 def force_teacher(request):
@@ -334,12 +334,12 @@ def construct_student_grades(username, course_filter, courseID):
         # makes several null checks
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment is not None 
+                  if grade.assessment is not None
                   and grade.assessment.course == course]
     else:
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)]
-    
+
     json_grades = [{"assessment":
                     {"name": grade.assessment.name,
                      "courseName": grade.assessment.course.name,
@@ -646,12 +646,13 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link, title in resources[item_id]['links'].items():
             resource = Resource(
-                title=title,  
+                title=title,
                 isBlackboardGenerated=True,
                 blackboardLink=link,
                 folder=folder
             )
             resource.save()
+
 
 def asynchronous_refresh(username, password):
     """
@@ -674,7 +675,8 @@ def asynchronous_refresh(username, password):
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
     print("Thread took ", time.time() - start)
-    return # Thread dies here
+    return  # Thread dies here
+
 
 @csrf_exempt
 def refresh(request):
@@ -686,17 +688,18 @@ def refresh(request):
     """
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'POST':
-        return BAD_REQUEST    
+        return BAD_REQUEST
     json_body = json.loads(request.body)
 
     username = json_body.get("username")
     password = json_body.get("password")
     if username is None or password is None:
         return BAD_REQUEST
-        
+
     asynchronous_refresh(username, password)
 
     return HttpResponse("SUCCESS")
+
 
 @api_view(['GET'])
 def get_course_files(request, course_id):
@@ -718,6 +721,7 @@ def get_course_files(request, course_id):
 
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 def get_course_resources(request, course_id, file_id=-1):
     """
@@ -738,9 +742,11 @@ def get_course_resources(request, course_id, file_id=-1):
         course_files = File.objects.filter(course=course, id=file_id)
     else:
         course_files = File.objects.filter(course=course)
-    course_resources = Resource.objects.filter(folder__in=course_files.values('id'))
+    course_resources = Resource.objects.filter(
+        folder__in=course_files.values('id'))
     serializer = ResourceSerializer(course_resources, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def get_course_announcements(request, course_id):
