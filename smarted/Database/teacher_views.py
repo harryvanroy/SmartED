@@ -419,7 +419,7 @@ def assign_resource_vark(request):
 
     # todo: check staff has access to course here
 
-    resource = Resource.objects.get(blackboardLink=json_body.get("link"))
+    resource = Resource.objects.get(id=json_body.get("id"))
 
     resource.V, resource.A, resource.R, resource.K = json_body.get("V"), \
         json_body.get("A"), json_body.get("R"), json_body.get("K")
@@ -427,3 +427,33 @@ def assign_resource_vark(request):
     resource.save()
 
     return HttpResponse("")
+
+
+def get_resource_feedback(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    # todo: check staff has access to course here
+
+    id = request.GET.get('id')
+
+    try:
+        resource = Resource.objects.get(id=id)
+    except:
+        return HttpResponse("failed query.. specify the correct resource link...")
+
+    print("RESOURCE: ", resource)
+
+
+    resource_feedback = ResourceFeedback.objects.filter(resource=resource)
+
+    # TODO: POSSIBLE THAT USER IS NONE
+    json_feedback = [{"user": {"username": x.user.username,
+                                "name": f"{x.user.firstName} {x.user.lastName}"},
+                      "feedback": x.feedback}
+                     for x in resource_feedback]
+    return HttpResponse(json.dumps(json_feedback))

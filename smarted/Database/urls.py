@@ -35,6 +35,7 @@ urlpatterns += [
     path('post-course-feedback/', views.post_course_feedback, name='course-feedback-post'),
     path('goals/', views.goals, name='goals'),
     path('refresh/', views.refresh, name='refresh'),
+    path('post-resource-feedback/', views.post_resource_feedback, name='post-resource-feedback'),
 
     path('teacher-courses/', teacher_views.get_teacher_courses, name='teacher-courses'),
     path('students-in-course/', teacher_views.students_in_course, name='students-in-course'),
@@ -47,7 +48,8 @@ urlpatterns += [
     path('add-teacher-course/', teacher_views.add_teacher_course, name='add-teacher-course'),
     path('delete-teacher-course/', teacher_views.remove_teacher_course, name='delete-teacher-course'),
     path('assign-resource-vark/', teacher_views.assign_resource_vark, name='assign-resource-vark'),
-    
+    path('resource-feedback/', teacher_views.get_resource_feedback, name='resource-feedback'),
+
     path('course-files/<int:course_id>/', views.get_course_files, name='course-files'),
     path('course-resources/<int:course_id>/', views.get_course_resources, name='course-resources'),
     path('course-resources/<int:course_id>/<int:file_id>/', views.get_course_resources, name='course-resources-file'),
