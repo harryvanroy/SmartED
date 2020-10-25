@@ -1,20 +1,31 @@
-import React from 'react';
+import React, { useEffect } from "react";
 import Cookies from "js-cookie";
-import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Paper, Box, Typography, ButtonBase, Button } from '@material-ui/core';
-import { Link, Route } from 'react-router-dom';
+import {
+  Grid,
+  Paper,
+  Box,
+  Typography,
+  ButtonBase,
+  Button,
+} from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-
-import { checkDate } from "./Home"
+import { makeStyles, withStyles } from "@material-ui/core/styles";
+import TreeView from "@material-ui/lab/TreeView";
+import TreeItem from "@material-ui/lab/TreeItem";
+import Collapse from "@material-ui/core/Collapse";
+import Chip from "@material-ui/core/Chip";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import { checkDate } from "./Home";
+import axios from "axios";
 
 //DETERMINE LOCATION
 var url;
-if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
@@ -32,107 +43,183 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1.5em",
     paddingBottom: "15px",
   },
+  root: {
+    height: 264,
+    flexGrow: 1,
+    maxWidth: 400,
+  },
 }));
 
-function Course({ course, assessment, resources, announcements }) {
+const VChip = withStyles({
+  root: {
+    backgroundColor: "#603E95",
+  },
+})((props) => <Chip size="small" label="V" {...props} />);
+
+const AChip = withStyles({
+  root: {
+    backgroundColor: "#009DA1",
+  },
+})((props) => <Chip size="small" label="A" {...props} />);
+
+const RChip = withStyles({
+  root: {
+    backgroundColor: "#FAC22B",
+  },
+})((props) => <Chip size="small" label="R" {...props} />);
+
+const KChip = withStyles({
+  root: {
+    backgroundColor: "#D7255D",
+  },
+})((props) => <Chip size="small" label="K" {...props} />);
+
+const Course = ({ currCourse, assessment, courses }) => {
   const classes = useStyles();
+
+  const [files, setFiles] = React.useState([]);
+  const [resources, setResources] = React.useState([]);
+
+  let resourceData = files
+    .filter((file0) => !file0.isAssessment)
+    .map((file) => {
+      return {
+        id: "" + file.id,
+        name: file.name,
+        children: resources
+          .filter((res0) => res0.folder === file.id)
+          .map((res, index) => {
+            return {
+              id: "" + index,
+              name: (
+                <a target="_blank" href={res.blackboardLink}>
+                  {res.title}
+                </a>
+              ),
+              children: [],
+            };
+          }),
+      };
+    });
+
+  let assessmentData = files
+    .filter((file0) => file0.isAssessment)
+    .map((file) => {
+      return {
+        id: "" + file.id,
+        name: file.name,
+        children: resources
+          .filter((res0) => res0.folder === file.id)
+          .map((res, index) => {
+            return {
+              id: "" + index,
+              name: (
+                <a target="_blank" href={res.blackboardLink}>
+                  {res.title}
+                </a>
+              ),
+              children: [],
+            };
+          }),
+      };
+    });
+
+  let data = {
+    id: "root",
+    name: "Resources",
+    children: [
+      {
+        id: "resources",
+        name: <Button color="primary">Learning Resources</Button>,
+        children: resourceData,
+      },
+      {
+        id: "assessment",
+        name: <Button color="secondary">Assessment</Button>,
+        children: assessmentData,
+      },
+    ],
+  };
+
+  const renderTree = (nodes) => (
+    <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
+      {Array.isArray(nodes.children)
+        ? nodes.children.map((node) => renderTree(node))
+        : null}
+    </TreeItem>
+  );
+
+  useEffect(() => {
+    axios(url + `/Database/course-files/${currCourse.id}/?format=json`, {
+      method: "get",
+      withCredentials: true,
+    }).then((res) => {
+      setFiles(res.data);
+
+      let resp = [];
+      let promises = [];
+      res.data.forEach((file) => {
+        promises.push(
+          axios(
+            url +
+              `/Database/course-resources/${currCourse.id}/${file.id}/?format=json`,
+            {
+              method: "get",
+              withCredentials: true,
+            }
+          ).then((res) => {
+            resp.push(res.data);
+            console.log(res.data);
+          })
+        );
+      });
+      Promise.all(promises).then(() => setResources([].concat.apply([], resp)));
+    });
+  }, [currCourse, assessment]);
+
+  const displayResource = (name, V, A, R, K) => {
+    return (
+      <div>
+        {name}&nbsp;
+        {V === 1 && <VChip />}
+        {A === 1 && <AChip />}
+        {R === 1 && <RChip />}
+        {K === 1 && <KChip />}
+      </div>
+    );
+  };
 
   return (
     <Box>
-      <Typography variant="h4">
-        Course: {course}
-      </Typography>
-      <Grid container justify="center" spacing={3} style={{ marginTop: 12 }}>
+      <Typography variant="h4">Course: {currCourse.name}</Typography>
+      <Grid
+        container
+        justify="center"
+        spacing={3}
+        style={{ marginTop: 12, minWidth: 550 }}
+      >
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
+              <Paper
+                elevation={3}
+                className={classes.paper}
+                style={{ height: 760, overflow: "auto" }}
+              >
                 <div
                   style={{ display: "flex", justifyContent: "center" }}
                   className={classes.paperTitle}
                 >
-                  <Typography variant="h5">
-                    Announcements
-                    <Link to={"./announcements"}>
-                      <Button
-                        style={{ marginLeft: 5 }}
-                        color="primary">
-                        View all
-                      </Button>
-                    </Link>
-                  </Typography>
+                  <Typography variant="h5">Resources</Typography>
                 </div>
-                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
-                  {announcements
-                    .sort(
-                      (a, b) =>
-                        Date.parse(b.dateAdded) - Date.parse(a.dateAdded)
-                    )
-                    .map((ann) => (
-                      <ButtonBase key={ann.id} style={{ width: "100%" }}>
-                        <Paper
-                          //onClick={handleOpenDialog(ann)}
-                          square
-                          style={{
-                            minHeight: 50,
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-start",
-                            alignItems: "center",
-                          }}
-                          key={ann.id}
-                          variant="outlined"
-                        >
-                          <Typography
-                            style={{
-                              flexGrow: 1,
-                              textAlign: "left",
-                              margin: 10,
-                            }}
-                          >
-                            {ann.title}
-                          </Typography>
-                          <Typography
-                            style={{
-                              margin: 10,
-                              color: "#51237a",
-                            }}
-                          >
-                            {/*{
-                              courses.filter(
-                                (course) => course.id === ann.course
-                              )[0].name
-                            }*/}
-                          </Typography>
-                          <Typography style={{ margin: 10 }}>
-                            {ann.dateAdded.slice(0, 10)}
-                          </Typography>
-                        </Paper>
-                      </ButtonBase>
-                    ))}
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div
-                  style={{ display: "flex", justifyContent: "center" }}
-                  className={classes.paperTitle}
+                <TreeView
+                  className={classes.root}
+                  defaultCollapseIcon={<ExpandMoreIcon />}
+                  defaultExpanded={["root"]}
+                  defaultExpandIcon={<ChevronRightIcon />}
                 >
-                  <Typography variant="h5">
-                    Recommended resources
-                    <Link to={"./resources"}>
-                      <Button
-                        style={{ marginLeft: 5 }}
-                        color="primary">
-                        View all
-                      </Button>
-                    </Link>
-                  </Typography>
-                </div>
-                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
-                  Hi
-                </Box>
+                  {renderTree(data)}
+                </TreeView>
               </Paper>
             </Grid>
           </Grid>
@@ -149,62 +236,61 @@ function Course({ course, assessment, resources, announcements }) {
                   flex={1}
                   flexDirection="column"
                 >
-                  <TableContainer
-                    style={{ marginBottom: 20 }}
-                    key={course.id}
-                    component={Paper}
-                    variant="outlined"
-                  >
-                    <Table aria-label="simple table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell align="center">{course.name}</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {assessment
-                          .filter(
-                            (allAssess) =>
-                              allAssess.course === course.id &&
-                              new Date(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate()
-                              ) < checkDate(allAssess.dateDescription)
-                          )
-                          .map((assessCourse) => {
-                            let currentDate = new Date(
-                              new Date().getFullYear(),
-                              new Date().getMonth(),
-                              new Date().getDate()
-                            );
-                            return (
-                              <TableRow key={assessCourse.id}>
-                                {checkDate(assessCourse.dateDescription) <
-                                  currentDate.setDate(
-                                    currentDate.getDate() + 7
-                                  ) ? (
-                                    <TableCell>
-                                      <Typography>
-                                        {assessCourse.name}{" "}
-                                        <Button color="secondary">
-                                          DUE SOON
-                                      </Button>
-                                      </Typography>
-                                    </TableCell>
-                                  ) : (
-                                    <TableCell>
-                                      <Typography>
-                                        {assessCourse.name}
-                                      </Typography>
-                                    </TableCell>
-                                  )}
-                              </TableRow>
-                            );
-                          })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                  {courses
+                    .filter((course) => course.name === currCourse)
+                    .map((course) => (
+                      <TableContainer
+                        style={{ marginBottom: 20 }}
+                        key={course.id}
+                        component={Paper}
+                        variant="outlined"
+                      >
+                        <Table aria-label="simple table">
+                          <TableBody>
+                            {assessment
+                              .filter(
+                                (allAssess) =>
+                                  allAssess.course === course.id &&
+                                  new Date(
+                                    new Date().getFullYear(),
+                                    new Date().getMonth(),
+                                    new Date().getDate()
+                                  ) < checkDate(allAssess.dateDescription)
+                              )
+                              .map((assessCourse) => {
+                                let currentDate = new Date(
+                                  new Date().getFullYear(),
+                                  new Date().getMonth(),
+                                  new Date().getDate()
+                                );
+                                return (
+                                  <TableRow key={assessCourse.id}>
+                                    {checkDate(assessCourse.dateDescription) <
+                                    currentDate.setDate(
+                                      currentDate.getDate() + 7
+                                    ) ? (
+                                      <TableCell>
+                                        <Typography>
+                                          {assessCourse.name}{" "}
+                                          <Button color="secondary">
+                                            DUE SOON
+                                          </Button>
+                                        </Typography>
+                                      </TableCell>
+                                    ) : (
+                                      <TableCell>
+                                        <Typography>
+                                          {assessCourse.name}
+                                        </Typography>
+                                      </TableCell>
+                                    )}
+                                  </TableRow>
+                                );
+                              })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    ))}
                 </Box>
               </Paper>
             </Grid>

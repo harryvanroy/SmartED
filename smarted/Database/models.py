@@ -103,13 +103,18 @@ class File(models.Model):
 
 
 class Resource(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     # description = models.TextField()
     isBlackboardGenerated = models.BooleanField()
-    blackboardLink = models.URLField(primary_key=True, max_length=512)
+    blackboardLink = models.URLField(max_length=512, unique=True)
     # dateAdded = models.DateTimeField('date published')
     # week = models.IntegerField()
     folder = models.ForeignKey(File, on_delete=models.SET_NULL, blank=True, null=True)
+    V = models.BooleanField(null=True)
+    A = models.BooleanField(null=True)
+    R = models.BooleanField(null=True)
+    K = models.BooleanField(null=True)
 
     def __str__(self):
         return f"{self.title} {self.isBlackboardGenerated} {self.blackboardLink} {self.folder}"

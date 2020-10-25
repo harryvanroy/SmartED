@@ -30,11 +30,8 @@ import Course from "./components/Course";
 import Feedback from "./components/Feedback";
 import Goals from "./components/Goals";
 import Grades from "./components/Grades";
-import Resources from "./components/Resources";
 import { Home, checkDate } from "./components/Home";
 import Vark from "./components/Vark";
-import CourseAnnouncements from "./components/CourseAnnouncements";
-import CourseResources from "./components/CourseResources";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -239,37 +236,34 @@ const StudentApp = ({ user }) => {
               <ListItemIcon>
                 <ClassIcon />
               </ListItemIcon>
-              <ListItemText primary="Courses" />
+              <ListItemText primary="My Courses" />
               {open ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {courses
-                  .map((a) => a.name)
-                  .map((text, index) => {
-                    return (
-                      <ListItem
-                        onClick={() => setCurrCourse(text)}
-                        key={index}
-                        button
-                        className={classes.nested}
-                        component={NavLink}
-                        to={"/course/" + text}
-                      >
-                        <ListItemText
-                          primary={text}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </ListItem>
-                    );
-                  })}
+                {courses.map((a) => {
+                  return (
+                    <ListItem
+                      onClick={() => setCurrCourse(a)}
+                      key={a.id}
+                      button
+                      className={classes.nested}
+                      component={NavLink}
+                      to={"/course/" + a.name}
+                    >
+                      <ListItemText
+                        primary={a.name}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                    </ListItem>
+                  );
+                })}
               </List>
             </Collapse>
             {[
               "Assessment",
               "Course Goals",
               "My Grades",
-              "Resources",
               "Course Feedback",
               "VARK",
             ].map((text, index) => (
@@ -278,14 +272,9 @@ const StudentApp = ({ user }) => {
                 key={text}
                 component={NavLink}
                 to={
-                  [
-                    "/assessment",
-                    "/goals",
-                    "/grades",
-                    "/resources",
-                    "/feedback",
-                    "/vark",
-                  ][index]
+                  ["/assessment", "/goals", "/grades", "/feedback", "/vark"][
+                    index
+                  ]
                 }
                 activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}
               >
@@ -295,9 +284,8 @@ const StudentApp = ({ user }) => {
                       0: <AssessmentIcon />,
                       1: <EmojiEmotionsIcon />,
                       2: <SchoolIcon />,
-                      3: <SubjectIcon />,
-                      4: <FeedbackIcon />,
-                      5: <FingerprintIcon />,
+                      3: <FeedbackIcon />,
+                      4: <FingerprintIcon />,
                     }[index]
                   }
                 </ListItemIcon>
@@ -318,7 +306,11 @@ const StudentApp = ({ user }) => {
         <Toolbar />
         <Switch>
           <Route path="/course/:name">
-            <Course course={currCourse} assessment={assessment} resources={null} announcements={announcements} />
+            <Course
+              currCourse={currCourse}
+              assessment={assessment}
+              courses={courses}
+            />
           </Route>
           <Route path="/assessment">
             <Assessment assessment={assessment} courses={courses} />
@@ -331,9 +323,6 @@ const StudentApp = ({ user }) => {
           </Route>
           <Route path="/grades">
             <Grades assessment={assessment} courses={courses} />
-          </Route>
-          <Route path="/resources">
-            <Resources />
           </Route>
           <Route path="/vark">
             <Vark parentVark={vark} setParentVarkScore={setParentVarkScore} />

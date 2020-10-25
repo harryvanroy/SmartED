@@ -11,9 +11,9 @@ from . import views
 import re
 
 # if enabled, overrides student/teacher check
-FORCE_TEACHER = views.FORCE_TEACHER
+FORCE_TEACHER = False
 # used if student/teacher check is overridden
-DEFAULT_TEACHER_USER = views.DEFAULT_TEACHER_USER
+DEFAULT_TEACHER_USER = "Uqjstuaa"
 
 # returns a boolean for success/fail and the teachers username
 
@@ -144,7 +144,7 @@ def add_teacher_course(request):
     staff = Staff.objects.get(user=User.objects.get(username=username))
 
     try:
-        course = json_body.get("course")
+        course = json_body.get("course").upper()
         mode = "EXTERNAL"
         sem = 2
         year = 2020
@@ -405,3 +405,55 @@ def students_course_grade(request):
                       for stu in students]
 
     return HttpResponse(json.dumps(student_grades))
+
+
+@csrf_exempt
+def assign_resource_vark(request):
+    json_body = json.loads(request.body)
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    # todo: check staff has access to course here
+
+    resource = Resource.objects.get(id=json_body.get("id"))
+
+    resource.V, resource.A, resource.R, resource.K = json_body.get("V"), \
+        json_body.get("A"), json_body.get("R"), json_body.get("K")
+
+    resource.save()
+
+    return HttpResponse("")
+
+
+def get_resource_feedback(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    # todo: check staff has access to course here
+
+    id = request.GET.get('id')
+
+    try:
+        resource = Resource.objects.get(id=id)
+    except:
+        return HttpResponse("failed query.. specify the correct resource link...")
+
+    print("RESOURCE: ", resource)
+
+
+    resource_feedback = ResourceFeedback.objects.filter(resource=resource)
+
+    # TODO: POSSIBLE THAT USER IS NONE
+    json_feedback = [{"user": {"username": x.user.username,
+                                "name": f"{x.user.firstName} {x.user.lastName}"},
+                      "feedback": x.feedback}
+                     for x in resource_feedback]
+    return HttpResponse(json.dumps(json_feedback))

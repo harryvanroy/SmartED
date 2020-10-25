@@ -1,3 +1,4 @@
+from . import teacher_views  # must be down here to avoid circular import error
 import json
 import re
 import arrow
@@ -15,8 +16,9 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
+
 
 DEFAULT_TEACHER_USER = "Uqjstuaa"
 DEFAULT_TEACHER_FIRST_NAME = "Johnno"
@@ -30,7 +32,6 @@ DEFAULT_USER = DEFAULT_USERS[INDEX]
 DEFAULT_FIRST_NAME = DEFAULT_FIRST_NAMES[INDEX]
 DEFAULT_LAST_NAME = "Sanderlands"
 
-from . import teacher_views  # must be down here to avoid circular import error
 
 @csrf_exempt
 def force_teacher(request):
@@ -334,12 +335,12 @@ def construct_student_grades(username, course_filter, courseID):
         # makes several null checks
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment is not None 
+                  if grade.assessment is not None
                   and grade.assessment.course == course]
     else:
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)]
-    
+
     json_grades = [{"assessment":
                     {"name": grade.assessment.name,
                      "courseName": grade.assessment.course.name,
@@ -429,6 +430,29 @@ def post_course_feedback(request):
     course_feedback.save()
 
     return HttpResponse("")
+
+
+@csrf_exempt
+def post_resource_feedback(request):
+    json_header = request.headers
+    try:
+        username = json.loads(json_header['X-Kvd-Payload'])['user']
+    except:
+        username = DEFAULT_USER
+
+    json_body = json.loads(request.body)
+
+    user = User.objects.get(username=username)
+    resource = Resource.objects.get(id=json_body.get("id"))
+    feedback = json_body.get("feedback")
+
+    resourcefeedback = ResourceFeedback(
+        user=user, resource=resource, feedback=feedback)
+
+    resourcefeedback.save()
+
+    return HttpResponse("")
+
 
 ################ GOALS #################
 @csrf_exempt
@@ -646,12 +670,16 @@ def save_resources(course, resources, assessed):
         folder.save()
         for link, title in resources[item_id]['links'].items():
             resource = Resource(
-                title=title,  
+                title=title,
                 isBlackboardGenerated=True,
                 blackboardLink=link,
                 folder=folder
             )
-            resource.save()
+            try:
+                resource.save()
+            except:
+                pass  # duplicate probably...
+
 
 def asynchronous_refresh(username, password):
     """
@@ -664,13 +692,18 @@ def asynchronous_refresh(username, password):
     courses = refresh_content(username, password)
 
     for course in courses.keys():
-        subject = Course.objects.get(
-            name=courses[course]['code'].split("/")[0])
+        try:
+            subject = Course.objects.get(
+                name=courses[course]['code'].split("/")[0])
+        except:
+            # edge case where user logs in with someone elses account
+            continue
         save_announcements(subject, courses[course]['announcements'])
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
     print("Thread took ", time.time() - start)
-    return # Thread dies here
+    return  # Thread dies here
+
 
 @csrf_exempt
 def refresh(request):
@@ -682,17 +715,18 @@ def refresh(request):
     """
     BAD_REQUEST = HttpResponse('This aint it chief')
     if request.method != 'POST':
-        return BAD_REQUEST    
+        return BAD_REQUEST
     json_body = json.loads(request.body)
 
     username = json_body.get("username")
     password = json_body.get("password")
     if username is None or password is None:
         return BAD_REQUEST
-        
+
     asynchronous_refresh(username, password)
 
     return HttpResponse("SUCCESS")
+
 
 @api_view(['GET'])
 def get_course_files(request, course_id):
@@ -714,6 +748,7 @@ def get_course_files(request, course_id):
 
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 def get_course_resources(request, course_id, file_id=-1):
     """
@@ -734,9 +769,11 @@ def get_course_resources(request, course_id, file_id=-1):
         course_files = File.objects.filter(course=course, id=file_id)
     else:
         course_files = File.objects.filter(course=course)
-    course_resources = Resource.objects.filter(folder__in=course_files.values('id'))
+    course_resources = Resource.objects.filter(
+        folder__in=course_files.values('id'))
     serializer = ResourceSerializer(course_resources, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def get_course_announcements(request, course_id):
@@ -757,5 +794,3 @@ def get_course_announcements(request, course_id):
     course_announcements = Announcement.objects.filter(course=course)
     serializer = AnnouncementSerializer(course_announcements, many=True)
     return Response(serializer.data)
-
-##############################################
