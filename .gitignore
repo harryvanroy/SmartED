@@ -12,6 +12,7 @@ geckodriver.log
 env
 db.sqlite3
 bin
+migrations
 lib
 scrape.py.orig
 core
