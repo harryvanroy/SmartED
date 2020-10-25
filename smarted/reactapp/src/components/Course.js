@@ -9,6 +9,8 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import { withStyles } from "@material-ui/core/styles"
+import Chip from '@material-ui/core/Chip';
 
 import { checkDate } from "./Home"
 
@@ -34,11 +36,52 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+
+const VChip = withStyles({
+  root: {
+    backgroundColor: '#603E95',
+  },
+})((props) => <Chip size="small" label="V" {...props} />);
+
+const AChip = withStyles({
+  root: {
+    backgroundColor: '#009DA1',
+  },
+})((props) => <Chip size="small" label="A" {...props} />);
+
+const RChip = withStyles({
+  root: {
+    backgroundColor: '#FAC22B',
+  },
+})((props) => <Chip size="small" label="R" {...props} />);
+
+const KChip = withStyles({
+  root: {
+    backgroundColor: '#D7255D',
+  },
+})((props) => <Chip size="small" label="K" {...props} />);
+
 function Course({ currCourse, assessment, courses }) {
   const classes = useStyles();
 
   console.log(courses);
   console.log(currCourse);
+
+  const displayResource = (name, V, A, R, K) => {
+    return (
+      <div>
+        {name}&nbsp;
+        {V === 1 &&
+          <VChip />}
+        {A === 1 &&
+          <AChip />}
+        {R === 1 &&
+          <RChip />}
+        {K === 1 &&
+          <KChip />}
+      </div>
+    );
+  }
 
   return (
     <Box>
