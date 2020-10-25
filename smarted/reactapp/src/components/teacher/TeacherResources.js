@@ -11,6 +11,7 @@ import axios from "axios";
 import Typography from "@material-ui/core/Typography";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
+import Chip from '@material-ui/core/Chip';
 
 const VCheckbox = withStyles({
   root: {
@@ -22,6 +23,12 @@ const VCheckbox = withStyles({
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
 
+const VChip = withStyles({
+  root: {
+    backgroundColor: '#603E95',
+  },
+})((props) => <Chip size="small" label="V" {...props} />);
+
 const ACheckbox = withStyles({
   root: {
     color: '#009DA1',
@@ -31,6 +38,12 @@ const ACheckbox = withStyles({
   },
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
+
+const AChip = withStyles({
+  root: {
+    backgroundColor: '#009DA1',
+  },
+})((props) => <Chip size="small" label="A" {...props} />);
 
 const RCheckbox = withStyles({
   root: {
@@ -42,6 +55,12 @@ const RCheckbox = withStyles({
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
 
+const RChip = withStyles({
+  root: {
+    backgroundColor: '#FAC22B',
+  },
+})((props) => <Chip size="small" label="R" {...props} />);
+
 const KCheckbox = withStyles({
   root: {
     color: '#D7255D',
@@ -51,6 +70,12 @@ const KCheckbox = withStyles({
   },
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
+
+const KChip = withStyles({
+  root: {
+    backgroundColor: '#D7255D',
+  },
+})((props) => <Chip size="small" label="K" {...props} />);
 
 const TeacherResources = ({ course }) => {
   const [tags, setTags] = React.useState({
@@ -63,6 +88,22 @@ const TeacherResources = ({ course }) => {
   const handleChangeTags = (event) => {
     setTags({ ...tags, [event.target.name]: event.target.checked });
   };
+
+  const displayResource = (name, V, A, R, K) => {
+    return (
+      <div>
+        {name}&nbsp;
+        {V === 1 &&
+          <VChip />}
+        {A === 1 &&
+          <AChip />}
+        {R === 1 &&
+          <RChip />}
+        {K === 1 &&
+          <KChip />}
+      </div>
+    );
+  }
 
   useEffect(() => {
   }, [course]);
@@ -98,7 +139,9 @@ const TeacherResources = ({ course }) => {
               labelId="demo-simple-select-outlined-label"
               label="resources"
             >
-              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={1}>
+                {displayResource("Lecture 1", 1, 0, 1, 1)}
+              </MenuItem>
             </Select>
             {/*{resources
                 .filter((res) => res.course === course.id)
@@ -137,7 +180,9 @@ const TeacherResources = ({ course }) => {
             </Button>
           </FormControl>
         </Grid>
-
+        <Grid item style={{ width: "100%", marginBottom: 20 }}>
+          Resource feedback
+        </Grid>
       </Grid>
     </div>
   );

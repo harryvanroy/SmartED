@@ -80,6 +80,7 @@ const SyncData = () => {
       })
       .catch((err) => {
         setOpenErr(true);
+        setValues({ ...values, done: true });
       });
   };
 
