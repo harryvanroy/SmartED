@@ -11,9 +11,9 @@ from . import views
 import re
 
 # if enabled, overrides student/teacher check
-FORCE_TEACHER = views.FORCE_TEACHER
+FORCE_TEACHER = False
 # used if student/teacher check is overridden
-DEFAULT_TEACHER_USER = views.DEFAULT_TEACHER_USER
+DEFAULT_TEACHER_USER = "Uqjstuaa"
 
 # returns a boolean for success/fail and the teachers username
 
