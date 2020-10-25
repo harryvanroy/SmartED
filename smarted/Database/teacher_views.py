@@ -3,6 +3,7 @@ import random
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.exceptions import ValidationError, ParseError
 from .scrape.ecp_scrape import get_course_assessment
 from .scrape.scrape import *
 from .models import *
@@ -57,7 +58,7 @@ def initialize_teacher_courses(header, staff):
         UQ.save()
 
     # initializes with these default courses, feel free to add more
-    courses = ['COMP3301', "DECO3801", "COMP3506", "COMS4200", "COMP3710"]
+    courses = ["DECO3801"]
 
     for course in courses:
         if len(Course.objects.filter(name=course, mode=mode,
@@ -100,6 +101,82 @@ def get_teacher_courses(request):
                     for x in course_list]
 
     return HttpResponse(json.dumps(json_courses))
+
+
+@csrf_exempt
+def remove_teacher_course(request):
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    if request.method != "DELETE":
+        raise ParseError
+
+    staff = Staff.objects.get(user=User.objects.get(username=username))
+
+    courseID = request.GET.get('id')
+    try:
+        course = Course.objects.get(id=courseID)
+    except:
+        raise ParseError
+
+    if len(StaffCourse.objects.filter(staff=staff, course=course)) == 0:
+        raise ParseError
+    else:
+        StaffCourse.objects.get(staff=staff, course=course).delete()
+
+    return HttpResponse("")
+
+
+@csrf_exempt
+def add_teacher_course(request):
+    json_header = request.headers
+    json_body = json.loads(request.body)
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    staff = Staff.objects.get(user=User.objects.get(username=username))
+
+    try:
+        course = json_body.get("course")
+        mode = "EXTERNAL"
+        sem = 2
+        year = 2020
+    except:
+        raise ParseError
+
+    if len(Course.objects.filter(name=course, mode=mode,
+                                 semester=sem, year=year)) == 0:
+        # course not already in database
+        UQ = Institution.objects.get(name="University of Queensland")
+        course_obj = Course(name=course, mode=mode, semester=sem,
+                            year=year, institution=UQ)
+        course_obj.save()
+
+    course_obj = Course.objects.get(name=course, mode=mode,
+                                    semester=sem, year=year)
+
+    # scrape assessment, if successful, yeehaw, else parseError
+    if "error" in str(views.course_assessment(request=None,
+                                              courseID=course_obj.id).content):
+        raise ParseError
+
+    # add teacher
+    course_obj.save()
+
+    if len(StaffCourse.objects
+           .filter(staff=staff, course=course_obj)) == 0:
+        print("saving studentCourse...")
+        staff_course = StaffCourse(staff=staff, course=course_obj)
+        staff_course.save()
+
+    return HttpResponse("ok")
 
 
 def students_in_course(request):
@@ -189,10 +266,10 @@ def students_at_risk(request):
     students_at_risk = []
 
     for student in students_in_course:
-        
+
         grades = [grade for grade
                   in StudentAssessment.objects.filter(student=student)
-                  if grade.assessment is not None 
+                  if grade.assessment is not None
                   and grade.assessment.course == course]
 
         total_weight = sum([float(grade.assessment.weight)
@@ -279,6 +356,7 @@ def get_average_vark(request):
 
     return HttpResponse(json.dumps(vark))
 
+
 def get_student_vark(request):
     json_header = request.headers
 
@@ -297,9 +375,10 @@ def get_student_vark(request):
     # todo: check student in teachers course
 
     json_vark = {"V": str(student.V), "A": str(student.A),
-     "R": str(student.R), "K": str(student.K)}
+                 "R": str(student.R), "K": str(student.K)}
 
     return HttpResponse(json.dumps(json_vark))
+
 
 def students_course_grade(request):
     json_header = request.headers
@@ -326,3 +405,25 @@ def students_course_grade(request):
                       for stu in students]
 
     return HttpResponse(json.dumps(student_grades))
+
+
+@csrf_exempt
+def assign_resource_vark(request):
+    json_body = json.loads(request.body)
+    json_header = request.headers
+
+    auth, username = authorize_teacher(json_header)
+
+    if not auth:
+        return HttpResponse("failed teacher auth...")
+
+    # todo: check staff has access to course here
+
+    resource = Resource.objects.get(blackboardLink=json_body.get("link"))
+
+    resource.V, resource.A, resource.R, resource.K = json_body.get("V"), \
+        json_body.get("A"), json_body.get("R"), json_body.get("K")
+
+    resource.save()
+
+    return HttpResponse("")

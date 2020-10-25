@@ -224,7 +224,7 @@ def vark(request):
         return HttpResponse(json.dumps(json_response))
 
 
-def course_assessment(request):
+def course_assessment(request=None, courseID=None):
     """
     A view for handling a get request for a courses assessment.
     This function reads the GET request's URL to determine the requested
@@ -236,7 +236,10 @@ def course_assessment(request):
 
     (see https://github.com/harryvanroy/SmartED/wiki)
     """
-    id = request.GET.get('id')
+    if courseID is None:
+        id = request.GET.get('id')
+    else:
+        id = courseID
 
     try:
         id = int(id)
@@ -641,14 +644,11 @@ def save_resources(course, resources, assessed):
             course=course
         )
         folder.save()
-        for link in resources[item_id]['links']:
+        for link, title in resources[item_id]['links'].items():
             resource = Resource(
-                title="",  # TODO: scrape this
-                description="",  # TODO: scrape this
+                title=title,  
                 isBlackboardGenerated=True,
                 blackboardLink=link,
-                dateAdded="2020-10-15",  # TODO: scrape this
-                week=1,  # TODO: scrape this
                 folder=folder
             )
             resource.save()
@@ -664,8 +664,12 @@ def asynchronous_refresh(username, password):
     courses = refresh_content(username, password)
 
     for course in courses.keys():
-        subject = Course.objects.get(
-            name=courses[course]['code'].split("/")[0])
+        try:
+            subject = Course.objects.get(
+                name=courses[course]['code'].split("/")[0])
+        except:
+            # edge case where user logs in with someone elses account
+            continue
         save_announcements(subject, courses[course]['announcements'])
         save_resources(subject, courses[course]['resources'], False)
         save_resources(subject, courses[course]['assessment'], True)
