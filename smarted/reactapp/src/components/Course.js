@@ -20,7 +20,7 @@ import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import Collapse from "@material-ui/core/Collapse";
 import { useSpring, animated } from "react-spring/web.cjs";
-
+import Chip from "@material-ui/core/Chip";
 import { checkDate } from "./Home";
 import axios from "axios";
 
@@ -121,7 +121,31 @@ const StyledTreeItem = withStyles((theme) => ({
   <TreeItem {...props} TransitionComponent={TransitionComponent} />
 ));
 
-const Course = ({ currCourse, assessment, courses }) => {
+const VChip = withStyles({
+  root: {
+    backgroundColor: "#603E95",
+  },
+})((props) => <Chip size="small" label="V" {...props} />);
+
+const AChip = withStyles({
+  root: {
+    backgroundColor: "#009DA1",
+  },
+})((props) => <Chip size="small" label="A" {...props} />);
+
+const RChip = withStyles({
+  root: {
+    backgroundColor: "#FAC22B",
+  },
+})((props) => <Chip size="small" label="R" {...props} />);
+
+const KChip = withStyles({
+  root: {
+    backgroundColor: "#D7255D",
+  },
+})((props) => <Chip size="small" label="K" {...props} />);
+
+function Course({ currCourse, assessment, courses }) {
   const classes = useStyles();
 
   const [files, setFiles] = React.useState([]);
@@ -155,6 +179,18 @@ const Course = ({ currCourse, assessment, courses }) => {
       Promise.all(promises).then(() => setResources([].concat.apply([], resp)));
     });
   }, [currCourse, assessment]);
+
+  const displayResource = (name, V, A, R, K) => {
+    return (
+      <div>
+        {name}&nbsp;
+        {V === 1 && <VChip />}
+        {A === 1 && <AChip />}
+        {R === 1 && <RChip />}
+        {K === 1 && <KChip />}
+      </div>
+    );
+  };
 
   return (
     <Box>
@@ -318,6 +354,6 @@ const Course = ({ currCourse, assessment, courses }) => {
       </Grid>
     </Box>
   );
-};
+}
 
 export default Course;
