@@ -241,25 +241,23 @@ const StudentApp = ({ user }) => {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {courses
-                  .map((a) => a.name)
-                  .map((text, index) => {
-                    return (
-                      <ListItem
-                        onClick={() => setCurrCourse(text)}
-                        key={index}
-                        button
-                        className={classes.nested}
-                        component={NavLink}
-                        to={"/course/" + text}
-                      >
-                        <ListItemText
-                          primary={text}
-                          classes={{ primary: classes.listItemText }}
-                        />
-                      </ListItem>
-                    );
-                  })}
+                {courses.map((a) => {
+                  return (
+                    <ListItem
+                      onClick={() => setCurrCourse(a)}
+                      key={a.id}
+                      button
+                      className={classes.nested}
+                      component={NavLink}
+                      to={"/course/" + a.name}
+                    >
+                      <ListItemText
+                        primary={a.name}
+                        classes={{ primary: classes.listItemText }}
+                      />
+                    </ListItem>
+                  );
+                })}
               </List>
             </Collapse>
             {[
