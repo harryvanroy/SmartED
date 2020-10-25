@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { FormGroup, FormControlLabel, Checkbox } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles"
+import { FormGroup, FormControlLabel, Checkbox, Paper } from "@material-ui/core";
+import { withStyles, useStyles } from "@material-ui/core/styles"
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
@@ -12,6 +12,12 @@ import Typography from "@material-ui/core/Typography";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
 import Chip from '@material-ui/core/Chip';
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
 
 const VCheckbox = withStyles({
   root: {
@@ -76,6 +82,7 @@ const KChip = withStyles({
     backgroundColor: '#D7255D',
   },
 })((props) => <Chip size="small" label="K" {...props} />);
+
 
 const TeacherResources = ({ course }) => {
   const [tags, setTags] = React.useState({
@@ -181,7 +188,46 @@ const TeacherResources = ({ course }) => {
           </FormControl>
         </Grid>
         <Grid item style={{ width: "100%", marginBottom: 20 }}>
-          Resource feedback
+          <Typography variant="h5">
+            Resource feedback
+          </Typography>
+          <TableContainer
+            style={{ marginBottom: 10, marginTop: 10 }}
+            component={Paper}
+          >
+            <Table style={{ minWidth: 550 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Resource</TableCell>
+                  <TableCell align="right">Student</TableCell>
+                  <TableCell align="right">Feedback</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/*feedback.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell component="th" scope="row">
+                      {row.user.username} ({row.user.name})
+                    </TableCell>
+                    <TableCell align="right">
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleOpenDialog(row.feedback)}
+                      >
+                        View feedback
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}*/}
+                <TableRow>
+                  <TableCell component="th" scope="row">Stuff</TableCell>
+                  <TableCell align="right" component="th" scope="row">anon</TableCell>
+                  <TableCell align="right">This sucks</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
       </Grid>
     </div>
