@@ -1,8 +1,15 @@
-import React from 'react';
+import React from "react";
 import Cookies from "js-cookie";
-import { makeStyles } from '@material-ui/core/styles';
-import { Grid, Paper, Box, Typography, ButtonBase, Button } from '@material-ui/core';
-import { Link, Route } from 'react-router-dom';
+import { makeStyles } from "@material-ui/core/styles";
+import {
+  Grid,
+  Paper,
+  Box,
+  Typography,
+  ButtonBase,
+  Button,
+} from "@material-ui/core";
+import { Link, Route } from "react-router-dom";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -12,11 +19,11 @@ import TableRow from "@material-ui/core/TableRow";
 import { withStyles } from "@material-ui/core/styles"
 import Chip from '@material-ui/core/Chip';
 
-import { checkDate } from "./Home"
+import { checkDate } from "./Home";
 
 //DETERMINE LOCATION
 var url;
-if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
@@ -85,10 +92,13 @@ function Course({ currCourse, assessment, courses }) {
 
   return (
     <Box>
-      <Typography variant="h4">
-        Course: {currCourse}
-      </Typography>
-      <Grid container justify="center" spacing={3} style={{ marginTop: 12 }}>
+      <Typography variant="h4">Course: {currCourse}</Typography>
+      <Grid
+        container
+        justify="center"
+        spacing={3}
+        style={{ marginTop: 12, minWidth: 550 }}
+      >
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
@@ -97,13 +107,9 @@ function Course({ currCourse, assessment, courses }) {
                   style={{ display: "flex", justifyContent: "center" }}
                   className={classes.paperTitle}
                 >
-                  <Typography variant="h5">
-                    Resources
-                  </Typography>
+                  <Typography variant="h5">Resources</Typography>
                 </div>
-                <Box style={{ maxHeight: 1052, overflow: "auto" }}>
-                  Hi
-                </Box>
+                <Box style={{ maxHeight: 1052, overflow: "auto" }}>Hi</Box>
               </Paper>
             </Grid>
           </Grid>
@@ -120,34 +126,36 @@ function Course({ currCourse, assessment, courses }) {
                   flex={1}
                   flexDirection="column"
                 >
-                  {courses.filter(course => course.name === currCourse).map((course) => (
-                    <TableContainer
-                      style={{ marginBottom: 20 }}
-                      key={course.id}
-                      component={Paper}
-                      variant="outlined"
-                    >
-                      <Table aria-label="simple table">
-                        <TableBody>
-                          {assessment
-                            .filter(
-                              (allAssess) =>
-                                allAssess.course === course.id &&
-                                new Date(
+                  {courses
+                    .filter((course) => course.name === currCourse)
+                    .map((course) => (
+                      <TableContainer
+                        style={{ marginBottom: 20 }}
+                        key={course.id}
+                        component={Paper}
+                        variant="outlined"
+                      >
+                        <Table aria-label="simple table">
+                          <TableBody>
+                            {assessment
+                              .filter(
+                                (allAssess) =>
+                                  allAssess.course === course.id &&
+                                  new Date(
+                                    new Date().getFullYear(),
+                                    new Date().getMonth(),
+                                    new Date().getDate()
+                                  ) < checkDate(allAssess.dateDescription)
+                              )
+                              .map((assessCourse) => {
+                                let currentDate = new Date(
                                   new Date().getFullYear(),
                                   new Date().getMonth(),
                                   new Date().getDate()
-                                ) < checkDate(allAssess.dateDescription)
-                            )
-                            .map((assessCourse) => {
-                              let currentDate = new Date(
-                                new Date().getFullYear(),
-                                new Date().getMonth(),
-                                new Date().getDate()
-                              );
-                              return (
-                                <TableRow key={assessCourse.id}>
-                                  {checkDate(assessCourse.dateDescription) <
+                                );
+                                return (
+                                  <TableRow key={assessCourse.id}>
+                                    {checkDate(assessCourse.dateDescription) <
                                     currentDate.setDate(
                                       currentDate.getDate() + 7
                                     ) ? (
@@ -156,7 +164,7 @@ function Course({ currCourse, assessment, courses }) {
                                           {assessCourse.name}{" "}
                                           <Button color="secondary">
                                             DUE SOON
-                                        </Button>
+                                          </Button>
                                         </Typography>
                                       </TableCell>
                                     ) : (
@@ -166,13 +174,13 @@ function Course({ currCourse, assessment, courses }) {
                                         </Typography>
                                       </TableCell>
                                     )}
-                                </TableRow>
-                              );
-                            })}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  ))}
+                                  </TableRow>
+                                );
+                              })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    ))}
                 </Box>
               </Paper>
             </Grid>
@@ -181,6 +189,6 @@ function Course({ currCourse, assessment, courses }) {
       </Grid>
     </Box>
   );
-};
+}
 
 export default Course;
