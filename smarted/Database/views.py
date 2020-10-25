@@ -16,7 +16,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
 
 
@@ -448,7 +448,7 @@ def post_resource_feedback(request):
 
     resourcefeedback = ResourceFeedback(
         user=user, resource=resource, feedback=feedback)
-    
+
     resourcefeedback.save()
 
     return HttpResponse("")
@@ -678,7 +678,7 @@ def save_resources(course, resources, assessed):
             try:
                 resource.save()
             except:
-                pass # duplicate probably...
+                pass  # duplicate probably...
 
 
 def asynchronous_refresh(username, password):
