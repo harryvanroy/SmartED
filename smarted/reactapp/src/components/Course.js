@@ -74,6 +74,17 @@ const KChip = withStyles({
   },
 })((props) => <Chip size="small" label="K" {...props} />);
 
+const displayResource = (V, A, R, K) => {
+  return (
+    <div>
+      {V && <VChip />}
+      {A && <AChip />}
+      {R && <RChip />}
+      {K && <KChip />}
+    </div>
+  );
+};
+
 const Course = ({ currCourse, assessment, courses }) => {
   const classes = useStyles();
 
@@ -92,9 +103,18 @@ const Course = ({ currCourse, assessment, courses }) => {
             return {
               id: "" + index,
               name: (
-                <a target="_blank" href={res.blackboardLink}>
-                  {res.title}
-                </a>
+                <div>
+                  <a
+                    style={{ display: "inline-block" }}
+                    target="_blank"
+                    href={res.blackboardLink}
+                  >
+                    {res.title}
+                  </a>
+                  <div style={{ display: "inline-block", marginLeft: 3 }}>
+                    {displayResource(res.V, res.A, res.R, res.K)}
+                  </div>
+                </div>
               ),
               children: [],
             };
@@ -114,9 +134,12 @@ const Course = ({ currCourse, assessment, courses }) => {
             return {
               id: "" + index,
               name: (
-                <a target="_blank" href={res.blackboardLink}>
-                  {res.title}
-                </a>
+                <div>
+                  <a target="_blank" href={res.blackboardLink}>
+                    {res.title}
+                  </a>
+                  {displayResource(res.V, res.A, res.R, res.K)}
+                </div>
               ),
               children: [],
             };
@@ -177,18 +200,6 @@ const Course = ({ currCourse, assessment, courses }) => {
     });
   }, [currCourse, assessment]);
 
-  const displayResource = (name, V, A, R, K) => {
-    return (
-      <div>
-        {name}&nbsp;
-        {V === 1 && <VChip />}
-        {A === 1 && <AChip />}
-        {R === 1 && <RChip />}
-        {K === 1 && <KChip />}
-      </div>
-    );
-  };
-
   return (
     <Box>
       <Typography variant="h4">Course: {currCourse.name}</Typography>
@@ -236,61 +247,55 @@ const Course = ({ currCourse, assessment, courses }) => {
                   flex={1}
                   flexDirection="column"
                 >
-                  {courses
-                    .filter((course) => course.name === currCourse)
-                    .map((course) => (
-                      <TableContainer
-                        style={{ marginBottom: 20 }}
-                        key={course.id}
-                        component={Paper}
-                        variant="outlined"
-                      >
-                        <Table aria-label="simple table">
-                          <TableBody>
-                            {assessment
-                              .filter(
-                                (allAssess) =>
-                                  allAssess.course === course.id &&
-                                  new Date(
-                                    new Date().getFullYear(),
-                                    new Date().getMonth(),
-                                    new Date().getDate()
-                                  ) < checkDate(allAssess.dateDescription)
-                              )
-                              .map((assessCourse) => {
-                                let currentDate = new Date(
-                                  new Date().getFullYear(),
-                                  new Date().getMonth(),
-                                  new Date().getDate()
-                                );
-                                return (
-                                  <TableRow key={assessCourse.id}>
-                                    {checkDate(assessCourse.dateDescription) <
-                                    currentDate.setDate(
-                                      currentDate.getDate() + 7
-                                    ) ? (
-                                      <TableCell>
-                                        <Typography>
-                                          {assessCourse.name}{" "}
-                                          <Button color="secondary">
-                                            DUE SOON
-                                          </Button>
-                                        </Typography>
-                                      </TableCell>
-                                    ) : (
-                                      <TableCell>
-                                        <Typography>
-                                          {assessCourse.name}
-                                        </Typography>
-                                      </TableCell>
-                                    )}
-                                  </TableRow>
-                                );
-                              })}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    ))}
+                  <TableContainer
+                    style={{ marginBottom: 20 }}
+                    key={currCourse.id}
+                    component={Paper}
+                    variant="outlined"
+                  >
+                    <Table aria-label="simple table">
+                      <TableBody>
+                        {assessment
+                          .filter(
+                            (allAssess) =>
+                              allAssess.course === currCourse.id &&
+                              new Date(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate()
+                              ) < checkDate(allAssess.dateDescription)
+                          )
+                          .map((assessCourse) => {
+                            let currentDate = new Date(
+                              new Date().getFullYear(),
+                              new Date().getMonth(),
+                              new Date().getDate()
+                            );
+                            return (
+                              <TableRow key={assessCourse.id}>
+                                {checkDate(assessCourse.dateDescription) <
+                                currentDate.setDate(
+                                  currentDate.getDate() + 7
+                                ) ? (
+                                  <TableCell>
+                                    <Typography>
+                                      {assessCourse.name}{" "}
+                                      <Button color="secondary">
+                                        DUE SOON
+                                      </Button>
+                                    </Typography>
+                                  </TableCell>
+                                ) : (
+                                  <TableCell>
+                                    <Typography>{assessCourse.name}</Typography>
+                                  </TableCell>
+                                )}
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Box>
               </Paper>
             </Grid>
