@@ -30,7 +30,6 @@ import Course from "./components/Course";
 import Feedback from "./components/Feedback";
 import Goals from "./components/Goals";
 import Grades from "./components/Grades";
-import Resources from "./components/Resources";
 import { Home, checkDate } from "./components/Home";
 import Vark from "./components/Vark";
 import axios from "axios";
@@ -267,7 +266,6 @@ const StudentApp = ({ user }) => {
               "Assessment",
               "Course Goals",
               "My Grades",
-              "Resources",
               "Course Feedback",
               "VARK",
             ].map((text, index) => (
@@ -276,14 +274,9 @@ const StudentApp = ({ user }) => {
                 key={text}
                 component={NavLink}
                 to={
-                  [
-                    "/assessment",
-                    "/goals",
-                    "/grades",
-                    "/resources",
-                    "/feedback",
-                    "/vark",
-                  ][index]
+                  ["/assessment", "/goals", "/grades", "/feedback", "/vark"][
+                    index
+                  ]
                 }
                 activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}
               >
@@ -293,9 +286,8 @@ const StudentApp = ({ user }) => {
                       0: <AssessmentIcon />,
                       1: <EmojiEmotionsIcon />,
                       2: <SchoolIcon />,
-                      3: <SubjectIcon />,
-                      4: <FeedbackIcon />,
-                      5: <FingerprintIcon />,
+                      3: <FeedbackIcon />,
+                      4: <FingerprintIcon />,
                     }[index]
                   }
                 </ListItemIcon>
@@ -329,9 +321,6 @@ const StudentApp = ({ user }) => {
           </Route>
           <Route path="/grades">
             <Grades assessment={assessment} courses={courses} />
-          </Route>
-          <Route path="/resources">
-            <Resources />
           </Route>
           <Route path="/vark">
             <Vark parentVark={vark} setParentVarkScore={setParentVarkScore} />
