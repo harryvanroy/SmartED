@@ -15,7 +15,7 @@ import {
   FormGroup,
   FormControl,
   FormControlLabel,
-  Checkbox
+  Checkbox,
 } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -31,7 +31,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { checkDate } from "./Home";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
 import FeedbackIcon from "@material-ui/icons/Feedback";
-import IconButton from '@material-ui/core/IconButton';
+import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
 import Vark from "./Vark";
 
@@ -81,28 +81,33 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
   const [open, setOpen] = React.useState(false);
   const [feedback, setFeedback] = React.useState({
     text: "",
-    anon: false,
+    course: 0,
   });
 
-  const handleOpen = (event) => {
+  const handleOpen = (id) => (event) => {
+    setFeedback({ ...feedback, course: id });
     setOpen(true);
-  }
+  };
 
   const handleClose = (event) => {
+    setFeedback({ text: "", course: 0 });
     setOpen(false);
-  }
+  };
 
   const handleTextChange = (event) => {
     setFeedback({ ...feedback, text: event.target.value });
   };
 
-  const handleAnonChange = (event) => {
-    setFeedback({ ...feedback, anon: event.target.checked });
-  };
-
   const handleSubmit = (event) => {
-
-  }
+    axios(url + `/Database/post-resource-feedback/`, {
+      method: "post",
+      data: {
+        id: feedback.course,
+        feedback: feedback.text,
+      },
+      withCredentials: true,
+    });
+  };
 
   let resourceData = files
     .filter((file0) => !file0.isAssessment)
@@ -120,10 +125,10 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
                   <a target="_blank" href={res.blackboardLink}>
                     {displayResource(res.title, res.V, res.A, res.R, res.K)}
                   </a>
-                  <IconButton onClick={handleOpen}>
+                  <IconButton onClick={handleOpen(res.id)}>
                     <FeedbackIcon fontSize="small"></FeedbackIcon>
                   </IconButton>
-                </div>                
+                </div>
               ),
               children: [],
             };
@@ -244,19 +249,17 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
                         (res.K && vark.K > 0.3)
                     )
                     .map((resFil) => (
-                      <a
-                        key={resFil.id}
-                        target="_blank"
-                        href={resFil.blackboardLink}
-                      >
-                        {displayResource(
-                          resFil.title,
-                          resFil.V,
-                          resFil.A,
-                          resFil.R,
-                          resFil.K
-                        )}
-                      </a>
+                      <div key={resFil.id}>
+                        <a target="_blank" href={resFil.blackboardLink}>
+                          {displayResource(
+                            resFil.title,
+                            resFil.V,
+                            resFil.A,
+                            resFil.R,
+                            resFil.K
+                          )}
+                        </a>
+                      </div>
                     ))}
                 </div>
               </Paper>
@@ -350,10 +353,8 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
         </Grid>
       </Grid>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          Resource feedback
-        </DialogTitle>
-        <DialogContent>
+        <DialogTitle>Resource feedback</DialogTitle>
+        <DialogContent style={{ width: 500 }}>
           <FormControl fullWidth>
             <TextField
               id="outlined-multiline-static"
@@ -364,17 +365,7 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
               onChange={handleTextChange}
             />
           </FormControl>
-          <Box style={{marginTop:6, marginBottom:12}}>
-            <FormControl component="fieldset" style={{marginTop:12, marginBottom:12}}>
-              <FormGroup aria-label="position" row>
-                <FormControlLabel
-                  value="end"
-                  control={<Checkbox color="primary" onChange={handleAnonChange} />}
-                  label="Anonymous? (Constructive feedback only. Bullying or hate speech will not be tolerated)"
-                  labelPlacement="end"
-                />
-              </FormGroup>
-            </FormControl>
+          <Box style={{ marginTop: 6, marginBottom: 12 }}>
             <br />
             <Button
               variant="contained"

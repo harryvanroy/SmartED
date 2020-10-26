@@ -43,7 +43,6 @@ const useRowStyles = makeStyles({
   root: {
     "& > *": {
       borderBottom: "unset",
-
     },
   },
 });
@@ -81,7 +80,10 @@ function Row(props) {
 
   return (
     <React.Fragment>
-      <TableRow className={classes.root} style={{ backgroundColor: props.color }}>
+      <TableRow
+        className={classes.root}
+        style={{ backgroundColor: props.color }}
+      >
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -141,7 +143,7 @@ function Row(props) {
 Row.propTypes = {
   row: PropTypes.shape({
     studentID: PropTypes.string.isRequired,
-    mame: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
     totalCompleted: PropTypes.string.isRequired,
     totalEarnt: PropTypes.string.isRequired,
     currentGrade: PropTypes.string.isRequired,
@@ -214,17 +216,17 @@ const TeacherGrades = ({ assessment, course }) => {
 
   const riskOfFailure = (grade) => {
     if (grade > 75) {
-      return 'lightgreen';
+      return "lightgreen";
     } else if (grade > 55) {
-      return 'yellow'
+      return "yellow";
     } else if (grade > 45) {
-      return 'orange';
+      return "orange";
     } else if (grade > 35) {
-      return 'tomato';
+      return "tomato";
     } else {
-      return 'red';
+      return "red";
     }
-  }
+  };
 
   useEffect(() => {
     axios(url + `/Database/students-in-course/?id=${course.id}`, {
@@ -365,7 +367,7 @@ const TeacherGrades = ({ assessment, course }) => {
                   );
                 })
                 .map((row, index) => {
-                  console.log('hi');
+                  console.log("hi");
                   console.log(row);
                   console.log(row.currentGrade);
                   return <Row key={index} row={row} />;

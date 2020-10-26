@@ -158,10 +158,14 @@ const TeacherApp = ({ user }) => {
       data: { course: addCourseCode },
       withCredentials: true,
     }).then((res) => {
-      console.log("successfully added");
+      axios(url + "/Database/teacher-courses/", {
+        method: "get",
+        withCredentials: true,
+      }).then((res) => {
+        setCourses(res.data);
+        console.log("successfully added");
+      });
     });
-    //todo: catch error and maybe adding... progress
-    // and update courses immediately
   };
 
   const handleDeleteCourse = (a) => {
@@ -170,12 +174,17 @@ const TeacherApp = ({ user }) => {
       withCredentials: true,
     }).then((res) => {
       console.log("successfully deleted");
-      courses.filter((course) => course.id !== a.id);
+      axios(url + "/Database/teacher-courses/", {
+        method: "get",
+        withCredentials: true,
+      }).then((res) => {
+        setCourses(res.data);
+      });
     });
     //todo: update courses immediately
   };
 
-  function editCoursesDialog() {
+  const editCoursesDialog = () => {
     return (
       <Dialog
         open={editCourseOpen}
@@ -196,7 +205,7 @@ const TeacherApp = ({ user }) => {
               </MenuItem>
             </Box>
           ))}
-          <DialogContentText style={{ color: "black" }}>
+          <DialogContent style={{ color: "black" }}>
             <Box display="flex" justifyContent="center">
               <FormControl fullWidth>
                 <Input
@@ -214,11 +223,11 @@ const TeacherApp = ({ user }) => {
                 Add
               </Button>
             </Box>
-          </DialogContentText>
+          </DialogContent>
         </DialogContent>
       </Dialog>
     );
-  }
+  };
 
   const handleCourseChange = (e) => {
     console.log(e);
