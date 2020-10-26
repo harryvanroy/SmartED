@@ -305,3 +305,4 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
 };
 
 export default Course;
+
