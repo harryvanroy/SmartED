@@ -82,7 +82,11 @@ const Students = ({ course }) => {
                 component={Paper}
               >
                 <div
-                  style={{ display: "flex", justifyContent: "center" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 7,
+                  }}
                   className={classes.paperTitle}
                 >
                   <Typography variant="h5">Students at risk</Typography>
