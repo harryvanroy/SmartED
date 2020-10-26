@@ -189,7 +189,7 @@ const Course = ({ currCourse, assessment, courses }) => {
                   defaultCollapseIcon={<ExpandMoreIcon />}
                   defaultExpanded={["root", "resources", "assessment"]}
                   defaultExpandIcon={<ChevronRightIcon />}
-                  style={{ height: 760, overflow: "auto" }}
+                  style={{ height: 470, overflow: "auto" }}
                 >
                   {renderTree(data)}
                 </TreeView>
