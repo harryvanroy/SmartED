@@ -160,7 +160,7 @@ const TeacherApp = ({ user }) => {
     }).then((res) => {
       console.log("successfully added");
     });
-    //todo: catch error and maybe adding... progress 
+    //todo: catch error and maybe adding... progress
     // and update courses immediately
   };
 
@@ -185,7 +185,7 @@ const TeacherApp = ({ user }) => {
         <DialogTitle id="form-dialog-title">Edit Courses</DialogTitle>
         <DialogContent>
           {courses.map((a) => (
-            <Box display="flex" justifyContent="spaceBetween">
+            <Box key={a.id} display="flex" justifyContent="spaceBetween">
               <MenuItem style={{ width: "80%" }}>{a.name}</MenuItem>
               <MenuItem
                 value="del"
