@@ -78,11 +78,15 @@ const Students = ({ course }) => {
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <TableContainer
-                style={{ marginBottom: 10, marginTop: 10 }}
+                style={{ marginBottom: 10, height: 650 }}
                 component={Paper}
               >
                 <div
-                  style={{ display: "flex", justifyContent: "center" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginTop: 7,
+                  }}
                   className={classes.paperTitle}
                 >
                   <Typography variant="h5">Students at risk</Typography>
@@ -124,13 +128,6 @@ const Students = ({ course }) => {
                 ) : (
                   <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
                 )}
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
-                  <Typography variant="h5">Upcoming assessment</Typography>
-                </div>
               </Paper>
             </Grid>
           </Grid>

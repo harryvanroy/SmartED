@@ -23,6 +23,11 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContentText from "@material-ui/core/DialogContentText";
 
 // DETERMINE LOCATION
 var url;
@@ -95,6 +100,8 @@ const TeacherResources = ({ course }) => {
   });
   const [currResource, setCurrResource] = React.useState({});
   const [resources, setResources] = React.useState([]);
+  const [feedback, setFeedback] = React.useState([]);
+  const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleChangeTags = (event) => {
     setTags({ ...tags, [event.target.name]: event.target.checked });
@@ -129,6 +136,22 @@ const TeacherResources = ({ course }) => {
     setCurrResource(event.target.value);
   };
 
+  const handleOpenFeedback = (id) => (event) => {
+    console.log(id);
+    axios(url + `/Database/resource-feedback/?id=${id}`, {
+      method: "get",
+      withCredentials: true,
+    }).then((res) => {
+      setOpenDialog(true);
+      setFeedback(res.data);
+    });
+  };
+
+  const handleCloseFeedback = (event) => {
+    setOpenDialog(false);
+    setFeedback([]);
+  };
+
   useEffect(() => {
     axios(url + `/Database/course-resources/${course.id}/`, {
       method: "get",
@@ -141,6 +164,38 @@ const TeacherResources = ({ course }) => {
 
   return (
     <div>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseFeedback}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">Feedback</DialogTitle>
+        <DialogContent>
+          <TableContainer
+            style={{ marginBottom: 10, marginTop: 10 }}
+            component={Paper}
+          >
+            <Table style={{ minWidth: 550 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Student</TableCell>
+                  <TableCell align="right">Feedback</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {feedback.map((res, index) => (
+                  <TableRow key={index}>
+                    <TableCell component="th" scope="row">
+                      {res.user.name} ({res.user.username})
+                    </TableCell>
+                    <TableCell align="right">{res.user.feedback}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DialogContent>
+      </Dialog>
       <Typography variant="h4">Resources</Typography>
       <Grid
         container
@@ -177,13 +232,6 @@ const TeacherResources = ({ course }) => {
                 </MenuItem>
               ))}
             </Select>
-            {/*{resources
-                .filter((res) => res.course === course.id)
-                .map((e) => (
-                  <MenuItem key={e.id} value={e.id}>
-                    {e.name}
-                  </MenuItem>
-                ))}*/}
 
             <FormGroup row>
               <FormControlLabel
@@ -247,36 +295,26 @@ const TeacherResources = ({ course }) => {
               <TableHead>
                 <TableRow>
                   <TableCell>Resource</TableCell>
-                  <TableCell align="right">Student</TableCell>
                   <TableCell align="right">Feedback</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {/*feedback.map((row, index) => (
-                  <TableRow key={index}>
+                {resources.map((res) => (
+                  <TableRow key={res.id}>
                     <TableCell component="th" scope="row">
-                      {row.user.username} ({row.user.name})
+                      {res.title}
                     </TableCell>
                     <TableCell align="right">
                       <Button
                         variant="outlined"
                         color="primary"
-                        onClick={handleOpenDialog(row.feedback)}
+                        onClick={handleOpenFeedback(res.id)}
                       >
                         View feedback
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}*/}
-                <TableRow>
-                  <TableCell component="th" scope="row">
-                    Stuff
-                  </TableCell>
-                  <TableCell align="right" component="th" scope="row">
-                    anon
-                  </TableCell>
-                  <TableCell align="right">This sucks</TableCell>
-                </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
