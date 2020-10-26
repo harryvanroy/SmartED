@@ -242,7 +242,7 @@ const TeacherApp = ({ user }) => {
           <Toolbar>
             <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
               <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-                SmartED
+                <span role="img" aria-label="cap">🎓</span>SmartED
               </Link>
             </Typography>
             <Typography style={{ marginLeft: 20, flexGrow: 1 }}>

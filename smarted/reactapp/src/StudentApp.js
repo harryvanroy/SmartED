@@ -10,6 +10,9 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Collapse from "@material-ui/core/Collapse";
+import IconButton from "@material-ui/core/IconButton";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 import { makeStyles } from "@material-ui/core/styles";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
@@ -17,12 +20,12 @@ import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import FeedbackIcon from "@material-ui/icons/Feedback";
-import SubjectIcon from "@material-ui/icons/Sort";
 import SchoolIcon from "@material-ui/icons/School";
 import ClassIcon from "@material-ui/icons/Class";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import HomeIcon from "@material-ui/icons/Home";
 import SyncIcon from "@material-ui/icons/Sync";
+import PersonIcon from '@material-ui/icons/Person';
 
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
@@ -64,7 +67,6 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    background: "#51237a",
   },
   drawer: {
     width: drawerWidth,
@@ -88,6 +90,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const barColours = [
+  "#51237a",
+  "firebrick",
+  "peru",
+  "chocolate",
+  "darkgreen",
+  "darkslategrey",
+  "black",
+  "darkblue"
+];
+
 const StudentApp = ({ user }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
@@ -97,6 +110,14 @@ const StudentApp = ({ user }) => {
   const [currCourse, setCurrCourse] = React.useState();
   const [assessment, setAssessment] = React.useState([]);
   const [announcements, setAnnouncements] = React.useState([]);
+
+  let localColorIndex = 0;
+  if (localStorage.getItem('barColourIndex') !== null) {
+    localColorIndex = parseInt(localStorage.getItem('barColourIndex'));
+  }
+  const [color, setColor] = React.useState(barColours[localColorIndex]);
+  const [colorIndex, setColorIndex] = React.useState(localColorIndex);
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = () => {
     setOpen(!open);
@@ -109,6 +130,27 @@ const StudentApp = ({ user }) => {
   const handleSyncClose = () => {
     setSyncOpen(false);
   };
+
+  const handleProfileOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  }
+
+  const handleProfileClose = () => {
+    setAnchorEl(false);
+  }
+
+  const incColorIndex = () => {
+    console.log(colorIndex);
+    if (colorIndex + 1 === barColours.length) {
+      setColor(barColours[0]);
+      setColorIndex(0);
+      localStorage.setItem('barColourIndex', 0);
+    } else {
+      setColor(barColours[colorIndex + 1]);
+      setColorIndex(colorIndex + 1);
+      localStorage.setItem('barColourIndex', colorIndex + 1);
+    }
+  }
 
   function syncDialog() {
     return (
@@ -206,11 +248,11 @@ const StudentApp = ({ user }) => {
       {syncDialog()}
 
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" className={classes.appBar} style={{background:color}}>
         <Toolbar>
           <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-              SmartED
+              <span role="img" aria-label="cap">🎓</span>SmartED
             </Link>
           </Typography>
           <Typography style={{ marginLeft: 20, flexGrow: 1 }}>
@@ -220,6 +262,25 @@ const StudentApp = ({ user }) => {
           <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
             <HomeIcon style={{ marginLeft: 10 }} fontSize={"large"} />
           </Link>
+          <IconButton 
+            onClick={handleProfileOpen} 
+            style={{ textDecoration: "none", color: "unset" }}
+            aria-controls="simple-menu" aria-haspopup="true"  
+          >
+            <PersonIcon style={{ marginLeft: 10 }} fontSize={"large"} />
+          </IconButton>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleProfileClose}
+          >
+            <Link to="/vark" style={{ textDecoration: "none", color: "unset" }}>
+              <MenuItem onClick={handleProfileClose}>VARK quiz</MenuItem>
+            </Link>
+            <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
       <Drawer
