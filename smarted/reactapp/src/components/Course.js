@@ -259,6 +259,9 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
                             resFil.K
                           )}
                         </a>
+                        <IconButton onClick={handleOpen(resFil.id)}>
+                          <FeedbackIcon fontSize="small"></FeedbackIcon>
+                        </IconButton>
                       </div>
                     ))}
                 </div>
