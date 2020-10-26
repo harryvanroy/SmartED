@@ -31,7 +31,7 @@ const resources = {
   V: "lecture slides, diagrams and YouTube videos",
   A: "lectures, seminars, podcasts and tutorials",
   R: "textbooks, articles and problem sets and past exams",
-  K: "practicals, demonstration videos, practicals and hands on examples",
+  K: "practicals, demonstration videos, and hands on examples",
 };
 
 const techniques = {
