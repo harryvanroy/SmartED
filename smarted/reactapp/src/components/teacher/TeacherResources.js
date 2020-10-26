@@ -16,13 +16,13 @@ import axios from "axios";
 import Typography from "@material-ui/core/Typography";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
-import Chip from "@material-ui/core/Chip";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import Brightness1Icon from "@material-ui/icons/Brightness1";
 
 // DETERMINE LOCATION
 var url;
@@ -44,12 +44,6 @@ const VCheckbox = withStyles({
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
 
-const VChip = withStyles({
-  root: {
-    backgroundColor: "#603E95",
-  },
-})((props) => <Chip size="small" label="V" {...props} />);
-
 const ACheckbox = withStyles({
   root: {
     color: "#009DA1",
@@ -59,12 +53,6 @@ const ACheckbox = withStyles({
   },
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
-
-const AChip = withStyles({
-  root: {
-    backgroundColor: "#009DA1",
-  },
-})((props) => <Chip size="small" label="A" {...props} />);
 
 const RCheckbox = withStyles({
   root: {
@@ -76,12 +64,6 @@ const RCheckbox = withStyles({
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
 
-const RChip = withStyles({
-  root: {
-    backgroundColor: "#FAC22B",
-  },
-})((props) => <Chip size="small" label="R" {...props} />);
-
 const KCheckbox = withStyles({
   root: {
     color: "#D7255D",
@@ -92,11 +74,17 @@ const KCheckbox = withStyles({
   checked: {},
 })((props) => <Checkbox color="default" {...props} />);
 
-const KChip = withStyles({
-  root: {
-    backgroundColor: "#D7255D",
-  },
-})((props) => <Chip size="small" label="K" {...props} />);
+const displayResource = (name, V, A, R, K) => {
+  return (
+    <div>
+      {name}&nbsp;
+      {V && <Brightness1Icon style={{ fontSize: 12, color: "#603E95" }} />}
+      {A && <Brightness1Icon style={{ fontSize: 12, color: "#009DA1" }} />}
+      {R && <Brightness1Icon style={{ fontSize: 12, color: "#FAC22B" }} />}
+      {K && <Brightness1Icon style={{ fontSize: 12, color: "#D7255D" }} />}
+    </div>
+  );
+};
 
 const TeacherResources = ({ course }) => {
   const [tags, setTags] = React.useState({
@@ -113,41 +101,32 @@ const TeacherResources = ({ course }) => {
   };
 
   const handlePostVark = () => {
-    console.log("posting vark for" + currResource.id);
-    axios(url + "/Database/assign-resource-vark/", {
-      method: "post",
-      data: {
-        id: currResource.id,
-        V: tags.V,
-        A: tags.A,
-        R: tags.R,
-        K: tags.K,
-      },
-      withCredentials: true,
-    }).then((res) => {
-      axios(url + `/Database/course-resources/${course.id}/`, {
-        method: "get",
+    if (currResource.id) {
+      console.log("posting vark for" + currResource.id);
+      axios(url + "/Database/assign-resource-vark/", {
+        method: "post",
+        data: {
+          id: currResource.id,
+          V: tags.V,
+          A: tags.A,
+          R: tags.R,
+          K: tags.K,
+        },
         withCredentials: true,
       }).then((res) => {
-        setResources(res.data);
-        console.log(res.data);
+        axios(url + `/Database/course-resources/${course.id}/`, {
+          method: "get",
+          withCredentials: true,
+        }).then((res) => {
+          setResources(res.data);
+          console.log(res.data);
+        });
       });
-    });
+    }
   };
 
   const handleChooseResource = (event) => {
     setCurrResource(event.target.value);
-  };
-  const displayResource = (name, V, A, R, K) => {
-    return (
-      <div>
-        {name}&nbsp;
-        {V && <VChip />}
-        {A && <AChip />}
-        {R && <RChip />}
-        {K && <KChip />}
-      </div>
-    );
   };
 
   useEffect(() => {

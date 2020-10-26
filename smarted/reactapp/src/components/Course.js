@@ -17,10 +17,10 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import Collapse from "@material-ui/core/Collapse";
-import Chip from "@material-ui/core/Chip";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { checkDate } from "./Home";
+import Brightness1Icon from "@material-ui/icons/Brightness1";
 import axios from "axios";
 
 //DETERMINE LOCATION
@@ -50,37 +50,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const VChip = withStyles({
-  root: {
-    backgroundColor: "#603E95",
-  },
-})((props) => <Chip size="small" label="V" {...props} />);
-
-const AChip = withStyles({
-  root: {
-    backgroundColor: "#009DA1",
-  },
-})((props) => <Chip size="small" label="A" {...props} />);
-
-const RChip = withStyles({
-  root: {
-    backgroundColor: "#FAC22B",
-  },
-})((props) => <Chip size="small" label="R" {...props} />);
-
-const KChip = withStyles({
-  root: {
-    backgroundColor: "#D7255D",
-  },
-})((props) => <Chip size="small" label="K" {...props} />);
-
-const displayResource = (V, A, R, K) => {
+const displayResource = (name, V, A, R, K) => {
   return (
     <div>
-      {V && <VChip />}
-      {A && <AChip />}
-      {R && <RChip />}
-      {K && <KChip />}
+      {name}&nbsp;
+      {V && <Brightness1Icon style={{ fontSize: 12, color: "#603E95" }} />}
+      {A && <Brightness1Icon style={{ fontSize: 12, color: "#009DA1" }} />}
+      {R && <Brightness1Icon style={{ fontSize: 12, color: "#FAC22B" }} />}
+      {K && <Brightness1Icon style={{ fontSize: 12, color: "#D7255D" }} />}
     </div>
   );
 };
@@ -103,18 +80,9 @@ const Course = ({ currCourse, assessment, courses }) => {
             return {
               id: "" + index,
               name: (
-                <div>
-                  <a
-                    style={{ display: "inline-block" }}
-                    target="_blank"
-                    href={res.blackboardLink}
-                  >
-                    {res.title}
-                  </a>
-                  <div style={{ display: "inline-block", marginLeft: 3 }}>
-                    {displayResource(res.V, res.A, res.R, res.K)}
-                  </div>
-                </div>
+                <a target="_blank" href={res.blackboardLink}>
+                  {displayResource(res.title, res.V, res.A, res.R, res.K)}
+                </a>
               ),
               children: [],
             };
@@ -134,12 +102,9 @@ const Course = ({ currCourse, assessment, courses }) => {
             return {
               id: "" + index,
               name: (
-                <div>
-                  <a target="_blank" href={res.blackboardLink}>
-                    {res.title}
-                  </a>
-                  {displayResource(res.V, res.A, res.R, res.K)}
-                </div>
+                <a target="_blank" href={res.blackboardLink}>
+                  {displayResource(res.title, res.V, res.A, res.R, res.K)}
+                </a>
               ),
               children: [],
             };
@@ -212,11 +177,7 @@ const Course = ({ currCourse, assessment, courses }) => {
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
-              <Paper
-                elevation={3}
-                className={classes.paper}
-                style={{ height: 760, overflow: "auto" }}
-              >
+              <Paper elevation={3} className={classes.paper}>
                 <div
                   style={{ display: "flex", justifyContent: "center" }}
                   className={classes.paperTitle}
@@ -226,8 +187,9 @@ const Course = ({ currCourse, assessment, courses }) => {
                 <TreeView
                   className={classes.root}
                   defaultCollapseIcon={<ExpandMoreIcon />}
-                  defaultExpanded={["root"]}
+                  defaultExpanded={["root", "resources", "assessment"]}
                   defaultExpandIcon={<ChevronRightIcon />}
+                  style={{ height: 760, overflow: "auto" }}
                 >
                   {renderTree(data)}
                 </TreeView>
