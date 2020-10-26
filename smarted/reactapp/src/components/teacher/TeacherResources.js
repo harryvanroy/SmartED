@@ -188,7 +188,7 @@ const TeacherResources = ({ course }) => {
                     <TableCell component="th" scope="row">
                       {res.user.name} ({res.user.username})
                     </TableCell>
-                    <TableCell align="right">{res.user.feedback}</TableCell>
+                    <TableCell align="right">{res.feedback}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
