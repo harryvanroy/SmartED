@@ -24,6 +24,7 @@ import SchoolIcon from "@material-ui/icons/School";
 import ClassIcon from "@material-ui/icons/Class";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import HomeIcon from "@material-ui/icons/Home";
+import ExitIcon from '@material-ui/icons/PowerSettingsNew';
 import SyncIcon from "@material-ui/icons/Sync";
 import PersonIcon from '@material-ui/icons/Person';
 
@@ -264,13 +265,16 @@ const StudentApp = ({ user }) => {
           <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
             <HomeIcon style={{ marginLeft: 10 }} fontSize={"large"} />
           </Link>
-          <IconButton 
+          <Link 
             onClick={handleProfileOpen} 
-            style={{ textDecoration: "none", color: "unset" }}
+            style={{ textDecoration: "none", color: "unset", marginLeft: 10 }}
             aria-controls="simple-menu" aria-haspopup="true"  
           >
-            <PersonIcon style={{ marginLeft: 10 }} fontSize={"large"} />
-          </IconButton>
+            <PersonIcon fontSize={"large"} />
+          </Link>
+          <a href="https://learn.uq.edu.au/webapps/login/?action=logout" style={{ textDecoration: "none", color: "unset" }}>
+            <ExitIcon style={{ marginLeft: 10 }} fontSize={"large"} />
+          </a>
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}
