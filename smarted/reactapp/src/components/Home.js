@@ -199,7 +199,9 @@ function Home({ assessment, courses, vark, announcements }) {
                             }
                           </Typography>
                           <Typography style={{ margin: 10 }}>
-                            {ann.dateAdded.slice(0, 10)}
+                            {ann.dateAdded.slice(8, 10) + 
+                            ann.dateAdded.slice(4,8) + 
+                            ann.dateAdded.slice(0,4)}
                           </Typography>
                         </Paper>
                       </ButtonBase>
