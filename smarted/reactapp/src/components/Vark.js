@@ -245,7 +245,7 @@ export default function Vark(props) {
       </Box>
 
       {questions.map((question, index) => ( 
-        <Box m={5} key={index}>
+        <Box m={2} style={{marginTop:24}} key={index}>
           <FormControl component="fieldset">
             <Typography variant="h6">
               {"Question " + String(index+1) + "\n"}
@@ -291,7 +291,7 @@ export default function Vark(props) {
           </FormControl>
         </Box>
       ))}
-      <Box m={5}>
+      <Box m={2} style={{marginTop:24, marginBottom:12}}>
         <Button variant="contained" color="primary" size="large" onClick={saveResults} >
             Save
         </Button>
