@@ -22,6 +22,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { checkDate } from "./Home";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
 import axios from "axios";
+import Vark from "./Vark";
 
 //DETERMINE LOCATION
 var url;
@@ -62,7 +63,7 @@ const displayResource = (name, V, A, R, K) => {
   );
 };
 
-const Course = ({ currCourse, assessment, courses }) => {
+const Course = ({ currCourse, assessment, courses, vark }) => {
   const classes = useStyles();
 
   const [files, setFiles] = React.useState([]);
@@ -176,6 +177,41 @@ const Course = ({ currCourse, assessment, courses }) => {
       >
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
+            <Grid item xs={12}>
+              <Paper elevation={3} className={classes.paper}>
+                <div
+                  style={{ display: "flex", justifyContent: "center" }}
+                  className={classes.paperTitle}
+                >
+                  <Typography variant="h5">Recommended resources</Typography>
+                </div>
+                <div style={{ maxHeight: 100, overflow: "auto" }}>
+                  {resources
+                    .filter(
+                      (res) =>
+                        (res.V && vark.V > 0.3) ||
+                        (res.A && vark.A > 0.3) ||
+                        (res.R && vark.R > 0.3) ||
+                        (res.K && vark.K > 0.3)
+                    )
+                    .map((resFil) => (
+                      <a
+                        key={resFil.id}
+                        target="_blank"
+                        href={resFil.blackboardLink}
+                      >
+                        {displayResource(
+                          resFil.title,
+                          resFil.V,
+                          resFil.A,
+                          resFil.R,
+                          resFil.K
+                        )}
+                      </a>
+                    ))}
+                </div>
+              </Paper>
+            </Grid>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
                 <div
