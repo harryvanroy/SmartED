@@ -11,6 +11,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -111,6 +112,7 @@ const StudentApp = ({ user }) => {
   const [currCourse, setCurrCourse] = React.useState();
   const [assessment, setAssessment] = React.useState([]);
   const [announcements, setAnnouncements] = React.useState([]);
+  const [logoutOpen, setLogoutOpen] = React.useState(false);
 
   let localColorIndex = 0;
   if (localStorage.getItem('barColourIndex') !== null) {
@@ -132,13 +134,21 @@ const StudentApp = ({ user }) => {
     setSyncOpen(false);
   };
 
+  const handleLogoutOpen = () => {
+    setLogoutOpen(true);
+  };
+
+  const handleLogoutClose = () => {
+    setLogoutOpen(false);
+  };
+
   const handleProfileOpen = (event) => {
     setAnchorEl(event.currentTarget);
-  }
+  };
 
   const handleProfileClose = () => {
     setAnchorEl(false);
-  }
+  };
 
   const incColorIndex = () => {
     console.log(colorIndex);
@@ -151,7 +161,27 @@ const StudentApp = ({ user }) => {
       setColorIndex(colorIndex + 1);
       localStorage.setItem('barColourIndex', colorIndex + 1);
     }
-  }
+  };
+
+  const logoutDialog = () => {
+    return (
+      <Dialog open={logoutOpen} onClose={handleLogoutClose}>
+        <DialogTitle>
+          Confirm logout?
+        </DialogTitle>
+        <DialogContent>
+          <Button variant="contained" color="primary" style={{marginLeft:12}} 
+            href="https://learn.uq.edu.au/webapps/login/?action=logout"
+          >
+            YES, LOG ME OUT
+          </Button>
+          <Button onClick={handleLogoutClose}>
+            NO
+          </Button>
+        </DialogContent>
+      </Dialog>
+    );
+  };
 
   function syncDialog() {
     return (
@@ -253,6 +283,7 @@ const StudentApp = ({ user }) => {
         style={{background:color}}
       >
         <Toolbar>
+          {logoutDialog()}
           <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
               <span role="img" aria-label="cap">🎓</span>SmartED
@@ -263,18 +294,18 @@ const StudentApp = ({ user }) => {
           </Typography>
           <Study />
           <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-            <HomeIcon style={{ marginLeft: 10 }} fontSize={"large"} />
+            <IconButton style={{ textDecoration: "none", color: "unset" }}>
+              <HomeIcon fontSize={"large"} />
+            </IconButton>
           </Link>
           <Link 
             onClick={handleProfileOpen} 
-            style={{ textDecoration: "none", color: "unset", marginLeft: 10 }}
+            style={{ textDecoration: "none", color: "unset"}}
             aria-controls="simple-menu" aria-haspopup="true"  
-          >
-            <PersonIcon fontSize={"large"} />
+          > <IconButton style={{ textDecoration: "none", color: "unset" }}>
+              <PersonIcon fontSize={"large"} />
+            </IconButton>     
           </Link>
-          <a href="https://learn.uq.edu.au/webapps/login/?action=logout" style={{ textDecoration: "none", color: "unset" }}>
-            <ExitIcon style={{ marginLeft: 10 }} fontSize={"large"} />
-          </a>
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}
@@ -287,6 +318,9 @@ const StudentApp = ({ user }) => {
             </Link>
             <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
           </Menu>
+          <IconButton onClick={handleLogoutOpen} style={{ textDecoration: "none", color: "unset" }}>
+            <ExitIcon fontSize={"large"} />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer

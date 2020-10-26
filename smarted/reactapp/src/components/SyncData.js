@@ -101,7 +101,7 @@ const SyncData = () => {
       ) : values.syncing ? (
         <Box display="flex" justifyContent="center" flexDirection="column">
           <CircularProgress style={{ margin: "auto" }} />
-          <h4>Syncing... This may take awhile, please wait...</h4>
+          <h4>Syncing... This may take a while, please wait...</h4>
         </Box>
       ) : (
         <>

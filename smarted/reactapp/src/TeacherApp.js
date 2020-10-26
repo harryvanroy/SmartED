@@ -25,6 +25,7 @@ import Menu from "@material-ui/core/Menu";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import HomeIcon from "@material-ui/icons/Home";
+import ExitIcon from '@material-ui/icons/PowerSettingsNew';
 import DeleteIcon from "@material-ui/icons/Delete";
 import PersonIcon from '@material-ui/icons/Person';
 
@@ -106,22 +107,31 @@ const TeacherApp = ({ user }) => {
     JSON.parse(localStorage.getItem("currentCourse"))
   );
   const [assessment, setAssessment] = React.useState([]);
+  const [logoutOpen, setLogoutOpen] = React.useState(false);
 
   let localColorIndex = 0;
   if (localStorage.getItem('barColourIndex') !== null) {
     localColorIndex = parseInt(localStorage.getItem('barColourIndex'));
-  }
+  };
   const [color, setColor] = React.useState(barColours[localColorIndex]);
   const [colorIndex, setColorIndex] = React.useState(localColorIndex);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
+  const handleLogoutOpen = () => {
+    setLogoutOpen(true);
+  };
+
+  const handleLogoutClose = () => {
+    setLogoutOpen(false);
+  };
+
   const handleProfileOpen = (event) => {
     setAnchorEl(event.currentTarget);
-  }
+  };
 
   const handleProfileClose = () => {
     setAnchorEl(false);
-  }
+  };
 
   const incColorIndex = () => {
     console.log(colorIndex);
@@ -134,7 +144,7 @@ const TeacherApp = ({ user }) => {
       setColorIndex(colorIndex + 1);
       localStorage.setItem('barColourIndex', colorIndex + 1);
     }
-  }
+  };
 
   useEffect(() => {
     axios(url + "/Database/teacher-courses/", {
@@ -270,6 +280,26 @@ const TeacherApp = ({ user }) => {
     );
   };
 
+  const logoutDialog = () => {
+    return (
+      <Dialog open={logoutOpen} onClose={handleLogoutClose}>
+        <DialogTitle>
+          Confirm logout?
+        </DialogTitle>
+        <DialogContent>
+          <Button variant="contained" color="primary" style={{marginLeft:12}} 
+            href="https://learn.uq.edu.au/webapps/login/?action=logout"
+          >
+            YES, LOG ME OUT
+          </Button>
+          <Button onClick={handleLogoutClose}>
+            NO
+          </Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   const handleCourseChange = (e) => {
     console.log(e);
     if (e.target.value === "edit") {
@@ -292,6 +322,7 @@ const TeacherApp = ({ user }) => {
           style={{background:color}}
         >
           <Toolbar>
+            {logoutDialog()}
             <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
               <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
                 <span role="img" aria-label="cap">🎓</span>SmartED
@@ -334,15 +365,18 @@ const TeacherApp = ({ user }) => {
               </Select>
             </FormControl>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-              <HomeIcon fontSize={"large"} />
+              <IconButton style={{ textDecoration: "none", color: "unset" }}>
+                <HomeIcon fontSize={"large"} />
+              </IconButton>
             </Link>
-            <IconButton 
+            <Link 
               onClick={handleProfileOpen} 
-              style={{ textDecoration: "none", color: "unset" }}
+              style={{ textDecoration: "none", color: "unset"}}
               aria-controls="simple-menu" aria-haspopup="true"  
-            >
-              <PersonIcon style={{ marginLeft: 10 }} fontSize={"large"} />
-            </IconButton>
+            > <IconButton style={{ textDecoration: "none", color: "unset" }}>
+                <PersonIcon fontSize={"large"} />
+              </IconButton>     
+            </Link>
             <Menu
               id="simple-menu"
               anchorEl={anchorEl}
@@ -350,13 +384,14 @@ const TeacherApp = ({ user }) => {
               open={Boolean(anchorEl)}
               onClose={handleProfileClose}
             >
-              <Link to="/vark" 
-                style={{ textDecoration: "none", color: "unset" }}
-              >
+              <Link to="/vark" style={{ textDecoration: "none", color: "unset" }}>
                 <MenuItem onClick={handleProfileClose}>VARK quiz</MenuItem>
               </Link>
               <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
             </Menu>
+            <IconButton onClick={handleLogoutOpen} style={{ textDecoration: "none", color: "unset" }}>
+              <ExitIcon fontSize={"large"} />
+            </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer
