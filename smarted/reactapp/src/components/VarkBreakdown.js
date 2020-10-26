@@ -4,6 +4,7 @@ import VisibilityOutlinedIcon  from "@material-ui/icons/VisibilityOutlined";
 import HearingOutlinedIcon from "@material-ui/icons/HearingOutlined"
 import TouchAppOutlinedIcon from "@material-ui/icons/TouchAppOutlined"
 import CreateOutlinedIcon from "@material-ui/icons/CreateOutlined";
+import Brightness1Icon from '@material-ui/icons/Brightness1';
 
 const types = {
   V: "Visual learner",
@@ -87,6 +88,18 @@ const minorIcon = (minor) => {
   }
 }
 
+const displayTypeDot = (size, type) => {
+  if (type === "V") {
+    return (<Brightness1Icon style={{fontSize:size, color:"#603E95"}} />);
+  } else if (type === "A") {
+    return (<Brightness1Icon style={{fontSize:size, color:"#009DA1"}} />);
+  } else if (type === "R") {
+    return (<Brightness1Icon style={{fontSize:size, color:"#FAC22B"}} />);
+  } else if (type === "K") {
+    return (<Brightness1Icon style={{fontSize:size, color:"#D7255D"}} />);
+  }
+};
+
 const classifier = ({ V, A, R, K }) => {
   if (V < 0.3 && A < 0.3 && R < 0.3 && K < 0.3) {
     return { major: "", minor: "" };
@@ -133,7 +146,7 @@ const majorTypeBreakdown = (major) => {
   } else {
     return (
       <Box style={{marginBottom : 24}}>
-        <Typography variant="h4">Primary: {types[major]} {majorIcon(major)}</Typography>
+        <Typography variant="h4"> {displayTypeDot(30, major)} Primary: {types[major]} {majorIcon(major)}</Typography>
         <Typography variant="subtitle1">
           Your primary learning style is {minorTypes[major]}. This means you 
           {" "}{descriptor[major]}. You may find the following resources useful: 
@@ -148,7 +161,7 @@ const majorTypeBreakdown = (major) => {
 const minorTypeBreakdown = (minor) => {
   return (
     <Box style={{marginBottom : 24}}>
-      <Typography variant="h5">Secondary: {types[minor]} {minorIcon(minor)}</Typography>
+      <Typography variant="h5"> {displayTypeDot(24, minor)} Secondary: {types[minor]} {minorIcon(minor)}</Typography>
       <Typography variant="subtitle1">
         Your secondary style is {minorTypes[minor]}. Supplement the above 
         resources with {" "}{resources[minor]}. Also try to {techniques[minor]}.
@@ -157,6 +170,26 @@ const minorTypeBreakdown = (minor) => {
   );
 };
 
+const majorResourceRecommendations = (major) => {
+  return (
+    <Box style={{marginBottom : 24}}>
+      <Typography variant="subtitle1">
+        Look for resources with the {displayTypeDot(12, major)} tag.
+      </Typography>
+    </Box>
+  )
+}
+
+const minorResourceRecommendations = (minor) => {
+  return (
+    <Box style={{marginBottom : 24}}>
+      <Typography variant="subtitle1">
+        Look for resources with the {displayTypeDot(12, minor)} tag.
+      </Typography>
+    </Box>
+  )
+}
+
 const breakdown = ({ major, minor }) => {
   console.log(major);
   console.log(minor);
@@ -164,13 +197,16 @@ const breakdown = ({ major, minor }) => {
     return (
       <div>
         {majorTypeBreakdown(major)}
+        {majorResourceRecommendations(major)}
       </div>
     );
   } else {
     return (
       <div>
         {majorTypeBreakdown(major)}
+        {majorResourceRecommendations(major)}
         {minorTypeBreakdown(minor)}
+        {minorResourceRecommendations(minor)}
       </div>
     );
   }
