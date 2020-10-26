@@ -248,7 +248,9 @@ const StudentApp = ({ user }) => {
       {syncDialog()}
 
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar} style={{background:color}}>
+      <AppBar position="fixed" className={classes.appBar} 
+        style={{background:color}}
+      >
         <Toolbar>
           <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
