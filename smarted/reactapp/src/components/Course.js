@@ -7,6 +7,15 @@ import {
   Typography,
   ButtonBase,
   Button,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
+  FormGroup,
+  FormControl,
+  FormControlLabel,
+  Checkbox
 } from "@material-ui/core";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -21,6 +30,8 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { checkDate } from "./Home";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
+import FeedbackIcon from "@material-ui/icons/Feedback";
+import IconButton from '@material-ui/core/IconButton';
 import axios from "axios";
 import Vark from "./Vark";
 
@@ -47,19 +58,18 @@ const useStyles = makeStyles((theme) => ({
   root: {
     height: 264,
     flexGrow: 1,
-    maxWidth: 400,
   },
 }));
 
 const displayResource = (name, V, A, R, K) => {
   return (
-    <div>
+    <span>
       {name}&nbsp;
       {V && <Brightness1Icon style={{ fontSize: 12, color: "#603E95" }} />}
       {A && <Brightness1Icon style={{ fontSize: 12, color: "#009DA1" }} />}
       {R && <Brightness1Icon style={{ fontSize: 12, color: "#FAC22B" }} />}
       {K && <Brightness1Icon style={{ fontSize: 12, color: "#D7255D" }} />}
-    </div>
+    </span>
   );
 };
 
@@ -68,6 +78,31 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
 
   const [files, setFiles] = React.useState([]);
   const [resources, setResources] = React.useState([]);
+  const [open, setOpen] = React.useState(false);
+  const [feedback, setFeedback] = React.useState({
+    text: "",
+    anon: false,
+  });
+
+  const handleOpen = (event) => {
+    setOpen(true);
+  }
+
+  const handleClose = (event) => {
+    setOpen(false);
+  }
+
+  const handleTextChange = (event) => {
+    setFeedback({ ...feedback, text: event.target.value });
+  };
+
+  const handleAnonChange = (event) => {
+    setFeedback({ ...feedback, anon: event.target.checked });
+  };
+
+  const handleSubmit = (event) => {
+
+  }
 
   let resourceData = files
     .filter((file0) => !file0.isAssessment)
@@ -81,9 +116,14 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
             return {
               id: "" + index,
               name: (
-                <a target="_blank" href={res.blackboardLink}>
-                  {displayResource(res.title, res.V, res.A, res.R, res.K)}
-                </a>
+                <div>
+                  <a target="_blank" href={res.blackboardLink}>
+                    {displayResource(res.title, res.V, res.A, res.R, res.K)}
+                  </a>
+                  <IconButton onClick={handleOpen}>
+                    <FeedbackIcon fontSize="small"></FeedbackIcon>
+                  </IconButton>
+                </div>                
               ),
               children: [],
             };
@@ -300,6 +340,44 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
           </Grid>
         </Grid>
       </Grid>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>
+          Resource feedback
+        </DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth>
+            <TextField
+              id="outlined-multiline-static"
+              multiline
+              rows={4}
+              placeholder="Type feedback here"
+              variant="outlined"
+              onChange={handleTextChange}
+            />
+          </FormControl>
+          <Box style={{marginTop:6, marginBottom:12}}>
+            <FormControl component="fieldset" style={{marginTop:12, marginBottom:12}}>
+              <FormGroup aria-label="position" row>
+                <FormControlLabel
+                  value="end"
+                  control={<Checkbox color="primary" onChange={handleAnonChange} />}
+                  label="Anonymous? (Constructive feedback only. Bullying or hate speech will not be tolerated)"
+                  labelPlacement="end"
+                />
+              </FormGroup>
+            </FormControl>
+            <br />
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={handleSubmit}
+            >
+              SEND TO COURSE STAFF
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
