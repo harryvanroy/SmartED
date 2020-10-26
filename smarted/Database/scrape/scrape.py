@@ -126,7 +126,22 @@ class UQBlackboardScraper:
             # descend into folders
             if folder == "Content Folder":
                 self.driver.get(self.RESOURCE_URL % (course_id, resource_id))
-                self.read_page(course_id, resources)
+                self.read_folder(course_id, resources, resource_id)
+
+    def read_folder(self, course_id, resources, resource_id):
+        soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+        page_items = self.find_items(soup)
+        if page_items is None:
+            return
+
+        for item in page_items:
+            # folder = item.find('img', class_="item_icon").attrs["alt"]
+            # if item.find('h3') is None:
+            #     continue
+            # name = item.find('h3').get_text().strip()
+            # resource_id = int(item.attrs['id'].split(':')[1].split('_')[1])
+            resources[resource_id]["links"].update(self.find_links(item))
+
 
     def get_learning_resources(self, course_id):
         """
