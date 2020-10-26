@@ -139,6 +139,12 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
   );
 
   useEffect(() => {
+    if (currCourse === undefined) {
+      currCourse = JSON.parse(localStorage.getItem("currCourse"));
+    }
+    if (!localStorage.getItem("currCourse")) {
+      localStorage.setItem("currCourse", JSON.stringify(currCourse));
+    }
     axios(url + `/Database/course-files/${currCourse.id}/?format=json`, {
       method: "get",
       withCredentials: true,
@@ -166,6 +172,9 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
     });
   }, [currCourse, assessment]);
 
+  if (currCourse === undefined) {
+    return null;
+  }
   return (
     <Box>
       <Typography variant="h4">Course: {currCourse.name}</Typography>
