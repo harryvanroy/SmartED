@@ -16,3 +16,4 @@ migrations
 lib
 scrape.py.orig
 core
+.DS_Store

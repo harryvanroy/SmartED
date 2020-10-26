@@ -17,11 +17,12 @@ import { makeStyles, withStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import Collapse from "@material-ui/core/Collapse";
-import Chip from "@material-ui/core/Chip";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { checkDate } from "./Home";
+import Brightness1Icon from "@material-ui/icons/Brightness1";
 import axios from "axios";
+import Vark from "./Vark";
 
 //DETERMINE LOCATION
 var url;
@@ -50,31 +51,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const VChip = withStyles({
-  root: {
-    backgroundColor: "#603E95",
-  },
-})((props) => <Chip size="small" label="V" {...props} />);
+const displayResource = (name, V, A, R, K) => {
+  return (
+    <div>
+      {name}&nbsp;
+      {V && <Brightness1Icon style={{ fontSize: 12, color: "#603E95" }} />}
+      {A && <Brightness1Icon style={{ fontSize: 12, color: "#009DA1" }} />}
+      {R && <Brightness1Icon style={{ fontSize: 12, color: "#FAC22B" }} />}
+      {K && <Brightness1Icon style={{ fontSize: 12, color: "#D7255D" }} />}
+    </div>
+  );
+};
 
-const AChip = withStyles({
-  root: {
-    backgroundColor: "#009DA1",
-  },
-})((props) => <Chip size="small" label="A" {...props} />);
-
-const RChip = withStyles({
-  root: {
-    backgroundColor: "#FAC22B",
-  },
-})((props) => <Chip size="small" label="R" {...props} />);
-
-const KChip = withStyles({
-  root: {
-    backgroundColor: "#D7255D",
-  },
-})((props) => <Chip size="small" label="K" {...props} />);
-
-const Course = ({ currCourse, assessment, courses }) => {
+const Course = ({ currCourse, assessment, courses, vark }) => {
   const classes = useStyles();
 
   const [files, setFiles] = React.useState([]);
@@ -93,7 +82,7 @@ const Course = ({ currCourse, assessment, courses }) => {
               id: "" + index,
               name: (
                 <a target="_blank" href={res.blackboardLink}>
-                  {res.title}
+                  {displayResource(res.title, res.V, res.A, res.R, res.K)}
                 </a>
               ),
               children: [],
@@ -115,7 +104,7 @@ const Course = ({ currCourse, assessment, courses }) => {
               id: "" + index,
               name: (
                 <a target="_blank" href={res.blackboardLink}>
-                  {res.title}
+                  {displayResource(res.title, res.V, res.A, res.R, res.K)}
                 </a>
               ),
               children: [],
@@ -177,18 +166,6 @@ const Course = ({ currCourse, assessment, courses }) => {
     });
   }, [currCourse, assessment]);
 
-  const displayResource = (name, V, A, R, K) => {
-    return (
-      <div>
-        {name}&nbsp;
-        {V === 1 && <VChip />}
-        {A === 1 && <AChip />}
-        {R === 1 && <RChip />}
-        {K === 1 && <KChip />}
-      </div>
-    );
-  };
-
   return (
     <Box>
       <Typography variant="h4">Course: {currCourse.name}</Typography>
@@ -201,11 +178,42 @@ const Course = ({ currCourse, assessment, courses }) => {
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
-              <Paper
-                elevation={3}
-                className={classes.paper}
-                style={{ height: 760, overflow: "auto" }}
-              >
+              <Paper elevation={3} className={classes.paper}>
+                <div
+                  style={{ display: "flex", justifyContent: "center" }}
+                  className={classes.paperTitle}
+                >
+                  <Typography variant="h5">Recommended resources</Typography>
+                </div>
+                <div style={{ maxHeight: 100, overflow: "auto" }}>
+                  {resources
+                    .filter(
+                      (res) =>
+                        (res.V && vark.V > 0.3) ||
+                        (res.A && vark.A > 0.3) ||
+                        (res.R && vark.R > 0.3) ||
+                        (res.K && vark.K > 0.3)
+                    )
+                    .map((resFil) => (
+                      <a
+                        key={resFil.id}
+                        target="_blank"
+                        href={resFil.blackboardLink}
+                      >
+                        {displayResource(
+                          resFil.title,
+                          resFil.V,
+                          resFil.A,
+                          resFil.R,
+                          resFil.K
+                        )}
+                      </a>
+                    ))}
+                </div>
+              </Paper>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper elevation={3} className={classes.paper}>
                 <div
                   style={{ display: "flex", justifyContent: "center" }}
                   className={classes.paperTitle}
@@ -215,8 +223,9 @@ const Course = ({ currCourse, assessment, courses }) => {
                 <TreeView
                   className={classes.root}
                   defaultCollapseIcon={<ExpandMoreIcon />}
-                  defaultExpanded={["root"]}
+                  defaultExpanded={["root", "resources", "assessment"]}
                   defaultExpandIcon={<ChevronRightIcon />}
+                  style={{ height: 470, overflow: "auto" }}
                 >
                   {renderTree(data)}
                 </TreeView>
@@ -236,61 +245,55 @@ const Course = ({ currCourse, assessment, courses }) => {
                   flex={1}
                   flexDirection="column"
                 >
-                  {courses
-                    .filter((course) => course.name === currCourse.name)
-                    .map((course) => (
-                      <TableContainer
-                        style={{ marginBottom: 20 }}
-                        key={course.id}
-                        component={Paper}
-                        variant="outlined"
-                      >
-                        <Table aria-label="simple table">
-                          <TableBody>
-                            {assessment
-                              .filter(
-                                (allAssess) =>
-                                  allAssess.course === course.id &&
-                                  new Date(
-                                    new Date().getFullYear(),
-                                    new Date().getMonth(),
-                                    new Date().getDate()
-                                  ) < checkDate(allAssess.dateDescription)
-                              )
-                              .map((assessCourse) => {
-                                let currentDate = new Date(
-                                  new Date().getFullYear(),
-                                  new Date().getMonth(),
-                                  new Date().getDate()
-                                );
-                                return (
-                                  <TableRow key={assessCourse.id}>
-                                    {checkDate(assessCourse.dateDescription) <
-                                    currentDate.setDate(
-                                      currentDate.getDate() + 7
-                                    ) ? (
-                                      <TableCell>
-                                        <Typography>
-                                          {assessCourse.name}{" "}
-                                          <Button color="secondary">
-                                            DUE SOON
-                                          </Button>
-                                        </Typography>
-                                      </TableCell>
-                                    ) : (
-                                      <TableCell>
-                                        <Typography>
-                                          {assessCourse.name}
-                                        </Typography>
-                                      </TableCell>
-                                    )}
-                                  </TableRow>
-                                );
-                              })}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    ))}
+                  <TableContainer
+                    style={{ marginBottom: 20 }}
+                    key={currCourse.id}
+                    component={Paper}
+                    variant="outlined"
+                  >
+                    <Table aria-label="simple table">
+                      <TableBody>
+                        {assessment
+                          .filter(
+                            (allAssess) =>
+                              allAssess.course === currCourse.id &&
+                              new Date(
+                                new Date().getFullYear(),
+                                new Date().getMonth(),
+                                new Date().getDate()
+                              ) < checkDate(allAssess.dateDescription)
+                          )
+                          .map((assessCourse) => {
+                            let currentDate = new Date(
+                              new Date().getFullYear(),
+                              new Date().getMonth(),
+                              new Date().getDate()
+                            );
+                            return (
+                              <TableRow key={assessCourse.id}>
+                                {checkDate(assessCourse.dateDescription) <
+                                currentDate.setDate(
+                                  currentDate.getDate() + 7
+                                ) ? (
+                                  <TableCell>
+                                    <Typography>
+                                      {assessCourse.name}{" "}
+                                      <Button color="secondary">
+                                        DUE SOON
+                                      </Button>
+                                    </Typography>
+                                  </TableCell>
+                                ) : (
+                                  <TableCell>
+                                    <Typography>{assessCourse.name}</Typography>
+                                  </TableCell>
+                                )}
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
                 </Box>
               </Paper>
             </Grid>

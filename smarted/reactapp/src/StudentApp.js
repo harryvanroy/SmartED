@@ -310,6 +310,7 @@ const StudentApp = ({ user }) => {
               currCourse={currCourse}
               assessment={assessment}
               courses={courses}
+              vark={vark}
             />
           </Route>
           <Route path="/assessment">
