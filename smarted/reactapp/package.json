@@ -17,6 +17,7 @@
     "react": "^16.13.1",
     "react-circle-progress-bar": "^0.1.4",
     "react-dom": "^16.13.1",
+    "react-favicon": "0.0.18",
     "react-latex": "^2.0.0",
     "react-minimal-pie-chart": "^8.0.1",
     "react-router-dom": "^5.2.0",

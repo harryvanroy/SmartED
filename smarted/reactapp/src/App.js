@@ -3,6 +3,7 @@ import StudentApp from './StudentApp';
 import TeacherApp from './TeacherApp';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import Favicon from 'react-favicon';
 
 // DETERMINE LOCATION
 var url;
@@ -47,6 +48,7 @@ const App = () => {
 
   return (
     <div>
+      <Favicon url="http://clipartmag.com/images/graduation-cap-png-24.png" />
       {user !== null && (user.is_student === 0 ? <TeacherApp user={user} /> : <StudentApp user={user} />)}
     </div>
   );
