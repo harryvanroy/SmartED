@@ -81,7 +81,6 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
   const [open, setOpen] = React.useState(false);
   const [feedback, setFeedback] = React.useState({
     text: "",
-    anon: false,
     course: 0,
   });
 
@@ -91,16 +90,12 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
   };
 
   const handleClose = (event) => {
-    setFeedback({ text: "", anon: false, course: 0 });
+    setFeedback({ text: "", course: 0 });
     setOpen(false);
   };
 
   const handleTextChange = (event) => {
     setFeedback({ ...feedback, text: event.target.value });
-  };
-
-  const handleAnonChange = (event) => {
-    setFeedback({ ...feedback, anon: event.target.checked });
   };
 
   const handleSubmit = (event) => {
@@ -359,7 +354,7 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
       </Grid>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Resource feedback</DialogTitle>
-        <DialogContent>
+        <DialogContent style={{ width: 500 }}>
           <FormControl fullWidth>
             <TextField
               id="outlined-multiline-static"
@@ -371,21 +366,6 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
             />
           </FormControl>
           <Box style={{ marginTop: 6, marginBottom: 12 }}>
-            <FormControl
-              component="fieldset"
-              style={{ marginTop: 12, marginBottom: 12 }}
-            >
-              <FormGroup aria-label="position" row>
-                <FormControlLabel
-                  value="end"
-                  control={
-                    <Checkbox color="primary" onChange={handleAnonChange} />
-                  }
-                  label="Anonymous? (Constructive feedback only. Bullying or hate speech will not be tolerated)"
-                  labelPlacement="end"
-                />
-              </FormGroup>
-            </FormControl>
             <br />
             <Button
               variant="contained"

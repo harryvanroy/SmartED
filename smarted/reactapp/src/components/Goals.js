@@ -164,48 +164,6 @@ function Goals({ courses, assessment }) {
     setDialogText("");
   };
 
-  const handleCompleted = (id, goalType) => (event) => {
-    switch (goalType) {
-      case 0:
-        setCustomGoals(
-          customGoals.map((goal) =>
-            goal.id !== id
-              ? goal
-              : { ...goal, is_complete: event.target.checked }
-          )
-        );
-        break;
-      case 1:
-        setGradeGoals(
-          gradeGoals.map((goal) =>
-            goal.id !== id
-              ? goal
-              : { ...goal, is_complete: event.target.checked }
-          )
-        );
-        break;
-      case 2:
-        setStudyGoals(
-          studyGoals.map((goal) =>
-            goal.id !== id
-              ? goal
-              : { ...goal, is_complete: event.target.checked }
-          )
-        );
-        break;
-      case 3:
-        setAssGoals(
-          assGoals.map((goal) =>
-            goal.id !== id
-              ? goal
-              : { ...goal, is_complete: event.target.checked }
-          )
-        );
-        break;
-      default:
-    }
-  };
-
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(state);
@@ -534,7 +492,6 @@ function Goals({ courses, assessment }) {
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell width="2"></TableCell>
               <TableCell>Course</TableCell>
               <TableCell align="right">Custom goal</TableCell>
               <TableCell width="2"></TableCell>
@@ -543,14 +500,6 @@ function Goals({ courses, assessment }) {
           <TableBody>
             {customGoals.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <Checkbox
-                    checked={row.is_complete}
-                    onChange={handleCompleted(row.id, 0)}
-                    name="checkedB"
-                    color="primary"
-                  />
-                </TableCell>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
@@ -580,7 +529,6 @@ function Goals({ courses, assessment }) {
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell width="2"></TableCell>
               <TableCell>Course</TableCell>
               <TableCell align="right">Overall grade</TableCell>
               <TableCell width="2"></TableCell>
@@ -589,14 +537,6 @@ function Goals({ courses, assessment }) {
           <TableBody>
             {gradeGoals.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <Checkbox
-                    checked={row.is_complete}
-                    onChange={handleCompleted(row.id, 1)}
-                    name="checkedB"
-                    color="primary"
-                  />
-                </TableCell>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
@@ -618,7 +558,6 @@ function Goals({ courses, assessment }) {
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell width="2"></TableCell>
               <TableCell>Course</TableCell>
               <TableCell align="right">Weekly study time</TableCell>
               <TableCell width="2"></TableCell>
@@ -627,14 +566,6 @@ function Goals({ courses, assessment }) {
           <TableBody>
             {studyGoals.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <Checkbox
-                    checked={row.is_complete}
-                    onChange={handleCompleted(row.id, 2)}
-                    name="checkedB"
-                    color="primary"
-                  />
-                </TableCell>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
@@ -656,7 +587,6 @@ function Goals({ courses, assessment }) {
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell width="2"></TableCell>
               <TableCell>Course</TableCell>
               <TableCell align="right">Assessment item</TableCell>
               <TableCell align="right">Grade</TableCell>
@@ -666,14 +596,6 @@ function Goals({ courses, assessment }) {
           <TableBody>
             {assGoals.map((row, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <Checkbox
-                    checked={row.is_complete}
-                    onChange={handleCompleted(row.id, 3)}
-                    name="checkedB"
-                    color="primary"
-                  />
-                </TableCell>
                 <TableCell component="th" scope="row">
                   {row.course.name}
                 </TableCell>
