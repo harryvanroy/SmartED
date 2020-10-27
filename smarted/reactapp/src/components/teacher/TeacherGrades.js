@@ -48,7 +48,7 @@ const useRowStyles = makeStyles({
 });
 
 const strToFloat = (str) => {
-  return parseFloat(str).toFixed(1);
+  return parseFloat(str).toFixed(2);
 };
 
 function createData(
@@ -173,7 +173,7 @@ const TeacherGrades = ({ assessment, course }) => {
   };
 
   const handleGradeChange = (e) => {
-    setGrade({ ...grade, grade: parseInt(e.target.value) });
+    setGrade({ ...grade, grade: parseFloat(e.target.value).toFixed(2) });
   };
 
   const handleClose = (event, reason) => {
