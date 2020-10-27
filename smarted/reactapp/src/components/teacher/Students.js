@@ -105,7 +105,9 @@ const Students = ({ course }) => {
                           {row.student.username} ({row.student.firstname}{" "}
                           {row.student.lastname})
                         </TableCell>
-                        <TableCell align="right">{row.grade}</TableCell>
+                        <TableCell align="right">
+                          {row.grade.toFixed(2)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
