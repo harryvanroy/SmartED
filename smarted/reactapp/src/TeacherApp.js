@@ -384,9 +384,6 @@ const TeacherApp = ({ user }) => {
               open={Boolean(anchorEl)}
               onClose={handleProfileClose}
             >
-              <Link to="/vark" style={{ textDecoration: "none", color: "unset" }}>
-                <MenuItem onClick={handleProfileClose}>VARK quiz</MenuItem>
-              </Link>
               <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
             </Menu>
             <IconButton onClick={handleLogoutOpen} style={{ textDecoration: "none", color: "unset" }}>
