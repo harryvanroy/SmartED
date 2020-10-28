@@ -19,7 +19,15 @@ DEFAULT_TEACHER_USER = "Uqjstuaa"
 
 
 def authorize_teacher(header):
+    """
+    Helper function for most teacher view requests
+    Reads the header to determine if they are exempt from auth check, or if
+    they pass the auth check as a real teacher.
 
+    :param header: the HttpRequest header to run the auth check on
+
+    :returns: a boolean representing if they are authed, and their username
+    """
     # check if request's csrf has an exemption for teacher checks
     CSRF_EXEMPT = False
     try:
@@ -48,6 +56,15 @@ def authorize_teacher(header):
 
 
 def initialize_teacher_courses(header, staff):
+    """
+    A helper function for views.initialize. The function initialized the
+    teacher if they are new and adds the default courses
+
+    :param header: the HttpRequest header to initalize a staff from
+    :param staff: the Staff model object to assign courses to and initialize
+
+    :returns: nothing
+    """
     sem = 2
     year = 2020
     mode = 'EXTERNAL'
@@ -84,6 +101,14 @@ def initialize_teacher_courses(header, staff):
 
 
 def get_teacher_courses(request):
+    """
+    A view that returns a json list of courses that the requesting staff
+    is teaching.
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -105,6 +130,14 @@ def get_teacher_courses(request):
 
 @csrf_exempt
 def remove_teacher_course(request):
+    """
+    A view for handling a staffs DELETE request to delete a course from their
+    list of teaching courses
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -133,6 +166,14 @@ def remove_teacher_course(request):
 
 @csrf_exempt
 def add_teacher_course(request):
+    """
+    A view to handle a staffs POST request to add a course to their teaching
+    list
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
     json_body = json.loads(request.body)
 
@@ -180,6 +221,14 @@ def add_teacher_course(request):
 
 
 def students_in_course(request):
+    """
+    A view to handle a staffs GET request to get a list of students in a
+    specified course
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -210,6 +259,14 @@ def students_in_course(request):
 
 @csrf_exempt
 def student_assessment_grade(request):
+    """
+    A view to handle a staffs POST request to post/update a specified students
+    grade on a specified assignment.
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_body = json.loads(request.body)
     json_header = request.headers
 
@@ -243,6 +300,14 @@ def student_assessment_grade(request):
 
 
 def students_at_risk(request):
+    """
+    A view for handling a staffs GET request to get a list of students who are
+    currently at risk of failing (>50%) a specified course
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -296,6 +361,14 @@ def students_at_risk(request):
 
 
 def get_course_feedback(request):
+    """
+    A view for handling a staffs GET request to get a list of feedback from
+    students in a specified course
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -322,6 +395,14 @@ def get_course_feedback(request):
 
 
 def get_average_vark(request):
+    """
+    A view to handle a staffs GET request to get the average VARK score of
+    students in a specified course
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -358,6 +439,14 @@ def get_average_vark(request):
 
 
 def get_student_vark(request):
+    """
+    A view to handle a staffs GET request to get a specific students VARK
+    score
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -381,6 +470,14 @@ def get_student_vark(request):
 
 
 def students_course_grade(request):
+    """
+    A view to handle a staffs GET request to get a list of all students grades
+    for all assessment in a specific course
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -409,6 +506,14 @@ def students_course_grade(request):
 
 @csrf_exempt
 def assign_resource_vark(request):
+    """
+    A view to handle a teachers POST request to post/update specified vark
+    types to a specified resource
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_body = json.loads(request.body)
     json_header = request.headers
 
@@ -430,6 +535,14 @@ def assign_resource_vark(request):
 
 
 def get_resource_feedback(request):
+    """
+    A view to handle a staffs GET request to get a list of feedback from 
+    students on a specified resource
+
+    :param request: the HttpRequest from the staff
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
 
     auth, username = authorize_teacher(json_header)
@@ -448,12 +561,11 @@ def get_resource_feedback(request):
 
     print("RESOURCE: ", resource)
 
-
     resource_feedback = ResourceFeedback.objects.filter(resource=resource)
 
     # TODO: POSSIBLE THAT USER IS NONE
     json_feedback = [{"user": {"username": x.user.username,
-                                "name": f"{x.user.firstName} {x.user.lastName}"},
+                               "name": f"{x.user.firstName} {x.user.lastName}"},
                       "feedback": x.feedback}
                      for x in resource_feedback]
     return HttpResponse(json.dumps(json_feedback))
