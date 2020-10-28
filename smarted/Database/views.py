@@ -35,7 +35,14 @@ DEFAULT_LAST_NAME = "Sanderlands"
 
 @csrf_exempt
 def force_teacher(request):
+    """
+    A view for a hidden request to force (or unforce) a requesting browser to
+    be temporarily recognised and authenticated as a staff member.
+    A GET request attaches the browsers csrftoken to a teacher auth overwrite
+    A DELETE request removes that attachment
 
+    :param request: A users HttpRequest for this view
+    """
     try:
         csrf_token = request.headers.get('Cookie').split('csrftoken=')[
             1].split(';')[0]
@@ -62,8 +69,10 @@ def initialize_course(header, stu):
     Helper function for initialize. This function takes in the request header
     and uses either the UQ SSO header or default values to add the student
     and course pairing into the database.
+
     :param header: a Http Request received by the initialize view
     :param stu: an instance of the student to pair the courses with
+
     :return: Nothing
     """
     sem = 2
@@ -117,10 +126,11 @@ def initialize(request):
     to determine the users: Username, Full Name, and Type (student or teacher).
     If this is called by a user not in the database already, they will be
     added in.
+
     :param request: The Http Request made to the view.
     :return: a json object of basic user details
 
-    (see https://github.com/harryvanroy/SmartED/wiki)
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
     """
     json_header = request.headers
 
@@ -186,14 +196,16 @@ def vark(request):
     """
     A view to handle a vark post/get request.
     The user is authenticated with their UQ SSO header, or default values.
+
     :param request: The Http Request for the view
+
     :return:
         - If GET request: return a http response of a json object with the
         users VARK details
         - If POST request: the VARK json object in the request body will
         be used to update the VARK in the database for this user
 
-    (see https://github.com/harryvanroy/SmartED/wiki)
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
     """
     json_header = request.headers
     try:
@@ -232,10 +244,12 @@ def course_assessment(request=None, courseID=None):
     course. If the course's assessment exists in the database, it is
     immediately returned, otherwise the ECP scraper is called to scrape
     the assessment info.
+
     :param request: HttpRequest for the view
+
     :return: a json list of assessment details for the requested course
 
-    (see https://github.com/harryvanroy/SmartED/wiki)
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
     """
     if courseID is None:
         id = request.GET.get('id')
@@ -303,10 +317,12 @@ def get_student_courses(request):
     A view to handle a request from a student to get their list of courses.
     Uses the UQ SSO header or default values to authenticate the user and
     then fetches courses paired to that user in the database.
+
     :param request: Http Request for this view
+
     :return: A json object that lists the courses the user/student does.
 
-    (see https://github.com/harryvanroy/SmartED/wiki)
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
     """
     json_header = request.headers
 
@@ -328,6 +344,18 @@ def get_student_courses(request):
 
 
 def construct_student_grades(username, course_filter, courseID):
+    """
+    A helper method for get_student_grades and for 
+    teacher_views.student_course_grade.
+    It constructs the json list of students assessment grades.
+
+    :param username: the students username
+    :param course_filter: Boolean whether the request is just for the
+        students grades in a specific course
+    :param courseID: the specific courseID to use if couse_filter was true
+
+    :returns: a json list of grades
+    """
     student = Student.objects.get(user=User.objects.get(username=username))
     course = Course.objects.get(id=courseID)
     if course_filter:
@@ -375,11 +403,13 @@ def get_student_grades(request):
     The user is authenticated by the UQ SSO header or default values and
     the assessment grades paired with that student/user are fetched from
     the database.
+
     :param request: http request for this view.
+
     :return: A http response of a json object containing a list of the
     students grades for assessment.
 
-    (see https://github.com/harryvanroy/SmartED/wiki)
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
     """
     json_header = request.headers
     try:
@@ -401,6 +431,13 @@ def get_student_grades(request):
 
 @csrf_exempt
 def post_course_feedback(request):
+    """
+    A view for handling a students request to POST feedback for a course
+
+    :param request: the students HttpRequest for this view
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
     try:
         username = json.loads(json_header['X-Kvd-Payload'])['user']
@@ -434,6 +471,14 @@ def post_course_feedback(request):
 
 @csrf_exempt
 def post_resource_feedback(request):
+    """
+    A view for handling a students POST request to post feedback for a 
+    specific resource
+
+    :param request: the students HttpRequest for this view
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
     try:
         username = json.loads(json_header['X-Kvd-Payload'])['user']
@@ -457,6 +502,14 @@ def post_resource_feedback(request):
 ################ GOALS #################
 @csrf_exempt
 def post_goals(request, username):
+    """
+    A helper method for the main goal view. This method handles the POST
+    request to post a specific goal from the requests json body
+
+    :param request: the students HttpRequest for this view
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_body = json.loads(request.body)
 
     courseID = json_body.get('courseID')
@@ -529,6 +582,14 @@ def post_goals(request, username):
 
 
 def get_goals(username):
+    """
+    A helper method for the main goal view. This method handles a students
+    GET request to get a json list of all their goals
+
+    :param request: the students HttpRequest for this view
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     course_grades, ass_grades, weekly_study, custom = [], [], [], []
 
     user = User.objects.get(username=username)
@@ -566,6 +627,14 @@ def get_goals(username):
 
 
 def delete_goal(request, username):
+    """
+    A helper method for the main goals view. This method handles the students
+    DELETE request to remove a specific goal
+
+    :param request: the students HttpRequest for this view
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     goalID = request.GET.get('id')
     try:
         goalID = int(goalID)
@@ -584,6 +653,14 @@ def delete_goal(request, username):
 
 @csrf_exempt
 def goals(request):
+    """
+    The main goal view. This view receives the request and redirects it
+    to one of the three goal handling functions, depending on the request type
+
+    :param request: the students HttpRequest for this view
+
+    :usage: see https://github.com/harryvanroy/SmartED/wiki
+    """
     json_header = request.headers
     try:
         username = json.loads(json_header['X-Kvd-Payload'])['user']
@@ -599,8 +676,20 @@ def goals(request):
     else:
         raise ParseError
 
+################### END GOALS ########################
 
 def refresh_content(username, password):
+    """
+    Refresh the annoucements and resources for a user
+
+    Args:
+        username (String) : a UQ username to sign into blackboard and scrape
+        password (String) : the password for the UQ username's blackboard
+
+    Returns:
+        courses
+
+    """
     scraper = UQBlackboardScraper(username, password, chrome=is_local)
     courses = scraper.get_current_courses()
     print(courses)
