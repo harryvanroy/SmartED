@@ -49,13 +49,15 @@ let currentDate = new Date(
 );
 
 function calculatePriority(item) {
+  // console.log("weight: ", item.weight, "date item:", checkDate(item.dateDescription),
+  // "curr date:", currentDate, "diff:", (checkDate(item.dateDescription) - currentDate)/ (1000 * 3600 * 24))
   return (
     item.weight /
-    Math.log(checkDate(item.dateDescription) - currentDate.getDate() + 1)
+    Math.log((checkDate(item.dateDescription) - currentDate)/(1000 * 3600 * 24) + 1)
   );
 }
 
-function Assessment({ assessment, courses }) {
+const Assessment = ({ assessment, courses }) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
@@ -67,6 +69,8 @@ function Assessment({ assessment, courses }) {
   const handlePriorityClose = () => {
     setOpen(false);
   };
+
+  console.log("PRIORITY!!!");
 
   return (
     <div>

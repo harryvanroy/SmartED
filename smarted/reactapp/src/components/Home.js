@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 
 function checkDate(dateString) {
   if (isNaN(parseInt(dateString[0]))) {
-    return new Date(8640000000000000);
+    return new Date(2020, 10, 20); // assume middle of exam block
   }
 
   let splitStr =
