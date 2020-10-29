@@ -247,7 +247,8 @@ def students_in_course(request):
     course = Course.objects.get(id=id)
 
     students = [stu_course.student for stu_course in
-                StudentCourse.objects.filter(course=course)]
+                StudentCourse.objects.filter(course=course) 
+                if stu_course.student is not None]
 
     json_students = [{"username": student.user.username,
                       "firstname": student.user.firstName,
@@ -494,7 +495,8 @@ def students_course_grade(request):
         return HttpResponse("failed query.. specify the correct course ID...")
 
     students = [
-        stu.student for stu in StudentCourse.objects.filter(course=course)]
+        stu.student for stu in StudentCourse.objects.filter(course=course)
+        if stu.student is not None]
 
     student_grades = [{"student": {"username": stu.user.username,
                                    "firstname": stu.user.firstName,
