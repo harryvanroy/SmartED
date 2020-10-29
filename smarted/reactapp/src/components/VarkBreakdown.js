@@ -115,6 +115,7 @@ const classifier = ({ V, A, R, K }) => {
     var varkArray = [V, A, R, K];
     var labels = ["V", "A", "R", "K"];
     var a1 = -Infinity;
+    var a2 = -Infinity;
     var b1 = -1;
     var b2 = -1;
     for (var i = 0; i < varkArray.length; i++) {
@@ -123,6 +124,10 @@ const classifier = ({ V, A, R, K }) => {
         a1 = varkArray[i];
         b1 = i;
       } else if (varkArray[i] === a1) {
+        b2 = i;
+        a2 = a1;
+      } else if (varkArray[i] > a2) {
+        a2 = varkArray[i];
         b2 = i;
       }
     }
