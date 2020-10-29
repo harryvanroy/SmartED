@@ -45,6 +45,7 @@ def authorize_teacher(header):
                 return False, "error"
         else:
             # this is a legit teacher
+            print("\n\nteachers user type: ", header['X-Uq-User-Type'], "\n\n")
             username = json.loads(header['X-Kvd-Payload'])['user']
             return True, username
     except:
