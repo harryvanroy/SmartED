@@ -39,7 +39,7 @@ def authorize_teacher(header):
 
     try:
         # there might be edge cases for this...
-        if header['X-Uq-User-Type'] == 'Student':
+        if 'Staff' not in header['X-Uq-User-Type']:
             if not FORCE_TEACHER and not CSRF_EXEMPT:
                 # no teacher overwrite and not a real teacher
                 return False, "error"
