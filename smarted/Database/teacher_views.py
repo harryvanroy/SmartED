@@ -420,7 +420,8 @@ def get_average_vark(request):
     # todo: check teacher in course
 
     students = [
-        stu.student for stu in StudentCourse.objects.filter(course=course)]
+        stu.student for stu in StudentCourse.objects.filter(course=course)
+            if stu.student is not None]
 
     V, A, R, K = [float(x.V) for x in students if x.V is not None], \
         [float(x.A) for x in students if x.A is not None], \
