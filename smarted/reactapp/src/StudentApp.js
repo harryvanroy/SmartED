@@ -197,7 +197,11 @@ const StudentApp = ({ user }) => {
           <DialogContentText style={{ color: "black" }}>
             After providing your UQ username and password, all your UQ learning
             resources and announcements data will be pulled from blackboard so
-            they can be displayed here!
+            they can be displayed here! <b>Disclaimer:</b> we never store your UQ 
+            password, and only use it to log in to blackboard once on your 
+            behalf. After securely syncing your learning resources, you are 
+            logged out of blackboard and will need to provide your login details 
+            again to re-sync.
             <SyncData />
           </DialogContentText>
         </DialogContent>
