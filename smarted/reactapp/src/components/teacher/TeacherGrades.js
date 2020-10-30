@@ -26,6 +26,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import PropTypes from "prop-types";
+import {Dialog, DialogContent, DialogTitle, DialogContentText} from "@material-ui/core";
 
 // DETERMINE LOCATION
 var url;
@@ -77,9 +78,25 @@ function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
+  const [riskDialogOpen, setRiskDialogOpen] = React.useState(false);
 
   return (
     <React.Fragment>
+      <Dialog
+      open = {riskDialogOpen}
+      onClose = {() => setRiskDialogOpen(false)}
+      >
+        <DialogTitle id="form-dialog-title">At Risk</DialogTitle>
+        <DialogContent>
+          <DialogContentText style={{ color: "black" }}>
+            A student is classified as "AT RISK" if their current weighted
+            average grade in this course is less than 50%. This is a
+            generalised statement and may not truly reflect the student's
+            actual risk of failure.
+          </DialogContentText>
+        </DialogContent>
+        
+      </Dialog>
       <TableRow
         className={classes.root}
         style={{ backgroundColor: props.color }}
@@ -96,7 +113,7 @@ function Row(props) {
         <TableCell component="th" scope="row">
           {row.studentID}
           {parseFloat(row.currentGrade) < 50 && (
-            <Button color="secondary">AT RISK</Button>
+            <Button color="secondary" onClick={() => setRiskDialogOpen(true)}>AT RISK</Button>
           )}
         </TableCell>
         <TableCell align="right">{row.name}</TableCell>

@@ -39,12 +39,13 @@ def authorize_teacher(header):
 
     try:
         # there might be edge cases for this...
-        if header['X-Uq-User-Type'] == 'Student':
+        if 'Staff' not in header['X-Uq-User-Type']:
             if not FORCE_TEACHER and not CSRF_EXEMPT:
                 # no teacher overwrite and not a real teacher
                 return False, "error"
         else:
             # this is a legit teacher
+            print("\n\nteachers user type: ", header['X-Uq-User-Type'], "\n\n")
             username = json.loads(header['X-Kvd-Payload'])['user']
             return True, username
     except:
@@ -247,7 +248,8 @@ def students_in_course(request):
     course = Course.objects.get(id=id)
 
     students = [stu_course.student for stu_course in
-                StudentCourse.objects.filter(course=course)]
+                StudentCourse.objects.filter(course=course) 
+                if stu_course.student is not None]
 
     json_students = [{"username": student.user.username,
                       "firstname": student.user.firstName,
@@ -420,7 +422,8 @@ def get_average_vark(request):
     # todo: check teacher in course
 
     students = [
-        stu.student for stu in StudentCourse.objects.filter(course=course)]
+        stu.student for stu in StudentCourse.objects.filter(course=course)
+            if stu.student is not None]
 
     V, A, R, K = [float(x.V) for x in students if x.V is not None], \
         [float(x.A) for x in students if x.A is not None], \
@@ -493,7 +496,8 @@ def students_course_grade(request):
         return HttpResponse("failed query.. specify the correct course ID...")
 
     students = [
-        stu.student for stu in StudentCourse.objects.filter(course=course)]
+        stu.student for stu in StudentCourse.objects.filter(course=course)
+        if stu.student is not None]
 
     student_grades = [{"student": {"username": stu.user.username,
                                    "firstname": stu.user.firstName,

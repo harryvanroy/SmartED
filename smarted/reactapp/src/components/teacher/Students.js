@@ -13,6 +13,11 @@ import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import InfoIcon from '@material-ui/icons/Info';
+import IconButton from "@material-ui/core/IconButton";
+import {Dialog, DialogContent, DialogTitle, DialogContentText} from "@material-ui/core";
+
+
 
 // DETERMINE LOCATION
 var url;
@@ -43,6 +48,7 @@ const Students = ({ course }) => {
     K: 0.25,
   });
   const [studentsAtRisk, setStudentsAtRisk] = React.useState([]);
+  const [riskDialogOpen, setRiskDialogOpen] = React.useState(false);
   const classes = useStyles();
 
   const GetCourseVARK = ({ id }) => {
@@ -73,6 +79,21 @@ const Students = ({ course }) => {
 
   return (
     <div>
+      <Dialog
+      open = {riskDialogOpen}
+      onClose = {() => setRiskDialogOpen(false)}
+      >
+        <DialogTitle id="form-dialog-title">At Risk</DialogTitle>
+        <DialogContent>
+          <DialogContentText style={{ color: "black" }}>
+            A student is classified as "AT RISK" if their current weighted
+            average grade in this course is less than 50%. This is a
+            generalised statement and may not truly reflect the student's
+            actual risk of failure.
+          </DialogContentText>
+        </DialogContent>
+        
+      </Dialog>
       <Grid container justify="center" spacing={3} style={{ minWidth: 550 }}>
         <Grid item xs={8}>
           <Grid container direction="column" spacing={3}>
@@ -85,11 +106,15 @@ const Students = ({ course }) => {
                   style={{
                     display: "flex",
                     justifyContent: "center",
+                    alignItems: "center",
                     marginTop: 7,
                   }}
                   className={classes.paperTitle}
                 >
-                  <Typography variant="h5">Students at risk</Typography>
+                  <Typography variant="h5">Students at risk </Typography>
+                  <IconButton onClick = {() => setRiskDialogOpen(true)}>
+                    <InfoIcon fontSize="small"/>
+                  </IconButton>
                 </div>
                 <Table className={classes.table} aria-label="simple table">
                   <TableHead>

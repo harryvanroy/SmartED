@@ -129,7 +129,7 @@ const Feedback = ({ courses }) => {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert onClose={handleSpamClose} severity="warning">
-          Limit of 2 course feeback messages per day reached!
+          Limit of 2 course feedback messages per day reached!
         </Alert>
       </Snackbar>
       <Snackbar
