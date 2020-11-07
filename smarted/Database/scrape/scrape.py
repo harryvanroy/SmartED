@@ -48,7 +48,6 @@ class UQBlackboardScraper:
         else:
             print("starting driver as chrome")
             chrome_options = webdriver.ChromeOptions()
-            chrome_options.add_argument("--kiosk")
             # chrome_options.add_argument("--headless")
             self.driver = webdriver.Chrome(ChromeDriverManager().install(), 
                 options=chrome_options)
@@ -135,11 +134,6 @@ class UQBlackboardScraper:
             return
 
         for item in page_items:
-            # folder = item.find('img', class_="item_icon").attrs["alt"]
-            # if item.find('h3') is None:
-            #     continue
-            # name = item.find('h3').get_text().strip()
-            # resource_id = int(item.attrs['id'].split(':')[1].split('_')[1])
             resources[resource_id]["links"].update(self.find_links(item))
 
 
@@ -228,7 +222,7 @@ class UQBlackboardScraper:
 
         for course in current_courses:
             link = course.find("a")
-            if link is None:
+            if link is None or "Examination" in link.text:
                 continue
 
             course_id = link.attrs['href'].split("%")[-3].split("_")[1]
@@ -265,10 +259,11 @@ if __name__ == "__main__":
     print(courses)
     for course in courses.keys():
         print("\nNEXT COURSE = %s \n" % courses[course])
-        # resources = scraper.get_course_announcements(course)
-        # print(resources)
+        resources = scraper.get_course_announcements(course)
+        print(resources)
         resources = scraper.get_learning_resources(course)
         print(resources)
         resources = scraper.get_course_assessment(course)
         print(resources)
-        break
+
+    scraper.driver.quit()
