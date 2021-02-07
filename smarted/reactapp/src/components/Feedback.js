@@ -30,7 +30,6 @@ console.log("location: " + url);
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(0),
-    minWidth: 120,
   },
 }));
 const Alert = (props) => {
@@ -116,8 +115,7 @@ const Feedback = ({ courses }) => {
         open={open}
         autoHideDuration={2000}
         onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Alert onClose={handleClose} severity="success">
           Feedback submitted!
         </Alert>
@@ -126,8 +124,7 @@ const Feedback = ({ courses }) => {
         open={openSpam}
         autoHideDuration={2000}
         onClose={handleSpamClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Alert onClose={handleSpamClose} severity="warning">
           Limit of 2 course feedback messages per day reached!
         </Alert>
@@ -136,28 +133,25 @@ const Feedback = ({ courses }) => {
         open={openErr}
         autoHideDuration={2000}
         onClose={handleErrClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Alert onClose={handleErrClose} severity="error">
           Invalid feedback!
         </Alert>
       </Snackbar>
       <Typography variant="h4">Course Feedback</Typography>
 
-      <Box style={{ minWidth: 550 }} m={2}>
+      <Box m={2}>
         <FormControl
           style={{ marginBottom: 12 }}
           variant="outlined"
-          className={classes.formControl}
-        >
+          className={classes.formControl}>
           <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
           <Select
             defaultValue=""
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
             label="Course"
-            onChange={handleCourseChange}
-          >
+            onChange={handleCourseChange}>
             {courses.map((a, index) => (
               <MenuItem key={index} value={a.id}>
                 {" "}
@@ -193,8 +187,7 @@ const Feedback = ({ courses }) => {
           variant="contained"
           color="primary"
           size="large"
-          onClick={handleSubmit}
-        >
+          onClick={handleSubmit}>
           SEND TO COURSE STAFF
         </Button>
         <Link to="/">

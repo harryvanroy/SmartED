@@ -36,8 +36,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1.5em",
     paddingBottom: "15px",
   },
-  table: {
-    minWidth: 400,
+  paperContainer: {
+    [theme.breakpoints.down("sm")]: {
+      flexDirection: "column",
+    },
   },
 }));
 
@@ -83,23 +85,21 @@ function Grades({ courses, assessment }) {
       <Typography variant="h4">My Grades</Typography>
       <Grid style={{ marginTop: 5 }} container spacing={3}>
         {grades.map((grade) => (
-          <Grid
-            key={grade.courseInfo.id}
-            style={{ minWidth: 550 }}
-            item
-            xs={12}
-          >
+          <Grid key={grade.courseInfo.id} item xs={12}>
             <Paper className={classes.paper} elavation={3}>
               <div className={classes.paperTitle}>
                 <Typography variant="h5">{grade.courseInfo.name}</Typography>
               </div>
-              <Box display="flex" justifyContent="center" alignItems="center">
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                className={classes.paperContainer}>
                 <Box
                   display="flex"
                   justifyContent="center"
                   flexDirection="column"
-                  alignItems="center"
-                >
+                  alignItems="center">
                   <Progress
                     style={{ marginRight: 30 }}
                     subtitle={`Progress for ${grade.courseInfo.name}`}
@@ -117,9 +117,8 @@ function Grades({ courses, assessment }) {
                 <TableContainer
                   style={{ marginBottom: 10, marginTop: 10 }}
                   component={Paper}
-                  elavation={3}
-                >
-                  <Table className={classes.table} aria-label="simple table">
+                  elavation={3}>
+                  <Table aria-label="simple table">
                     <TableHead>
                       <TableRow>
                         <TableCell>Assessment</TableCell>
@@ -134,8 +133,8 @@ function Grades({ courses, assessment }) {
                             {parseInt(item.grade) < 50 ? (
                               <Button color="secondary">FAILED</Button>
                             ) : (
-                                <Button color="primary">PASSED</Button>
-                              )}
+                              <Button color="primary">PASSED</Button>
+                            )}
                           </TableCell>
                           <TableCell align="right">
                             <Typography>

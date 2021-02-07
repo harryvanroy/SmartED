@@ -25,9 +25,9 @@ import Menu from "@material-ui/core/Menu";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import HomeIcon from "@material-ui/icons/Home";
-import ExitIcon from '@material-ui/icons/PowerSettingsNew';
+import ExitIcon from "@material-ui/icons/PowerSettingsNew";
 import DeleteIcon from "@material-ui/icons/Delete";
-import PersonIcon from '@material-ui/icons/Person';
+import PersonIcon from "@material-ui/icons/Person";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -94,7 +94,7 @@ const barColours = [
   "darkgreen",
   "darkslategrey",
   "black",
-  "darkblue"
+  "darkblue",
 ];
 
 const TeacherApp = ({ user }) => {
@@ -110,9 +110,9 @@ const TeacherApp = ({ user }) => {
   const [logoutOpen, setLogoutOpen] = React.useState(false);
 
   let localColorIndex = 0;
-  if (localStorage.getItem('barColourIndex') !== null) {
-    localColorIndex = parseInt(localStorage.getItem('barColourIndex'));
-  };
+  if (localStorage.getItem("barColourIndex") !== null) {
+    localColorIndex = parseInt(localStorage.getItem("barColourIndex"));
+  }
   const [color, setColor] = React.useState(barColours[localColorIndex]);
   const [colorIndex, setColorIndex] = React.useState(localColorIndex);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -138,11 +138,11 @@ const TeacherApp = ({ user }) => {
     if (colorIndex + 1 === barColours.length) {
       setColor(barColours[0]);
       setColorIndex(0);
-      localStorage.setItem('barColourIndex', 0);
+      localStorage.setItem("barColourIndex", 0);
     } else {
       setColor(barColours[colorIndex + 1]);
       setColorIndex(colorIndex + 1);
-      localStorage.setItem('barColourIndex', colorIndex + 1);
+      localStorage.setItem("barColourIndex", colorIndex + 1);
     }
   };
 
@@ -240,8 +240,7 @@ const TeacherApp = ({ user }) => {
       <Dialog
         open={editCourseOpen}
         onClose={handleEditCourseClose}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Edit Courses</DialogTitle>
         <DialogContent>
           {courses.map((a) => (
@@ -250,8 +249,7 @@ const TeacherApp = ({ user }) => {
               <MenuItem
                 value="del"
                 value={a}
-                onClick={() => handleDeleteCourse(a)}
-              >
+                onClick={() => handleDeleteCourse(a)}>
                 <DeleteIcon value="del" />
               </MenuItem>
             </Box>
@@ -269,8 +267,7 @@ const TeacherApp = ({ user }) => {
               <Button
                 style={{ margin: 12 }}
                 onClick={handleAddCourseSubmit}
-                variant="contained"
-              >
+                variant="contained">
                 Add
               </Button>
             </Box>
@@ -283,22 +280,20 @@ const TeacherApp = ({ user }) => {
   const logoutDialog = () => {
     return (
       <Dialog open={logoutOpen} onClose={handleLogoutClose}>
-        <DialogTitle>
-          Confirm logout?
-        </DialogTitle>
+        <DialogTitle>Confirm logout?</DialogTitle>
         <DialogContent>
-          <Button variant="contained" color="primary" style={{marginLeft:12}} 
-            href="https://learn.uq.edu.au/webapps/login/?action=logout"
-          >
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ marginLeft: 12 }}
+            href="https://learn.uq.edu.au/webapps/login/?action=logout">
             YES, LOG ME OUT
           </Button>
-          <Button onClick={handleLogoutClose}>
-            NO
-          </Button>
+          <Button onClick={handleLogoutClose}>NO</Button>
         </DialogContent>
       </Dialog>
     );
-  }
+  };
 
   const handleCourseChange = (e) => {
     console.log(e);
@@ -318,14 +313,18 @@ const TeacherApp = ({ user }) => {
       <div className={classes.root}>
         {editCoursesDialog()}
         <CssBaseline />
-        <AppBar position="fixed" className={classes.appBar} 
-          style={{background:color}}
-        >
+        <AppBar
+          position="fixed"
+          className={classes.appBar}
+          style={{ background: color }}>
           <Toolbar>
             {logoutDialog()}
             <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
               <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-                <span role="img" aria-label="cap">🎓</span>SmartED
+                <span role="img" aria-label="cap">
+                  🎓
+                </span>
+                SmartED
               </Link>
             </Typography>
             <Typography style={{ marginLeft: 20, flexGrow: 1 }}>
@@ -337,12 +336,10 @@ const TeacherApp = ({ user }) => {
             <FormControl
               style={{ marginRight: 18, marginTop: 5, marginBottom: 5 }}
               variant="outlined"
-              className={classes.formControl}
-            >
+              className={classes.formControl}>
               <InputLabel
                 id="demo-simple-select-outlined-label"
-                style={{ color: "white" }}
-              >
+                style={{ color: "white" }}>
                 Course
               </InputLabel>
               <Select
@@ -352,8 +349,7 @@ const TeacherApp = ({ user }) => {
                 id="demo-simple-select-outlined"
                 label="Course"
                 style={{ color: "white" }}
-                onChange={handleCourseChange}
-              >
+                onChange={handleCourseChange}>
                 {courses.map((a) => (
                   <MenuItem key={a.name} value={a}>
                     {a.name}
@@ -369,24 +365,27 @@ const TeacherApp = ({ user }) => {
                 <HomeIcon fontSize={"large"} />
               </IconButton>
             </Link>
-            <Link 
-              onClick={handleProfileOpen} 
-              style={{ textDecoration: "none", color: "unset"}}
-              aria-controls="simple-menu" aria-haspopup="true"  
-            > <IconButton style={{ textDecoration: "none", color: "unset" }}>
+            <Link
+              onClick={handleProfileOpen}
+              style={{ textDecoration: "none", color: "unset" }}
+              aria-controls="simple-menu"
+              aria-haspopup="true">
+              {" "}
+              <IconButton style={{ textDecoration: "none", color: "unset" }}>
                 <PersonIcon fontSize={"large"} />
-              </IconButton>     
+              </IconButton>
             </Link>
             <Menu
               id="simple-menu"
               anchorEl={anchorEl}
               keepMounted
               open={Boolean(anchorEl)}
-              onClose={handleProfileClose}
-            >
+              onClose={handleProfileClose}>
               <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
             </Menu>
-            <IconButton onClick={handleLogoutOpen} style={{ textDecoration: "none", color: "unset" }}>
+            <IconButton
+              onClick={handleLogoutOpen}
+              style={{ textDecoration: "none", color: "unset" }}>
               <ExitIcon fontSize={"large"} />
             </IconButton>
           </Toolbar>
@@ -396,8 +395,7 @@ const TeacherApp = ({ user }) => {
           variant="permanent"
           classes={{
             paper: classes.drawerPaper,
-          }}
-        >
+          }}>
           <Toolbar />
           <div className={classes.drawerContainer}>
             <List>
@@ -416,8 +414,7 @@ const TeacherApp = ({ user }) => {
                         "/teacherfeedback",
                       ][index]
                     }
-                    activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}
-                  >
+                    activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}>
                     <ListItemIcon>
                       {
                         {

@@ -25,9 +25,10 @@ import SchoolIcon from "@material-ui/icons/School";
 import ClassIcon from "@material-ui/icons/Class";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import HomeIcon from "@material-ui/icons/Home";
-import ExitIcon from '@material-ui/icons/PowerSettingsNew';
+import ExitIcon from "@material-ui/icons/PowerSettingsNew";
 import SyncIcon from "@material-ui/icons/Sync";
-import PersonIcon from '@material-ui/icons/Person';
+import PersonIcon from "@material-ui/icons/Person";
+import MenuIcon from "@material-ui/icons/Menu";
 
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
@@ -67,9 +68,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
   },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-  },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -100,7 +98,7 @@ const barColours = [
   "darkgreen",
   "darkslategrey",
   "black",
-  "darkblue"
+  "darkblue",
 ];
 
 const StudentApp = ({ user }) => {
@@ -113,10 +111,11 @@ const StudentApp = ({ user }) => {
   const [assessment, setAssessment] = React.useState([]);
   const [announcements, setAnnouncements] = React.useState([]);
   const [logoutOpen, setLogoutOpen] = React.useState(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
 
   let localColorIndex = 0;
-  if (localStorage.getItem('barColourIndex') !== null) {
-    localColorIndex = parseInt(localStorage.getItem('barColourIndex'));
+  if (localStorage.getItem("barColourIndex") !== null) {
+    localColorIndex = parseInt(localStorage.getItem("barColourIndex"));
   }
   const [color, setColor] = React.useState(barColours[localColorIndex]);
   const [colorIndex, setColorIndex] = React.useState(localColorIndex);
@@ -155,29 +154,27 @@ const StudentApp = ({ user }) => {
     if (colorIndex + 1 === barColours.length) {
       setColor(barColours[0]);
       setColorIndex(0);
-      localStorage.setItem('barColourIndex', 0);
+      localStorage.setItem("barColourIndex", 0);
     } else {
       setColor(barColours[colorIndex + 1]);
       setColorIndex(colorIndex + 1);
-      localStorage.setItem('barColourIndex', colorIndex + 1);
+      localStorage.setItem("barColourIndex", colorIndex + 1);
     }
   };
 
   const logoutDialog = () => {
     return (
       <Dialog open={logoutOpen} onClose={handleLogoutClose}>
-        <DialogTitle>
-          Confirm logout?
-        </DialogTitle>
+        <DialogTitle>Confirm logout?</DialogTitle>
         <DialogContent>
-          <Button variant="contained" color="primary" style={{marginLeft:12}} 
-            href="https://learn.uq.edu.au/webapps/login/?action=logout"
-          >
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ marginLeft: 12 }}
+            href="https://learn.uq.edu.au/webapps/login/?action=logout">
             YES, LOG ME OUT
           </Button>
-          <Button onClick={handleLogoutClose}>
-            NO
-          </Button>
+          <Button onClick={handleLogoutClose}>NO</Button>
         </DialogContent>
       </Dialog>
     );
@@ -188,8 +185,7 @@ const StudentApp = ({ user }) => {
       <Dialog
         open={syncOpen}
         onClose={handleSyncClose}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">
           Synchronise Your UQ Data
         </DialogTitle>
@@ -197,10 +193,10 @@ const StudentApp = ({ user }) => {
           <DialogContentText style={{ color: "black" }}>
             After providing your UQ username and password, all your UQ learning
             resources and announcements data will be pulled from blackboard so
-            they can be displayed here! <b>Disclaimer:</b> we never store your UQ 
-            password, and only use it to log in to blackboard once on your 
-            behalf. After securely syncing your learning resources, you are 
-            logged out of blackboard and will need to provide your login details 
+            they can be displayed here! <b>Disclaimer:</b> we never store your
+            UQ password, and only use it to log in to blackboard once on your
+            behalf. After securely syncing your learning resources, you are
+            logged out of blackboard and will need to provide your login details
             again to re-sync.
             <SyncData />
           </DialogContentText>
@@ -277,64 +273,62 @@ const StudentApp = ({ user }) => {
       });
     });
   }, []);
-  console.log(announcements);
   return (
     <div className={classes.root}>
       {syncDialog()}
-
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar} 
-        style={{background:color}}
-      >
+      <AppBar position="fixed" style={{ background: color }}>
         <Toolbar>
           {logoutDialog()}
-          <Typography variant="h4" noWrap /*style={{flexGrow: 1}}*/>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={() => setOpenDrawer(true)}>
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h4" noWrap style={{ flexGrow: 1 }}>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-              <span role="img" aria-label="cap">🎓</span>SmartED
+              <span role="img" aria-label="cap">
+                🎓
+              </span>
+              SmartED
             </Link>
           </Typography>
-          <Typography style={{ marginLeft: 20, flexGrow: 1 }}>
-            Welcome {user.firstname}!
-          </Typography>
           <Study />
-          <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
+          <Link
+            onClick={handleProfileOpen}
+            style={{ textDecoration: "none", color: "unset" }}
+            aria-controls="simple-menu"
+            aria-haspopup="true">
             <IconButton style={{ textDecoration: "none", color: "unset" }}>
-              <HomeIcon fontSize={"large"} />
-            </IconButton>
-          </Link>
-          <Link 
-            onClick={handleProfileOpen} 
-            style={{ textDecoration: "none", color: "unset"}}
-            aria-controls="simple-menu" aria-haspopup="true"  
-          > <IconButton style={{ textDecoration: "none", color: "unset" }}>
               <PersonIcon fontSize={"large"} />
-            </IconButton>     
+            </IconButton>
           </Link>
           <Menu
             id="simple-menu"
             anchorEl={anchorEl}
             keepMounted
             open={Boolean(anchorEl)}
-            onClose={handleProfileClose}
-          >
+            onClose={handleProfileClose}>
             <Link to="/vark" style={{ textDecoration: "none", color: "unset" }}>
               <MenuItem onClick={handleProfileClose}>VARK quiz</MenuItem>
             </Link>
             <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
           </Menu>
-          <IconButton onClick={handleLogoutOpen} style={{ textDecoration: "none", color: "unset" }}>
+          <IconButton
+            onClick={handleLogoutOpen}
+            style={{ textDecoration: "none", color: "unset" }}>
             <ExitIcon fontSize={"large"} />
           </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
         className={classes.drawer}
-        variant="permanent"
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
         classes={{
           paper: classes.drawerPaper,
-        }}
-      >
-        <Toolbar />
+        }}>
         <div className={classes.drawerContainer}>
           <List>
             <ListItem button onClick={handleClick}>
@@ -354,8 +348,7 @@ const StudentApp = ({ user }) => {
                       button
                       className={classes.nested}
                       component={NavLink}
-                      to={"/course/" + a.name}
-                    >
+                      to={"/course/" + a.name}>
                       <ListItemText
                         primary={a.name}
                         classes={{ primary: classes.listItemText }}
@@ -381,8 +374,7 @@ const StudentApp = ({ user }) => {
                     index
                   ]
                 }
-                activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}
-              >
+                activeStyle={{ background: "rgb(0, 0, 0, 0.1)" }}>
                 <ListItemIcon>
                   {
                     {

@@ -61,7 +61,7 @@ function checkDate(dateString) {
   return new Date(year, month, day);
 }
 
-function Home({ assessment, courses, vark, announcements }) {
+const Home = ({ assessment, courses, vark, announcements }) => {
   const classes = useStyles();
 
   const [open, setOpen] = React.useState(false);
@@ -102,8 +102,7 @@ function Home({ assessment, courses, vark, announcements }) {
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">
           {dialogAnn.title}
           <Typography color="primary">
@@ -117,8 +116,7 @@ function Home({ assessment, courses, vark, announcements }) {
       <Dialog
         open={open}
         onClose={handleVarkClose}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">About VARK</DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
@@ -137,81 +135,71 @@ function Home({ assessment, courses, vark, announcements }) {
       <Dialog
         open={altOpen}
         onClose={handleAltClose}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">VARK score breakdown</DialogTitle>
         <DialogContent>
           <VarkBreakdown V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
         </DialogContent>
       </Dialog>
 
-      <Grid container justify="center" spacing={3} style={{ minWidth: 550 }}>
-        <Grid item xs={8}>
-          <Grid container direction="column" spacing={3}>
-            <Grid item xs={12}>
-              <Paper elevation={3} className={classes.paper}>
-                <div
-                  style={{ display: "flex", justifyContent: "center" }}
-                  className={classes.paperTitle}
-                >
-                  <Typography variant="h5">Announcements</Typography>
-                </div>
-                <Box style={{ maxHeight: 760, overflow: "auto" }}>
-                  {announcements
-                    .sort(
-                      (a, b) =>
-                        Date.parse(b.dateAdded) - Date.parse(a.dateAdded)
-                    )
-                    .map((ann) => (
-                      <ButtonBase key={ann.id} style={{ width: "100%" }}>
-                        <Paper
-                          onClick={handleOpenDialog(ann)}
-                          square
-                          style={{
-                            minHeight: 50,
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "flex-start",
-                            alignItems: "center",
-                          }}
-                          key={ann.id}
-                          variant="outlined"
-                        >
-                          <Typography
-                            style={{
-                              flexGrow: 1,
-                              textAlign: "left",
-                              margin: 10,
-                            }}
-                          >
-                            {ann.title.slice(0, 25) + "..."}
-                          </Typography>
-                          <Typography
-                            style={{
-                              margin: 10,
-                              color: "#51237a",
-                            }}
-                          >
-                            {
-                              courses.filter(
-                                (course) => course.id === ann.course
-                              )[0].name
-                            }
-                          </Typography>
-                          <Typography style={{ margin: 10 }}>
-                            {ann.dateAdded.slice(8, 10) + 
-                            ann.dateAdded.slice(4,8) + 
-                            ann.dateAdded.slice(0,4)}
-                          </Typography>
-                        </Paper>
-                      </ButtonBase>
-                    ))}
-                </Box>
-              </Paper>
-            </Grid>
-          </Grid>
+      <Grid container justify="center" spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} className={classes.paper}>
+            <div
+              style={{ display: "flex", justifyContent: "center" }}
+              className={classes.paperTitle}>
+              <Typography variant="h5">Announcements</Typography>
+            </div>
+            <Box style={{ maxHeight: 760, overflow: "auto" }}>
+              {announcements
+                .sort(
+                  (a, b) => Date.parse(b.dateAdded) - Date.parse(a.dateAdded)
+                )
+                .map((ann) => (
+                  <ButtonBase key={ann.id} style={{ width: "100%" }}>
+                    <Paper
+                      onClick={handleOpenDialog(ann)}
+                      square
+                      style={{
+                        minHeight: 50,
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                      key={ann.id}
+                      variant="outlined">
+                      <Typography
+                        style={{
+                          flexGrow: 1,
+                          textAlign: "left",
+                          margin: 10,
+                        }}>
+                        {ann.title.slice(0, 25) + "..."}
+                      </Typography>
+                      <Typography
+                        style={{
+                          margin: 10,
+                          color: "#51237a",
+                        }}>
+                        {
+                          courses.filter(
+                            (course) => course.id === ann.course
+                          )[0].name
+                        }
+                      </Typography>
+                      <Typography style={{ margin: 10 }}>
+                        {ann.dateAdded.slice(8, 10) +
+                          ann.dateAdded.slice(4, 8) +
+                          ann.dateAdded.slice(0, 4)}
+                      </Typography>
+                    </Paper>
+                  </ButtonBase>
+                ))}
+            </Box>
+          </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12} style={{ textAlign: "center" }}>
               <Paper elevation={3} className={classes.paper}>
@@ -221,8 +209,7 @@ function Home({ assessment, courses, vark, announcements }) {
                     <Button
                       style={{ marginLeft: 5 }}
                       color="primary"
-                      onClick={handleVarkOpen}
-                    >
+                      onClick={handleVarkOpen}>
                       Read more
                     </Button>
                   </Typography>
@@ -239,8 +226,7 @@ function Home({ assessment, courses, vark, announcements }) {
                       variant="contained"
                       color="primary"
                       style={{ marginTop: 12 }}
-                      onClick={handleAltOpen}
-                    >
+                      onClick={handleAltOpen}>
                       My VARK Score
                     </Button>
                   </div>
@@ -255,15 +241,13 @@ function Home({ assessment, courses, vark, announcements }) {
                 <Box
                   style={{ maxHeight: 300, overflow: "auto" }}
                   flex={1}
-                  flexDirection="column"
-                >
+                  flexDirection="column">
                   {courses.map((course) => (
                     <TableContainer
                       style={{ marginBottom: 20 }}
                       key={course.id}
                       component={Paper}
-                      variant="outlined"
-                    >
+                      variant="outlined">
                       <Table aria-label="simple table">
                         <TableHead>
                           <TableRow>
@@ -323,6 +307,6 @@ function Home({ assessment, courses, vark, announcements }) {
       </Grid>
     </div>
   );
-}
+};
 
 export { Home, checkDate };

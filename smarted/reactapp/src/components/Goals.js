@@ -42,9 +42,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(0),
     minWidth: 120,
   },
-  table: {
-    minWidth: 550,
-  },
 }));
 
 function Goals({ courses, assessment }) {
@@ -252,13 +249,11 @@ function Goals({ courses, assessment }) {
           Get grade
           <FormControl
             style={{ marginLeft: 6, marginRight: 6 }}
-            variant="outlined"
-          >
+            variant="outlined">
             <Select
               id="demo-simple-select-outlined"
               onChange={handleGradeChange}
-              defaultValue=""
-            >
+              defaultValue="">
               <MenuItem value={1}> 1</MenuItem>
               <MenuItem value={2}> 2</MenuItem>
               <MenuItem value={3}> 3</MenuItem>
@@ -281,13 +276,11 @@ function Goals({ courses, assessment }) {
           Get grade
           <FormControl
             style={{ marginLeft: 6, marginRight: 6 }}
-            variant="outlined"
-          >
+            variant="outlined">
             <Select
               id="demo-simple-select-outlined"
               onChange={handleGradeChange}
-              defaultValue=""
-            >
+              defaultValue="">
               <MenuItem value={1}> 1</MenuItem>
               <MenuItem value={2}> 2</MenuItem>
               <MenuItem value={3}> 3</MenuItem>
@@ -300,13 +293,11 @@ function Goals({ courses, assessment }) {
           in assessment item
           <FormControl
             style={{ marginLeft: 6, marginRight: 6 }}
-            variant="outlined"
-          >
+            variant="outlined">
             <Select
               id="demo-simple-select-outlined"
               onChange={handleAssessmentChange}
-              defaultValue=""
-            >
+              defaultValue="">
               {assessment
                 .filter((ass) => ass.course === state.courseID)
                 .map((e) => (
@@ -385,8 +376,7 @@ function Goals({ courses, assessment }) {
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Custom goal</DialogTitle>
         <DialogContent>
           <DialogContentText>{dialogText}</DialogContentText>
@@ -400,23 +390,20 @@ function Goals({ courses, assessment }) {
             variant="contained"
             color="primary"
             size="large"
-            onClick={handleOpen}
-          >
+            onClick={handleOpen}>
             ADD GOAL
           </Button>
           <Dialog
             open={open}
             onClose={handleClose}
-            aria-labelledby="form-dialog-title"
-          >
+            aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
             <DialogContent>
               <Box m={2}>
                 <FormControl
                   style={{ marginBottom: 12, marginRight: 6 }}
                   variant="outlined"
-                  className={classes.formControl}
-                >
+                  className={classes.formControl}>
                   <InputLabel id="demo-simple-select-outlined-label">
                     Course
                   </InputLabel>
@@ -425,8 +412,7 @@ function Goals({ courses, assessment }) {
                     id="demo-simple-select-outlined"
                     label="Course"
                     defaultValue=""
-                    onChange={handleCourseChange}
-                  >
+                    onChange={handleCourseChange}>
                     {courses.map((a, index) => (
                       <MenuItem key={index} value={a}>
                         {" "}
@@ -438,8 +424,7 @@ function Goals({ courses, assessment }) {
                 <FormControl
                   style={{ marginBottom: 12 }}
                   variant="outlined"
-                  className={classes.formControl}
-                >
+                  className={classes.formControl}>
                   <InputLabel id="demo-simple-select-outlined-label">
                     Goal type
                   </InputLabel>
@@ -448,8 +433,7 @@ function Goals({ courses, assessment }) {
                     id="demo-simple-select-outlined"
                     label="Course"
                     defaultValue=""
-                    onChange={handleGoalChange}
-                  >
+                    onChange={handleGoalChange}>
                     <MenuItem value={"COURSEGRADE"}> Overall grade </MenuItem>
                     <MenuItem value={"ASSESSMENTGRADE"}>
                       {" "}
@@ -469,8 +453,7 @@ function Goals({ courses, assessment }) {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                color="primary"
-              >
+                color="primary">
                 ADD
               </Button>
               <Button onClick={handleClose} color="primary">
@@ -478,18 +461,12 @@ function Goals({ courses, assessment }) {
               </Button>
             </DialogActions>
           </Dialog>
-          <Link to="/">
-            <Button color="primary" size="large">
-              Back
-            </Button>
-          </Link>
         </Box>
       </Box>
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
-        component={Paper}
-      >
-        <Table className={classes.table} aria-label="simple table">
+        component={Paper}>
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
@@ -507,8 +484,7 @@ function Goals({ courses, assessment }) {
                   <Button
                     variant="outlined"
                     color="primary"
-                    onClick={handleOpenDialog(row.text)}
-                  >
+                    onClick={handleOpenDialog(row.text)}>
                     View goal
                   </Button>
                 </TableCell>
@@ -524,9 +500,8 @@ function Goals({ courses, assessment }) {
       </TableContainer>
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
-        component={Paper}
-      >
-        <Table className={classes.table} aria-label="simple table">
+        component={Paper}>
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
@@ -553,9 +528,8 @@ function Goals({ courses, assessment }) {
       </TableContainer>
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
-        component={Paper}
-      >
-        <Table className={classes.table} aria-label="simple table">
+        component={Paper}>
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
@@ -582,9 +556,8 @@ function Goals({ courses, assessment }) {
       </TableContainer>
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
-        component={Paper}
-      >
-        <Table className={classes.table} aria-label="simple table">
+        component={Paper}>
+        <Table aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>

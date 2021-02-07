@@ -53,7 +53,9 @@ function calculatePriority(item) {
   // "curr date:", currentDate, "diff:", (checkDate(item.dateDescription) - currentDate)/ (1000 * 3600 * 24))
   return (
     item.weight /
-    Math.log((checkDate(item.dateDescription) - currentDate)/(1000 * 3600 * 24) + 1)
+    Math.log(
+      (checkDate(item.dateDescription) - currentDate) / (1000 * 3600 * 24) + 1
+    )
   );
 }
 
@@ -77,8 +79,7 @@ const Assessment = ({ assessment, courses }) => {
       <Dialog
         open={open}
         onClose={handlePriorityClose}
-        aria-labelledby="form-dialog-title"
-      >
+        aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Priority</DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
@@ -99,7 +100,7 @@ const Assessment = ({ assessment, courses }) => {
       <Typography variant="h4">Assessment</Typography>
       <Grid style={{ marginTop: 5 }} container spacing={3}>
         {courses.map((course) => (
-          <Grid key={course.id} item xs={6}>
+          <Grid key={course.id} item xs={12}>
             <Paper className={classes.paper} elavation={3}>
               <div className={classes.paperTitle}>
                 <Typography variant="h5">{course.name}</Typography>
@@ -108,8 +109,7 @@ const Assessment = ({ assessment, courses }) => {
                 style={{ marginBottom: 10, marginTop: 10, width: "100%" }}
                 component={Paper}
                 elavation={3}
-                variant="outlined"
-              >
+                variant="outlined">
                 <Table className={classes.table}>
                   <TableHead>
                     <TableRow>
@@ -118,8 +118,7 @@ const Assessment = ({ assessment, courses }) => {
                           align="left"
                           style={{ marginLeft: 5, textTransform: "none" }}
                           color="primary"
-                          onClick={handlePriorityOpen}
-                        >
+                          onClick={handlePriorityOpen}>
                           Priority
                         </Button>
                       </TableCell>
@@ -144,17 +143,16 @@ const Assessment = ({ assessment, courses }) => {
                       })
                       .map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell align="center">
+                          <TableCell align="left">
                             {Math.round(100 * calculatePriority(item)) / 100}
                           </TableCell>
                           <TableCell
                             component="th"
                             scope="row"
-                            style={{ width: "50%" }}
-                          >
+                            style={{ width: "50%" }}>
                             {item.name}
                           </TableCell>
-                          <TableCell align="center">{item.weight}%</TableCell>
+                          <TableCell align="left">{item.weight}%</TableCell>
                           <TableCell align="right">
                             {item.dateDescription}
                           </TableCell>
@@ -173,17 +171,16 @@ const Assessment = ({ assessment, courses }) => {
                       )
                       .map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell align="center">
+                          <TableCell align="left">
                             <Button color="primary">Completed</Button>
                           </TableCell>
                           <TableCell
                             component="th"
                             scope="row"
-                            style={{ width: "40%" }}
-                          >
+                            style={{ width: "40%" }}>
                             {item.name}
                           </TableCell>
-                          <TableCell align="center">{item.weight}%</TableCell>
+                          <TableCell align="left">{item.weight}%</TableCell>
                           <TableCell align="right" style={{ width: "30%" }}>
                             {item.dateDescription}
                           </TableCell>
@@ -198,6 +195,6 @@ const Assessment = ({ assessment, courses }) => {
       </Grid>
     </div>
   );
-}
+};
 
 export default Assessment;
