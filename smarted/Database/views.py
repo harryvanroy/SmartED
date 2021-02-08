@@ -75,8 +75,8 @@ def initialize_course(header, stu):
 
     :return: Nothing
     """
-    sem = 2
-    year = 2020
+    sem = 1
+    year = 2021
     mode = 'EXTERNAL'
 
     # Initialize UQ if needed
@@ -677,6 +677,7 @@ def goals(request):
         raise ParseError
 
 ################### END GOALS ########################
+
 
 def refresh_content(username, password):
     """
