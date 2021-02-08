@@ -39,7 +39,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "1.5em",
     paddingBottom: "15px",
   },
-  table: {},
 }));
 
 let currentDate = new Date(
@@ -48,16 +47,14 @@ let currentDate = new Date(
   new Date().getDate()
 );
 
-function calculatePriority(item) {
-  // console.log("weight: ", item.weight, "date item:", checkDate(item.dateDescription),
-  // "curr date:", currentDate, "diff:", (checkDate(item.dateDescription) - currentDate)/ (1000 * 3600 * 24))
+const calculatePriority = (item) => {
   return (
     item.weight /
     Math.log(
       (checkDate(item.dateDescription) - currentDate) / (1000 * 3600 * 24) + 1
     )
   );
-}
+};
 
 const Assessment = ({ assessment, courses }) => {
   const classes = useStyles();
@@ -122,7 +119,7 @@ const Assessment = ({ assessment, courses }) => {
                           Priority
                         </Button>
                       </TableCell>
-                      <TableCell style={{ width: "40%" }}>Assessment</TableCell>
+                      <TableCell>Assessment</TableCell>
                       <TableCell align="center">Weight</TableCell>
                       <TableCell align="right">Due Date</TableCell>
                     </TableRow>
@@ -146,10 +143,7 @@ const Assessment = ({ assessment, courses }) => {
                           <TableCell align="left">
                             {Math.round(100 * calculatePriority(item)) / 100}
                           </TableCell>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            style={{ width: "50%" }}>
+                          <TableCell component="th" scope="row">
                             {item.name}
                           </TableCell>
                           <TableCell align="left">{item.weight}%</TableCell>
@@ -171,17 +165,12 @@ const Assessment = ({ assessment, courses }) => {
                       )
                       .map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell align="left">
-                            <Button color="primary">Completed</Button>
-                          </TableCell>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            style={{ width: "40%" }}>
+                          <TableCell align="left">Completed</TableCell>
+                          <TableCell component="th" scope="row">
                             {item.name}
                           </TableCell>
                           <TableCell align="left">{item.weight}%</TableCell>
-                          <TableCell align="right" style={{ width: "30%" }}>
+                          <TableCell align="right">
                             {item.dateDescription}
                           </TableCell>
                         </TableRow>

@@ -1,26 +1,21 @@
-import React, { useEffect } from "react";
-import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
-import { Button, Box, Typography } from "@material-ui/core";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
-import FormControl from "@material-ui/core/FormControl";
-import { Link } from "react-router-dom";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
-import axios from "axios";
+import React, { useState } from "react";
+import {
+  Button,
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  DialogContentText,
+  Box,
+} from "@material-ui/core";
 import Cookies from "js-cookie";
-import DialogContentText from "@material-ui/core/DialogContentText";
 
 // DETERMINE LOCATION
 var url;
@@ -32,23 +27,14 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
 console.log("location: " + url);
 //
 
-const useStyles = makeStyles((theme) => ({
-  table: {
-    minWidth: 550,
-  },
-}));
-
 const TeacherFeedback = ({ feedback }) => {
-  const classes = useStyles();
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [dialogText, setDialogText] = React.useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogText, setDialogText] = useState("");
 
-  function handleOpenDialog(text) {
-    return function () {
-      setOpenDialog(true);
-      setDialogText(text);
-    };
-  }
+  const handleOpenDialog = (text) => () => {
+    setOpenDialog(true);
+    setDialogText(text);
+  };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -56,23 +42,16 @@ const TeacherFeedback = ({ feedback }) => {
   };
 
   return (
-    <div>
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Feedback</DialogTitle>
+    <Box>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Feedback</DialogTitle>
         <DialogContent>
           <DialogContentText>{dialogText}</DialogContentText>
         </DialogContent>
       </Dialog>
       <Typography variant="h4">Course Feedback</Typography>
-      <TableContainer
-        style={{ marginBottom: 10, marginTop: 10 }}
-        component={Paper}
-      >
-        <Table className={classes.table} aria-label="simple table">
+      <TableContainer style={{ marginTop: 10 }} component={Paper}>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Student</TableCell>
@@ -89,8 +68,7 @@ const TeacherFeedback = ({ feedback }) => {
                   <Button
                     variant="outlined"
                     color="primary"
-                    onClick={handleOpenDialog(row.feedback)}
-                  >
+                    onClick={handleOpenDialog(row.feedback)}>
                     View feedback
                   </Button>
                 </TableCell>
@@ -99,7 +77,7 @@ const TeacherFeedback = ({ feedback }) => {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Box>
   );
 };
 

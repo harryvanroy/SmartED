@@ -1,23 +1,26 @@
-import React, { useEffect } from "react";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
 import VarkChart from "../VarkChart";
 import Cookies from "js-cookie";
 import axios from "axios";
-import Box from "@material-ui/core/Box";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import InfoIcon from '@material-ui/icons/Info';
-import IconButton from "@material-ui/core/IconButton";
-import {Dialog, DialogContent, DialogTitle, DialogContentText} from "@material-ui/core";
-
-
+import InfoIcon from "@material-ui/icons/Info";
 
 // DETERMINE LOCATION
 var url;
@@ -47,11 +50,11 @@ const Students = ({ course }) => {
     R: 0.25,
     K: 0.25,
   });
-  const [studentsAtRisk, setStudentsAtRisk] = React.useState([]);
-  const [riskDialogOpen, setRiskDialogOpen] = React.useState(false);
+  const [studentsAtRisk, setStudentsAtRisk] = useState([]);
+  const [riskDialogOpen, setRiskDialogOpen] = useState(false);
   const classes = useStyles();
 
-  const GetCourseVARK = ({ id }) => {
+  useEffect(() => {
     axios(url + "/Database/course-average-vark/?id=" + course.id, {
       method: "get",
       withCredentials: true,
@@ -64,10 +67,6 @@ const Students = ({ course }) => {
         K: parseFloat(res.data.K),
       });
     });
-  };
-
-  useEffect(() => {
-    GetCourseVARK(course.id);
 
     axios(url + `/Database/students-at-risk/?id=${course.id}`, {
       method: "get",
@@ -78,89 +77,73 @@ const Students = ({ course }) => {
   }, [course]);
 
   return (
-    <div>
-      <Dialog
-      open = {riskDialogOpen}
-      onClose = {() => setRiskDialogOpen(false)}
-      >
-        <DialogTitle id="form-dialog-title">At Risk</DialogTitle>
+    <Box>
+      <Dialog open={riskDialogOpen} onClose={() => setRiskDialogOpen(false)}>
+        <DialogTitle>At Risk</DialogTitle>
         <DialogContent>
-          <DialogContentText style={{ color: "black" }}>
+          <DialogContentText>
             A student is classified as "AT RISK" if their current weighted
-            average grade in this course is less than 50%. This is a
-            generalised statement and may not truly reflect the student's
-            actual risk of failure.
+            average grade in this course is less than 50%. This is a generalised
+            statement and may not truly reflect the student's actual risk of
+            failure.
           </DialogContentText>
         </DialogContent>
-        
       </Dialog>
-      <Grid container justify="center" spacing={3} style={{ minWidth: 550 }}>
-        <Grid item xs={8}>
-          <Grid container direction="column" spacing={3}>
-            <Grid item xs={12}>
-              <TableContainer
-                style={{ marginBottom: 10, height: 650 }}
-                component={Paper}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: 7,
-                  }}
-                  className={classes.paperTitle}
-                >
-                  <Typography variant="h5">Students at risk </Typography>
-                  <IconButton onClick = {() => setRiskDialogOpen(true)}>
-                    <InfoIcon fontSize="small"/>
-                  </IconButton>
-                </div>
-                <Table className={classes.table} aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Student</TableCell>
-                      <TableCell align="right">Current grade</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {studentsAtRisk.map((row, index) => (
-                      <TableRow key={index}>
-                        <TableCell component="th" scope="row">
-                          {row.student.username} ({row.student.firstname}{" "}
-                          {row.student.lastname})
-                        </TableCell>
-                        <TableCell align="right">
-                          {row.grade.toFixed(2)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-          </Grid>
+      <Grid container justify="center" spacing={3}>
+        <Grid item xs={12} md={8}>
+          <TableContainer
+            style={{ marginBottom: 10, height: 650 }}
+            component={Paper}>
+            <Box
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 7,
+              }}
+              className={classes.paperTitle}>
+              <Typography variant="h5">Students at risk </Typography>
+              <IconButton onClick={() => setRiskDialogOpen(true)}>
+                <InfoIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <Table className={classes.table} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Student</TableCell>
+                  <TableCell align="right">Current grade</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {studentsAtRisk.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell component="th" scope="row">
+                      {row.student.username} ({row.student.firstname}{" "}
+                      {row.student.lastname})
+                    </TableCell>
+                    <TableCell align="right">{row.grade.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
-        <Grid item xs={4}>
-          <Grid container direction="column" spacing={3}>
-            <Grid item xs={12} style={{ textAlign: "center" }}>
-              <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
-                  <Typography variant="h5">Course VARK Summary</Typography>
-                </div>
-                {isNaN(vark.V) ? (
-                  <Typography align="center">
-                    Students have not completed VARK survey
-                  </Typography>
-                ) : (
-                  <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
-                )}
-              </Paper>
-            </Grid>
-          </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} className={classes.paper}>
+            <Box className={classes.paperTitle}>
+              <Typography variant="h5">Course VARK Summary</Typography>
+            </Box>
+            {isNaN(vark.V) ? (
+              <Typography align="center">
+                Students have not completed VARK survey
+              </Typography>
+            ) : (
+              <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
+            )}
+          </Paper>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormGroup,
   FormControlLabel,
@@ -24,10 +24,9 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContentText from "@material-ui/core/DialogContentText";
+import Box from "@material-ui/core/Box";
 
 // DETERMINE LOCATION
 var url;
@@ -82,7 +81,7 @@ const KCheckbox = withStyles({
 const displayResource = (name, V, A, R, K) => {
   return (
     <div>
-      {name}&nbsp;
+      {name}
       {V && <Brightness1Icon style={{ fontSize: 12, color: "#603E95" }} />}
       {A && <Brightness1Icon style={{ fontSize: 12, color: "#009DA1" }} />}
       {R && <Brightness1Icon style={{ fontSize: 12, color: "#FAC22B" }} />}
@@ -98,10 +97,10 @@ const TeacherResources = ({ course }) => {
     R: false,
     K: false,
   });
-  const [currResource, setCurrResource] = React.useState({});
-  const [resources, setResources] = React.useState([]);
-  const [feedback, setFeedback] = React.useState([]);
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [currResource, setCurrResource] = useState({});
+  const [resources, setResources] = useState([]);
+  const [feedback, setFeedback] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleChangeTags = (event) => {
     setTags({ ...tags, [event.target.name]: event.target.checked });
@@ -109,7 +108,6 @@ const TeacherResources = ({ course }) => {
 
   const handlePostVark = () => {
     if (currResource.id) {
-      console.log("posting vark for" + currResource.id);
       axios(url + "/Database/assign-resource-vark/", {
         method: "post",
         data: {
@@ -126,7 +124,6 @@ const TeacherResources = ({ course }) => {
           withCredentials: true,
         }).then((res) => {
           setResources(res.data);
-          console.log(res.data);
         });
       });
     }
@@ -158,24 +155,18 @@ const TeacherResources = ({ course }) => {
       withCredentials: true,
     }).then((res) => {
       setResources(res.data);
-      console.log(res.data);
     });
   }, [course]);
 
   return (
-    <div>
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseFeedback}
-        aria-labelledby="form-dialog-title"
-      >
-        <DialogTitle id="form-dialog-title">Feedback</DialogTitle>
+    <Box>
+      <Dialog open={openDialog} onClose={handleCloseFeedback}>
+        <DialogTitle>Feedback</DialogTitle>
         <DialogContent>
           <TableContainer
             style={{ marginBottom: 10, marginTop: 10 }}
-            component={Paper}
-          >
-            <Table style={{ minWidth: 550 }} aria-label="simple table">
+            component={Paper}>
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Student</TableCell>
@@ -201,9 +192,7 @@ const TeacherResources = ({ course }) => {
         container
         direction="column"
         justify="flex-start"
-        alignItems="center"
-        style={{ minWidth: 550 }}
-      >
+        alignItems="center">
         <Grid item style={{ width: "100%", marginBottom: 20 }}>
           <Typography style={{ marginBottom: 5, textAlign: "center" }}>
             Tag learning resources
@@ -214,18 +203,12 @@ const TeacherResources = ({ course }) => {
               marginRight: 6,
             }}
             fullWidth
-            variant="outlined"
-          >
-            <InputLabel id="demo-simple-select-outlined-label">
-              Resource
-            </InputLabel>
+            variant="outlined">
+            <InputLabel>Resource</InputLabel>
             <Select
               defaultValue=""
-              id="demo-simple-select-outlined"
-              labelId="demo-simple-select-outlined-label"
               label="resources"
-              onChange={handleChooseResource}
-            >
+              onChange={handleChooseResource}>
               {resources.map((res) => (
                 <MenuItem key={res.id} value={res}>
                   {displayResource(res.title, res.V, res.A, res.R, res.K)}
@@ -279,8 +262,7 @@ const TeacherResources = ({ course }) => {
               style={{ marginTop: 10 }}
               variant="contained"
               color="primary"
-              onClick={handlePostVark}
-            >
+              onClick={handlePostVark}>
               TAG
             </Button>
           </FormControl>
@@ -289,9 +271,8 @@ const TeacherResources = ({ course }) => {
           <Typography variant="h5">Resource feedback</Typography>
           <TableContainer
             style={{ marginBottom: 10, marginTop: 10 }}
-            component={Paper}
-          >
-            <Table style={{ minWidth: 550 }} aria-label="simple table">
+            component={Paper}>
+            <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Resource</TableCell>
@@ -308,9 +289,8 @@ const TeacherResources = ({ course }) => {
                       <Button
                         variant="outlined"
                         color="primary"
-                        onClick={handleOpenFeedback(res.id)}
-                      >
-                        View feedback
+                        onClick={handleOpenFeedback(res.id)}>
+                        View
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -320,7 +300,7 @@ const TeacherResources = ({ course }) => {
           </TableContainer>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 export default TeacherResources;

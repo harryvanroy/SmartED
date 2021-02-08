@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
@@ -26,7 +26,12 @@ import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
 import PropTypes from "prop-types";
-import {Dialog, DialogContent, DialogTitle, DialogContentText} from "@material-ui/core";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+} from "@material-ui/core";
 
 // DETERMINE LOCATION
 var url;
@@ -81,39 +86,35 @@ function Row(props) {
   const [riskDialogOpen, setRiskDialogOpen] = React.useState(false);
 
   return (
-    <React.Fragment>
-      <Dialog
-      open = {riskDialogOpen}
-      onClose = {() => setRiskDialogOpen(false)}
-      >
+    <>
+      <Dialog open={riskDialogOpen} onClose={() => setRiskDialogOpen(false)}>
         <DialogTitle id="form-dialog-title">At Risk</DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
             A student is classified as "AT RISK" if their current weighted
-            average grade in this course is less than 50%. This is a
-            generalised statement and may not truly reflect the student's
-            actual risk of failure.
+            average grade in this course is less than 50%. This is a generalised
+            statement and may not truly reflect the student's actual risk of
+            failure.
           </DialogContentText>
         </DialogContent>
-        
       </Dialog>
       <TableRow
         className={classes.root}
-        style={{ backgroundColor: props.color }}
-      >
+        style={{ backgroundColor: props.color }}>
         <TableCell>
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen(!open)}
-          >
+            onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
         <TableCell component="th" scope="row">
           {row.studentID}
           {parseFloat(row.currentGrade) < 50 && (
-            <Button color="secondary" onClick={() => setRiskDialogOpen(true)}>AT RISK</Button>
+            <Button color="secondary" onClick={() => setRiskDialogOpen(true)}>
+              AT RISK
+            </Button>
           )}
         </TableCell>
         <TableCell align="right">{row.name}</TableCell>
@@ -154,7 +155,7 @@ function Row(props) {
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   );
 }
 Row.propTypes = {
@@ -180,11 +181,12 @@ const TeacherGrades = ({ assessment, course }) => {
     assID: 0,
     grade: 0,
   });
-  const [studentsCourse, setStudentsCourse] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
-  const [openErr, setOpenErr] = React.useState(false);
-  const [studentGrades, setStudentGrades] = React.useState([]);
+  const [studentsCourse, setStudentsCourse] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [openErr, setOpenErr] = useState(false);
+  const [studentGrades, setStudentGrades] = useState([]);
   const classes = useRowStyles();
+
   const handleAssessmentChange = (e) => {
     setGrade({ ...grade, assID: parseInt(e.target.value) });
   };
@@ -231,20 +233,6 @@ const TeacherGrades = ({ assessment, course }) => {
       });
   };
 
-  const riskOfFailure = (grade) => {
-    if (grade > 75) {
-      return "lightgreen";
-    } else if (grade > 55) {
-      return "yellow";
-    } else if (grade > 45) {
-      return "orange";
-    } else if (grade > 35) {
-      return "tomato";
-    } else {
-      return "red";
-    }
-  };
-
   useEffect(() => {
     axios(url + `/Database/students-in-course/?id=${course.id}`, {
       method: "get",
@@ -263,13 +251,12 @@ const TeacherGrades = ({ assessment, course }) => {
   }, [course]);
 
   return (
-    <div>
+    <Box>
       <Snackbar
         open={open}
         autoHideDuration={2000}
         onClose={handleClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Alert onClose={handleClose} severity="success">
           Grade submitted!
         </Alert>
@@ -278,8 +265,7 @@ const TeacherGrades = ({ assessment, course }) => {
         open={openErr}
         autoHideDuration={2000}
         onClose={handleErrClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Alert onClose={handleErrClose} severity="error">
           Invalid grade!
         </Alert>
@@ -289,9 +275,7 @@ const TeacherGrades = ({ assessment, course }) => {
         container
         direction="column"
         justify="flex-start"
-        alignItems="center"
-        style={{ minWidth: 550 }}
-      >
+        alignItems="center">
         <Grid item style={{ width: "100%", marginBottom: 20 }}>
           <Typography style={{ marginBottom: 5, textAlign: "center" }}>
             Add Student Grade
@@ -302,8 +286,7 @@ const TeacherGrades = ({ assessment, course }) => {
               marginRight: 6,
             }}
             fullWidth
-            variant="outlined"
-          >
+            variant="outlined">
             <InputLabel id="demo-simple-select-outlined-label">
               Assessment
             </InputLabel>
@@ -312,8 +295,7 @@ const TeacherGrades = ({ assessment, course }) => {
               id="demo-simple-select-outlined"
               labelId="demo-simple-select-outlined-label"
               label="Assessment"
-              onChange={handleAssessmentChange}
-            >
+              onChange={handleAssessmentChange}>
               {assessment
                 .filter((ass) => ass.course === course.id)
                 .map((e) => (
@@ -346,8 +328,7 @@ const TeacherGrades = ({ assessment, course }) => {
               style={{ marginTop: 10 }}
               variant="contained"
               onClick={handleSubmit}
-              color="primary"
-            >
+              color="primary">
               ADD
             </Button>
           </FormControl>
@@ -367,7 +348,6 @@ const TeacherGrades = ({ assessment, course }) => {
             <TableBody>
               {studentGrades
                 .map((grad) => {
-                  console.log(grad);
                   return createData(
                     grad.student.username,
                     `${grad.student.firstname} ${grad.student.lastname}`,
@@ -384,16 +364,13 @@ const TeacherGrades = ({ assessment, course }) => {
                   );
                 })
                 .map((row, index) => {
-                  console.log("hi");
-                  console.log(row);
-                  console.log(row.currentGrade);
                   return <Row key={index} row={row} />;
                 })}
             </TableBody>
           </Table>
         </TableContainer>
       </Grid>
-    </div>
+    </Box>
   );
 };
 export default TeacherGrades;

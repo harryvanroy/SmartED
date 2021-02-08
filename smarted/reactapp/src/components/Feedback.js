@@ -9,7 +9,6 @@ import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Snackbar from "@material-ui/core/Snackbar";
@@ -32,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(0),
   },
 }));
+
 const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 };
@@ -41,30 +41,14 @@ const Feedback = ({ courses }) => {
   const [openErr, setOpenErr] = React.useState(false);
   const [openSpam, setOpenSpam] = React.useState(false);
   const classes = useStyles();
-  const [state, setState] = React.useState({
-    course: "",
-    text: "",
-    anon: false,
-  });
-
-  const handleCourseChange = (event) => {
-    console.log(state.course);
-    setState({ ...state, course: event.target.value });
-  };
-
-  const handleTextChange = (event) => {
-    setState({ ...state, text: event.target.value });
-  };
-
-  const handleAnonChange = (event) => {
-    setState({ ...state, anon: event.target.checked });
-  };
+  const [course, setCourse] = React.useState("");
+  const [text, setText] = React.useState("");
+  const [anon, setAnon] = React.useState(false);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpen(false);
   };
 
@@ -72,7 +56,6 @@ const Feedback = ({ courses }) => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpenErr(false);
   };
 
@@ -80,22 +63,20 @@ const Feedback = ({ courses }) => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpenSpam(false);
   };
 
   const handleSubmit = (event) => {
-    if (state.text === "" || state.course === "") {
+    if (text === "" || course === "") {
       setOpenErr(true);
       return;
     }
-    console.log(state);
     axios(url + `/Database/post-course-feedback/`, {
       method: "post",
       data: {
-        courseID: state.course,
-        feedback: state.text,
-        anonymous: state.anon === true ? 1 : 0,
+        courseID: course,
+        feedback: text,
+        anonymous: anon === true ? 1 : 0,
       },
       withCredentials: true,
     }).then((res) => {
@@ -104,13 +85,11 @@ const Feedback = ({ courses }) => {
       } else {
         setOpen(true);
       }
-      console.log("posted..");
-      console.log(res);
     });
   };
 
   return (
-    <Box width="80%">
+    <Box>
       <Snackbar
         open={open}
         autoHideDuration={2000}
@@ -138,63 +117,47 @@ const Feedback = ({ courses }) => {
           Invalid feedback!
         </Alert>
       </Snackbar>
-      <Typography variant="h4">Course Feedback</Typography>
 
+      <Typography variant="h4">Course Feedback</Typography>
       <Box m={2}>
-        <FormControl
-          style={{ marginBottom: 12 }}
-          variant="outlined"
-          className={classes.formControl}>
-          <InputLabel id="demo-simple-select-outlined-label">Course</InputLabel>
+        <FormControl variant="filled" fullWidth>
+          <InputLabel>Course</InputLabel>
           <Select
-            defaultValue=""
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
+            value={course}
             label="Course"
-            onChange={handleCourseChange}>
+            onChange={(e) => setCourse(e.target.value)}>
             {courses.map((a, index) => (
               <MenuItem key={index} value={a.id}>
-                {" "}
-                {a.name}{" "}
+                {a.name}
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
-        <FormControl fullWidth>
           <TextField
-            id="outlined-multiline-static"
             multiline
             rows={8}
             placeholder="Type feedback here"
             variant="outlined"
-            onChange={handleTextChange}
+            onChange={(e) => setText(e.target.value)}
           />
-        </FormControl>
-      </Box>
-      <Box m={2}>
-        <FormControl component="fieldset">
-          <FormGroup aria-label="position" row>
-            <FormControlLabel
-              value="end"
-              control={<Checkbox color="primary" onChange={handleAnonChange} />}
-              label="Anonymous? (Constructive feedback only. Bullying or hate speech will not be tolerated)"
-              labelPlacement="end"
-            />
-          </FormGroup>
-        </FormControl>
-        <br />
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          onClick={handleSubmit}>
-          SEND TO COURSE STAFF
-        </Button>
-        <Link to="/">
-          <Button color="primary" size="large">
-            Back
+          <FormControlLabel
+            value="end"
+            control={
+              <Checkbox
+                color="primary"
+                onChange={(e) => setAnon(e.target.checked)}
+              />
+            }
+            label="Anonymous?"
+            labelPlacement="end"
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handleSubmit}>
+            SEND TO COURSE STAFF
           </Button>
-        </Link>
+        </FormControl>
       </Box>
     </Box>
   );

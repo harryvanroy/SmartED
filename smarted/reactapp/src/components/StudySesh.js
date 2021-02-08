@@ -1,19 +1,25 @@
-import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import { makeStyles } from '@material-ui/core/styles';
-import { Button, Box, Typography } from '@material-ui/core';
-import FormControl from '@material-ui/core/FormControl';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Cookies from 'js-cookie';
-
-
+import React from "react";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles } from "@material-ui/core/styles";
+import NoteIcon from "@material-ui/icons/Note";
+import {
+  Button,
+  Box,
+  Typography,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+} from "@material-ui/core";
+import FormControl from "@material-ui/core/FormControl";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Cookies from "js-cookie";
 
 // DETERMINE LOCATION
 var url;
-if (typeof Cookies.get('EAIT_WEB') !== "undefined") {
+if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON DECO SITE");
   url = "https://deco3801-pogware.uqcloud.net";
 } else {
@@ -26,8 +32,8 @@ console.log("location: " + url);
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(0),
-    minWidth: 120
-  }
+    minWidth: 120,
+  },
 }));
 
 export default function Study() {
@@ -36,21 +42,21 @@ export default function Study() {
   let is_started = false;
   let duration = 0;
   let starttime = new Date().getTime();
-  let g1 = '';
-  let g2 = '';
-  let g3 = '';
-  let g4 = '';
-  let g5 = '';
+  let g1 = "";
+  let g2 = "";
+  let g3 = "";
+  let g4 = "";
+  let g5 = "";
 
-  if (localStorage.getItem('studyStartTime') !== null) {
+  if (localStorage.getItem("studyStartTime") !== null) {
     is_started = true;
-    duration = parseFloat(localStorage.getItem('duration'));
-    starttime = parseInt(localStorage.getItem('studyStartTime'));
-    g1 = localStorage.getItem('g1');
-    g2 = localStorage.getItem('g2');
-    g3 = localStorage.getItem('g3');
-    g4 = localStorage.getItem('g4');
-    g5 = localStorage.getItem('g5');
+    duration = parseFloat(localStorage.getItem("duration"));
+    starttime = parseInt(localStorage.getItem("studyStartTime"));
+    g1 = localStorage.getItem("g1");
+    g2 = localStorage.getItem("g2");
+    g3 = localStorage.getItem("g3");
+    g4 = localStorage.getItem("g4");
+    g5 = localStorage.getItem("g5");
   }
 
   const [started, setStarted] = React.useState(is_started);
@@ -63,69 +69,66 @@ export default function Study() {
     g2: g2,
     g3: g3,
     g4: g4,
-    g5: g5
+    g5: g5,
   });
 
   const handleTextChange1 = (event) => {
     setState({ ...state, g1: event.target.value });
     console.log(state);
-    localStorage.setItem('g1', event.target.value);
-  }
+    localStorage.setItem("g1", event.target.value);
+  };
   const handleTextChange2 = (event) => {
     setState({ ...state, g2: event.target.value });
     console.log(state);
-    localStorage.setItem('g2', event.target.value);
-  }
+    localStorage.setItem("g2", event.target.value);
+  };
   const handleTextChange3 = (event) => {
     setState({ ...state, g3: event.target.value });
     console.log(state);
-    localStorage.setItem('g3', event.target.value);
-  }
+    localStorage.setItem("g3", event.target.value);
+  };
   const handleTextChange4 = (event) => {
     setState({ ...state, g4: event.target.value });
     console.log(state);
-    localStorage.setItem('g4', event.target.value);
-  }
+    localStorage.setItem("g4", event.target.value);
+  };
   const handleTextChange5 = (event) => {
     setState({ ...state, g5: event.target.value });
     console.log(state);
-    localStorage.setItem('g5', event.target.value);
-  }
+    localStorage.setItem("g5", event.target.value);
+  };
 
   const handleDurChange = (event) => {
     setState({ ...state, duration: parseFloat(event.target.value) });
-    localStorage.setItem('duration', event.target.value);
-  }
-
+    localStorage.setItem("duration", event.target.value);
+  };
 
   const handleOpen = () => {
     setOpen(true);
-  }
+  };
 
   const handleClose = () => {
     setOpen(false);
-  }
+  };
 
   const handleAltOpen = () => {
     setAlt(true);
-  }
+  };
 
   const handleAltClose = () => {
     setAlt(false);
-  }
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setStarted(true);
     var startDate = new Date().getTime();
 
-    localStorage.setItem('studyStartTime', startDate);
+    localStorage.setItem("studyStartTime", startDate);
 
     setState({ ...state, starttime: startDate });
     handleClose();
-  }
-
-
+  };
 
   const drawDurField = () => {
     return (
@@ -138,7 +141,7 @@ export default function Study() {
         />
       </FormControl>
     );
-  }
+  };
 
   const drawTextField1 = () => {
     return (
@@ -218,49 +221,58 @@ export default function Study() {
   const drawButton = () => {
     if (started) {
       return (
-        <Button style={{ marginRight: 18, marginTop: 5, marginBottom: 5 }} onClick={handleAltOpen} variant="contained">
-          VIEW STUDY SESSION
-        </Button>
-      )
+        <ListItem button onClick={handleAltOpen}>
+          <ListItemIcon>
+            <NoteIcon />
+          </ListItemIcon>
+          <ListItemText primary="View Study Session" />
+        </ListItem>
+      );
     }
-    return (<Button style={{ marginRight: 18, marginTop: 5, marginBottom: 5 }} onClick={handleOpen} variant="contained">
-      START STUDY SESSION
-    </Button>
-    )
-  }
+    return (
+      <ListItem button onClick={handleOpen}>
+        <ListItemIcon>
+          <NoteIcon />
+        </ListItemIcon>
+        <ListItemText primary="Start Study Session" />
+      </ListItem>
+    );
+  };
 
   const reset = () => {
     setStarted(false);
     setState({
       duration: 0,
       starttime: new Date().getTime(),
-      g1: '',
-      g2: '',
-      g3: '',
-      g4: '',
-      g5: ''
+      g1: "",
+      g2: "",
+      g3: "",
+      g4: "",
+      g5: "",
     });
     setOpen(false);
     setAlt(false);
-    localStorage.removeItem('studyStartTime');
-    localStorage.removeItem('g1');
-    localStorage.removeItem('g2');
-    localStorage.removeItem('g3');
-    localStorage.removeItem('g4');
-    localStorage.removeItem('g5');
-    localStorage.removeItem('duration');
-  }
+    localStorage.removeItem("studyStartTime");
+    localStorage.removeItem("g1");
+    localStorage.removeItem("g2");
+    localStorage.removeItem("g3");
+    localStorage.removeItem("g4");
+    localStorage.removeItem("g5");
+    localStorage.removeItem("duration");
+  };
 
   const altDialog = () => {
     var now = new Date().getTime();
-    console.log('now', now);
-    console.log('starttime duration', state.starttime, state.duration);
-    
+    console.log("now", now);
+    console.log("starttime duration", state.starttime, state.duration);
+
     var timeleft = state.starttime + state.duration * 60 * 60 * 1000 - now;
 
-    console.log('timeleft', timeleft)
+    console.log("timeleft", timeleft);
 
-    var hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var hours = Math.floor(
+      (timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
     var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
     return (
       <Dialog open={altopen} onClose={handleAltClose} fullWidth={true}>
@@ -270,34 +282,24 @@ export default function Study() {
             <Typography variant="h6">
               Time remaining: {hours}:{minutes}
             </Typography>
-            <Typography variant="subtitle1">
-              {state.g1}
-            </Typography>
-            <Typography variant="subtitle1">
-              {state.g2}
-            </Typography>
-            <Typography variant="subtitle1">
-              {state.g3}
-            </Typography>
-            <Typography variant="subtitle1">
-              {state.g4}
-            </Typography>
-            <Typography variant="subtitle1">
-              {state.g5}
-            </Typography>
+            <Typography variant="subtitle1">{state.g1}</Typography>
+            <Typography variant="subtitle1">{state.g2}</Typography>
+            <Typography variant="subtitle1">{state.g3}</Typography>
+            <Typography variant="subtitle1">{state.g4}</Typography>
+            <Typography variant="subtitle1">{state.g5}</Typography>
           </Box>
         </DialogContent>
         <DialogActions>
           <Button variant="contained" onClick={reset} color="primary">
             END SESSION
-            </Button>
+          </Button>
           <Button onClick={handleAltClose} color="primary">
             CLOSE
-            </Button>
+          </Button>
         </DialogActions>
       </Dialog>
-    )
-  }
+    );
+  };
 
   return (
     <div>
@@ -318,12 +320,12 @@ export default function Study() {
         <DialogActions>
           <Button variant="contained" onClick={handleSubmit} color="primary">
             START
-            </Button>
+          </Button>
           <Button onClick={handleClose} color="primary">
             CLOSE
-            </Button>
+          </Button>
         </DialogActions>
       </Dialog>
     </div>
-  )
-};
+  );
+}

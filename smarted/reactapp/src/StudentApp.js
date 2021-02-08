@@ -1,21 +1,25 @@
 import React, { useEffect } from "react";
-
-import Drawer from "@material-ui/core/Drawer";
-import AppBar from "@material-ui/core/AppBar";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Collapse from "@material-ui/core/Collapse";
-import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-
-import { makeStyles } from "@material-ui/core/styles";
+import {
+  Drawer,
+  AppBar,
+  CssBaseline,
+  Toolbar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+  IconButton,
+  Button,
+  Menu,
+  MenuItem,
+  Box,
+  Typography,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+} from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
@@ -29,26 +33,19 @@ import ExitIcon from "@material-ui/icons/PowerSettingsNew";
 import SyncIcon from "@material-ui/icons/Sync";
 import PersonIcon from "@material-ui/icons/Person";
 import MenuIcon from "@material-ui/icons/Menu";
-
+import { makeStyles } from "@material-ui/core/styles";
 import { Switch, Route, Link, NavLink } from "react-router-dom";
 import Assessment from "./components/Assessment";
 import Course from "./components/Course";
 import Feedback from "./components/Feedback";
 import Goals from "./components/Goals";
 import Grades from "./components/Grades";
-import { Home, checkDate } from "./components/Home";
+import { Home } from "./components/Home";
+import Study from "./components/StudySesh";
 import Vark from "./components/Vark";
+import SyncData from "./components/SyncData";
 import axios from "axios";
 import Cookies from "js-cookie";
-
-import Study from "./components/StudySesh";
-
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContentText from "@material-ui/core/DialogContentText";
-
-import SyncData from "./components/SyncData";
 
 const drawerWidth = 200;
 
@@ -90,17 +87,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const barColours = [
-  "#51237a",
-  "firebrick",
-  "peru",
-  "chocolate",
-  "darkgreen",
-  "darkslategrey",
-  "black",
-  "darkblue",
-];
-
 const StudentApp = ({ user }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
@@ -112,14 +98,6 @@ const StudentApp = ({ user }) => {
   const [announcements, setAnnouncements] = React.useState([]);
   const [logoutOpen, setLogoutOpen] = React.useState(false);
   const [openDrawer, setOpenDrawer] = React.useState(false);
-
-  let localColorIndex = 0;
-  if (localStorage.getItem("barColourIndex") !== null) {
-    localColorIndex = parseInt(localStorage.getItem("barColourIndex"));
-  }
-  const [color, setColor] = React.useState(barColours[localColorIndex]);
-  const [colorIndex, setColorIndex] = React.useState(localColorIndex);
-  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = () => {
     setOpen(!open);
@@ -141,28 +119,7 @@ const StudentApp = ({ user }) => {
     setLogoutOpen(false);
   };
 
-  const handleProfileOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleProfileClose = () => {
-    setAnchorEl(false);
-  };
-
-  const incColorIndex = () => {
-    console.log(colorIndex);
-    if (colorIndex + 1 === barColours.length) {
-      setColor(barColours[0]);
-      setColorIndex(0);
-      localStorage.setItem("barColourIndex", 0);
-    } else {
-      setColor(barColours[colorIndex + 1]);
-      setColorIndex(colorIndex + 1);
-      localStorage.setItem("barColourIndex", colorIndex + 1);
-    }
-  };
-
-  const logoutDialog = () => {
+  const LogOutDialog = () => {
     return (
       <Dialog open={logoutOpen} onClose={handleLogoutClose}>
         <DialogTitle>Confirm logout?</DialogTitle>
@@ -180,7 +137,7 @@ const StudentApp = ({ user }) => {
     );
   };
 
-  function syncDialog() {
+  const SyncDialog = () => {
     return (
       <Dialog
         open={syncOpen}
@@ -203,7 +160,7 @@ const StudentApp = ({ user }) => {
         </DialogContent>
       </Dialog>
     );
-  }
+  };
 
   const setParentVarkScore = (score) => {
     setVark(score);
@@ -274,12 +231,12 @@ const StudentApp = ({ user }) => {
     });
   }, []);
   return (
-    <div className={classes.root}>
-      {syncDialog()}
+    <Box className={classes.root}>
       <CssBaseline />
-      <AppBar position="fixed" style={{ background: color }}>
+      <SyncDialog />
+      <LogOutDialog />
+      <AppBar position="fixed" style={{ backgroundColor: "#51237a" }}>
         <Toolbar>
-          {logoutDialog()}
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -294,27 +251,6 @@ const StudentApp = ({ user }) => {
               SmartED
             </Link>
           </Typography>
-          <Study />
-          <Link
-            onClick={handleProfileOpen}
-            style={{ textDecoration: "none", color: "unset" }}
-            aria-controls="simple-menu"
-            aria-haspopup="true">
-            <IconButton style={{ textDecoration: "none", color: "unset" }}>
-              <PersonIcon fontSize={"large"} />
-            </IconButton>
-          </Link>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleProfileClose}>
-            <Link to="/vark" style={{ textDecoration: "none", color: "unset" }}>
-              <MenuItem onClick={handleProfileClose}>VARK quiz</MenuItem>
-            </Link>
-            <MenuItem onClick={incColorIndex}>Change colour</MenuItem>
-          </Menu>
           <IconButton
             onClick={handleLogoutOpen}
             style={{ textDecoration: "none", color: "unset" }}>
@@ -396,10 +332,11 @@ const StudentApp = ({ user }) => {
               </ListItemIcon>
               <ListItemText primary="Sync UQ Data" />
             </ListItem>
+            <Study />
           </List>
         </div>
       </Drawer>
-      <main className={classes.content}>
+      <Box className={classes.content}>
         <Toolbar />
         <Switch>
           <Route path="/course/:name">
@@ -434,8 +371,8 @@ const StudentApp = ({ user }) => {
             />
           </Route>
         </Switch>
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
