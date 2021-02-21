@@ -167,7 +167,10 @@ class UQBlackboardScraper:
                 for a particular course
         """
         self.driver.get(self.COURSE_URL % course_id)
-        self.driver.find_element_by_xpath('//*[@title="Assessment"]').click()
+        try:
+            self.driver.find_element_by_xpath('//*[@title="Assessment"]').click()
+        except:
+            return {}
         resources = {}
         self.read_page(course_id, resources)
         return resources

@@ -23,16 +23,13 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
-import HomeIcon from "@material-ui/icons/Home";
 import ExitIcon from "@material-ui/icons/PowerSettingsNew";
 import DeleteIcon from "@material-ui/icons/Delete";
-import PersonIcon from "@material-ui/icons/Person";
 import MenuIcon from "@material-ui/icons/Menu";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContentText from "@material-ui/core/DialogContentText";
 
 import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";

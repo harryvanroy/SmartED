@@ -16,7 +16,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = False
+is_local = True
 FORCE_TEACHER = False
 
 
@@ -93,7 +93,7 @@ def initialize_course(header, stu):
                 print(match.string.split("uq:")[1].split("_")[0])
                 courses.append(match.string.split("uq:")[1].split("_")[0])
     except:
-        courses = ['COMP3301', "DECO3801", "COMP3506", "COMS4200", "ECON3520"]
+        courses = ['COMS4507', "STAT3007", "COMP3400", "COMP4403"]
 
     for course in courses:
         if len(Course.objects.filter(name=course, mode=mode,

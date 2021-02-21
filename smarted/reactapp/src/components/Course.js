@@ -1,39 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import {
   Grid,
   Paper,
   Box,
   Typography,
-  ButtonBase,
   Button,
   Dialog,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
-  FormGroup,
   FormControl,
-  FormControlLabel,
-  Checkbox,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  IconButton,
 } from "@material-ui/core";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableRow from "@material-ui/core/TableRow";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
-import Collapse from "@material-ui/core/Collapse";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import { checkDate } from "./Home";
 import Brightness1Icon from "@material-ui/icons/Brightness1";
 import FeedbackIcon from "@material-ui/icons/Feedback";
-import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
-import Vark from "./Vark";
+import { checkDate } from "./Home";
 
 //DETERMINE LOCATION
 var url;
@@ -44,7 +37,6 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON LOCAL");
   url = "http://localhost:8000";
 }
-console.log("location: " + url);
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -76,20 +68,20 @@ const displayResource = (name, V, A, R, K) => {
 const Course = ({ currCourse, assessment, courses, vark }) => {
   const classes = useStyles();
 
-  const [files, setFiles] = React.useState([]);
-  const [resources, setResources] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
-  const [feedback, setFeedback] = React.useState({
+  const [files, setFiles] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [feedback, setFeedback] = useState({
     text: "",
     course: 0,
   });
 
-  const handleOpen = (id) => (event) => {
+  const handleOpen = (id) => () => {
     setFeedback({ ...feedback, course: id });
     setOpen(true);
   };
 
-  const handleClose = (event) => {
+  const handleClose = () => {
     setFeedback({ text: "", course: 0 });
     setOpen(false);
   };
@@ -98,7 +90,7 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
     setFeedback({ ...feedback, text: event.target.value });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = () => {
     axios(url + `/Database/post-resource-feedback/`, {
       method: "post",
       data: {
@@ -121,14 +113,14 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
             return {
               id: "" + index,
               name: (
-                <div>
+                <Box>
                   <a target="_blank" href={res.blackboardLink}>
                     {displayResource(res.title, res.V, res.A, res.R, res.K)}
                   </a>
                   <IconButton onClick={handleOpen(res.id)}>
                     <FeedbackIcon fontSize="small"></FeedbackIcon>
                   </IconButton>
-                </div>
+                </Box>
               ),
               children: [],
             };
@@ -209,7 +201,6 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
             }
           ).then((res) => {
             resp.push(res.data);
-            console.log(res.data);
           })
         );
       });
@@ -223,23 +214,17 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
   return (
     <Box>
       <Typography variant="h4">Course: {currCourse.name}</Typography>
-      <Grid
-        container
-        justify="center"
-        spacing={3}
-        style={{ marginTop: 12, minWidth: 550 }}
-      >
-        <Grid item xs={8}>
+      <Grid container justify="center" spacing={3} style={{ marginTop: 12 }}>
+        <Grid item xs={12} md={8}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
-                <div
+                <Box
                   style={{ display: "flex", justifyContent: "center" }}
-                  className={classes.paperTitle}
-                >
+                  className={classes.paperTitle}>
                   <Typography variant="h5">Recommended resources</Typography>
-                </div>
-                <div style={{ maxHeight: 100, overflow: "auto" }}>
+                </Box>
+                <Box>
                   {resources
                     .filter(
                       (res) =>
@@ -249,7 +234,7 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
                         (res.K && vark.K > 0.3)
                     )
                     .map((resFil) => (
-                      <div key={resFil.id}>
+                      <Box key={resFil.id}>
                         <a target="_blank" href={resFil.blackboardLink}>
                           {displayResource(
                             resFil.title,
@@ -262,51 +247,43 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
                         <IconButton onClick={handleOpen(resFil.id)}>
                           <FeedbackIcon fontSize="small"></FeedbackIcon>
                         </IconButton>
-                      </div>
+                      </Box>
                     ))}
-                </div>
+                </Box>
               </Paper>
             </Grid>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
-                <div
+                <Box
                   style={{ display: "flex", justifyContent: "center" }}
-                  className={classes.paperTitle}
-                >
+                  className={classes.paperTitle}>
                   <Typography variant="h5">Resources</Typography>
-                </div>
+                </Box>
                 <TreeView
                   className={classes.root}
                   defaultCollapseIcon={<ExpandMoreIcon />}
                   defaultExpanded={["root", "resources", "assessment"]}
-                  defaultExpandIcon={<ChevronRightIcon />}
-                  style={{ height: 470, overflow: "auto" }}
-                >
+                  defaultExpandIcon={<ChevronRightIcon />}>
                   {renderTree(data)}
                 </TreeView>
               </Paper>
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
+                <Box className={classes.paperTitle}>
                   <Typography variant="h5">Upcoming assessment</Typography>
-                </div>
-                <Box
-                  style={{ maxHeight: 655, overflow: "auto" }}
-                  flex={1}
-                  flexDirection="column"
-                >
+                </Box>
+                <Box flex={1} flexDirection="column">
                   <TableContainer
                     style={{ marginBottom: 20 }}
                     key={currCourse.id}
                     component={Paper}
-                    variant="outlined"
-                  >
-                    <Table aria-label="simple table">
+                    variant="outlined">
+                    <Table>
                       <TableBody>
                         {assessment
                           .filter(
@@ -360,7 +337,6 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
         <DialogContent style={{ width: 500 }}>
           <FormControl fullWidth>
             <TextField
-              id="outlined-multiline-static"
               multiline
               rows={4}
               placeholder="Type feedback here"
@@ -374,8 +350,7 @@ const Course = ({ currCourse, assessment, courses, vark }) => {
               variant="contained"
               color="primary"
               size="large"
-              onClick={handleSubmit}
-            >
+              onClick={handleSubmit}>
               SEND TO COURSE STAFF
             </Button>
           </Box>

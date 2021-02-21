@@ -23,7 +23,6 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON LOCAL");
   url = "http://localhost:8000";
 }
-console.log("location: " + url);
 //
 
 const useStyles = makeStyles((theme) => ({

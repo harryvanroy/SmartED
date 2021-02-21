@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   AppBar,
@@ -11,16 +11,14 @@ import {
   Collapse,
   IconButton,
   Button,
-  Menu,
-  MenuItem,
   Box,
   Typography,
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogContentText,
 } from "@material-ui/core";
 import EmojiEmotionsIcon from "@material-ui/icons/EmojiEmotions";
+import Brightness1Icon from "@material-ui/icons/Brightness1";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import AssessmentIcon from "@material-ui/icons/Assessment";
@@ -28,10 +26,8 @@ import FeedbackIcon from "@material-ui/icons/Feedback";
 import SchoolIcon from "@material-ui/icons/School";
 import ClassIcon from "@material-ui/icons/Class";
 import FingerprintIcon from "@material-ui/icons/Fingerprint";
-import HomeIcon from "@material-ui/icons/Home";
 import ExitIcon from "@material-ui/icons/PowerSettingsNew";
 import SyncIcon from "@material-ui/icons/Sync";
-import PersonIcon from "@material-ui/icons/Person";
 import MenuIcon from "@material-ui/icons/Menu";
 import { makeStyles } from "@material-ui/core/styles";
 import { Switch, Route, Link, NavLink } from "react-router-dom";
@@ -58,7 +54,6 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON LOCAL");
   url = "http://localhost:8000";
 }
-console.log("location: " + url);
 //
 
 const useStyles = makeStyles((theme) => ({
@@ -85,53 +80,39 @@ const useStyles = makeStyles((theme) => ({
   listItemText: {
     fontSize: "0.9em",
   },
+  appbar: {
+    backgroundColor: "#51237a",
+  },
+  courseIcon: {
+    fontSize: "small",
+    color: "#51237a",
+  },
 }));
 
-const StudentApp = ({ user }) => {
+const StudentApp = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const [syncOpen, setSyncOpen] = React.useState(false);
-  const [vark, setVark] = React.useState({});
-  const [courses, setCourses] = React.useState([]);
-  const [currCourse, setCurrCourse] = React.useState();
-  const [assessment, setAssessment] = React.useState([]);
-  const [announcements, setAnnouncements] = React.useState([]);
-  const [logoutOpen, setLogoutOpen] = React.useState(false);
-  const [openDrawer, setOpenDrawer] = React.useState(false);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
-
-  const handleSyncOpen = () => {
-    setSyncOpen(true);
-  };
-
-  const handleSyncClose = () => {
-    setSyncOpen(false);
-  };
-
-  const handleLogoutOpen = () => {
-    setLogoutOpen(true);
-  };
-
-  const handleLogoutClose = () => {
-    setLogoutOpen(false);
-  };
+  const [open, setOpen] = useState(false);
+  const [syncOpen, setSyncOpen] = useState(false);
+  const [vark, setVark] = useState({});
+  const [courses, setCourses] = useState([]);
+  const [currCourse, setCurrCourse] = useState({});
+  const [assessment, setAssessment] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   const LogOutDialog = () => {
     return (
-      <Dialog open={logoutOpen} onClose={handleLogoutClose}>
+      <Dialog open={logoutOpen} onClose={() => setLogoutOpen(false)}>
         <DialogTitle>Confirm logout?</DialogTitle>
         <DialogContent>
           <Button
             variant="contained"
             color="primary"
-            style={{ marginLeft: 12 }}
             href="https://learn.uq.edu.au/webapps/login/?action=logout">
             YES, LOG ME OUT
           </Button>
-          <Button onClick={handleLogoutClose}>NO</Button>
+          <Button onClick={() => setLogoutOpen(false)}>NO</Button>
         </DialogContent>
       </Dialog>
     );
@@ -139,15 +120,10 @@ const StudentApp = ({ user }) => {
 
   const SyncDialog = () => {
     return (
-      <Dialog
-        open={syncOpen}
-        onClose={handleSyncClose}
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">
-          Synchronise Your UQ Data
-        </DialogTitle>
+      <Dialog open={syncOpen} onClose={() => setSyncOpen(false)}>
+        <DialogTitle align="center">Synchronise Your UQ Data</DialogTitle>
         <DialogContent>
-          <DialogContentText style={{ color: "black" }}>
+          <Typography>
             After providing your UQ username and password, all your UQ learning
             resources and announcements data will be pulled from blackboard so
             they can be displayed here! <b>Disclaimer:</b> we never store your
@@ -155,8 +131,8 @@ const StudentApp = ({ user }) => {
             behalf. After securely syncing your learning resources, you are
             logged out of blackboard and will need to provide your login details
             again to re-sync.
-            <SyncData />
-          </DialogContentText>
+          </Typography>
+          <SyncData />
         </DialogContent>
       </Dialog>
     );
@@ -181,13 +157,13 @@ const StudentApp = ({ user }) => {
       method: "get",
       withCredentials: true,
     }).then((res) => {
-      console.log(res.data);
       setCourses(res.data);
+
       let resp = [];
       let promises = [];
-
       let respAnnounce = [];
       let promisesAnnounce = [];
+
       res.data.forEach((course) => {
         promises.push(
           axios(url + `/Database/course-assessment/?id=${course.id}`, {
@@ -221,7 +197,6 @@ const StudentApp = ({ user }) => {
       method: "get",
       withCredentials: true,
     }).then((res) => {
-      console.log(res.data);
       setVark({
         V: parseFloat(res.data.V),
         A: parseFloat(res.data.A),
@@ -230,31 +205,26 @@ const StudentApp = ({ user }) => {
       });
     });
   }, []);
+
   return (
     <Box className={classes.root}>
       <CssBaseline />
       <SyncDialog />
       <LogOutDialog />
-      <AppBar position="fixed" style={{ backgroundColor: "#51237a" }}>
+      <AppBar position="fixed" className={classes.appbar}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => setOpenDrawer(true)}>
+          <IconButton color="inherit" onClick={() => setOpenDrawer(true)}>
             <MenuIcon />
           </IconButton>
           <Typography variant="h4" noWrap style={{ flexGrow: 1 }}>
             <Link to="/" style={{ textDecoration: "none", color: "unset" }}>
-              <span role="img" aria-label="cap">
-                🎓
-              </span>
-              SmartED
+              🎓 SmartED
             </Link>
           </Typography>
           <IconButton
-            onClick={handleLogoutOpen}
+            onClick={() => setLogoutOpen(true)}
             style={{ textDecoration: "none", color: "unset" }}>
-            <ExitIcon fontSize={"large"} />
+            <ExitIcon fontSize="large" />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -265,9 +235,9 @@ const StudentApp = ({ user }) => {
         classes={{
           paper: classes.drawerPaper,
         }}>
-        <div className={classes.drawerContainer}>
+        <Box className={classes.drawerContainer}>
           <List>
-            <ListItem button onClick={handleClick}>
+            <ListItem button onClick={() => setOpen(!open)}>
               <ListItemIcon>
                 <ClassIcon />
               </ListItemIcon>
@@ -276,17 +246,32 @@ const StudentApp = ({ user }) => {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {courses.map((a) => {
+                {courses.map((course) => {
                   return (
                     <ListItem
-                      onClick={() => setCurrCourse(a)}
-                      key={a.id}
+                      onClick={() => {
+                        setOpenDrawer(false);
+                        setCurrCourse(course);
+                      }}
+                      key={course.id}
                       button
                       className={classes.nested}
                       component={NavLink}
-                      to={"/course/" + a.name}>
+                      to={"/course/" + course.name}>
                       <ListItemText
-                        primary={a.name}
+                        primary={
+                          <Typography>
+                            <Brightness1Icon className={classes.courseIcon} />
+                            {" " + course.name}
+                          </Typography>
+                        }
+                        secondary={
+                          <>
+                            <Typography variant="caption">
+                              Semester {course.semester}, {course.year}
+                            </Typography>
+                          </>
+                        }
                         classes={{ primary: classes.listItemText }}
                       />
                     </ListItem>
@@ -304,6 +289,7 @@ const StudentApp = ({ user }) => {
               <ListItem
                 button
                 key={text}
+                onClick={() => setOpenDrawer(false)}
                 component={NavLink}
                 to={
                   ["/assessment", "/goals", "/grades", "/feedback", "/vark"][
@@ -326,7 +312,12 @@ const StudentApp = ({ user }) => {
               </ListItem>
             ))}
 
-            <ListItem button onClick={handleSyncOpen}>
+            <ListItem
+              button
+              onClick={() => {
+                setOpenDrawer(false);
+                setSyncOpen(true);
+              }}>
               <ListItemIcon>
                 <SyncIcon />
               </ListItemIcon>
@@ -334,7 +325,7 @@ const StudentApp = ({ user }) => {
             </ListItem>
             <Study />
           </List>
-        </div>
+        </Box>
       </Drawer>
       <Box className={classes.content}>
         <Toolbar />

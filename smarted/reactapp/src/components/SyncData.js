@@ -1,19 +1,19 @@
-import React from "react";
-import { Button, Box, Typography } from "@material-ui/core";
-
-import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import React, { useState } from "react";
+import {
+  Button,
+  Box,
+  Typography,
+  IconButton,
+  FormControl,
+  Input,
+  InputAdornment,
+  Snackbar,
+} from "@material-ui/core";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import CircularProgress from "@material-ui/core/CircularProgress";
-
 import Cookies from "js-cookie";
 import axios from "axios";
-import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
 
 // DETERMINE LOCATION
@@ -33,38 +33,31 @@ const Alert = (props) => {
 };
 
 const SyncData = () => {
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     username: "",
     password: "",
     showPassword: false,
     syncing: false,
     done: false,
   });
-  const [openErr, setOpenErr] = React.useState(false);
+  const [openErr, setOpenErr] = useState(false);
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
-  };
-
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
   };
 
   const handleErrClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
-
     setOpenErr(false);
   };
 
   const handleSubmit = () => {
+    if (values.username === "" || values.password === "") {
+      return;
+    }
     setValues({ ...values, syncing: true });
-
     axios(url + "/Database/refresh/", {
       method: "post",
       data: {
@@ -73,12 +66,11 @@ const SyncData = () => {
       },
       withCredentials: true,
     })
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         setValues({ ...values, syncing: false });
         setValues({ ...values, done: true });
       })
-      .catch((err) => {
+      .catch(() => {
         setOpenErr(true);
         setValues({ ...values, done: true });
       });
@@ -90,18 +82,17 @@ const SyncData = () => {
         open={openErr}
         autoHideDuration={2000}
         onClose={handleErrClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
         <Alert onClose={handleErrClose} severity="error">
           Error submitting!
         </Alert>
       </Snackbar>
       {values.done ? (
-        <h4>Done Syncing!</h4>
+        <Typography>Done Syncing!</Typography>
       ) : values.syncing ? (
         <Box display="flex" justifyContent="center" flexDirection="column">
           <CircularProgress style={{ margin: "auto" }} />
-          <h4>Syncing... This may take a while, please wait...</h4>
+          <Typography>Syncing. This may take a while, please wait.</Typography>
         </Box>
       ) : (
         <>
@@ -117,7 +108,6 @@ const SyncData = () => {
             <Input
               style={{ margin: 12 }}
               placeholder="Password"
-              id="standard-adornment-password"
               type={values.showPassword ? "text" : "password"}
               value={values.password}
               onChange={handleChange("password")}
@@ -125,9 +115,13 @@ const SyncData = () => {
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="toggle password visibility"
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                  >
+                    onClick={() =>
+                      setValues({
+                        ...values,
+                        showPassword: !values.showPassword,
+                      })
+                    }
+                    onMouseDown={(event) => event.preventDefault()}>
                     {values.showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
@@ -137,8 +131,7 @@ const SyncData = () => {
           <Button
             style={{ margin: 12 }}
             onClick={handleSubmit}
-            variant="contained"
-          >
+            variant="contained">
             Sync
           </Button>
         </>

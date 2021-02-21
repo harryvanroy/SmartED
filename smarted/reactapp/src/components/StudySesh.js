@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
 import NoteIcon from "@material-ui/icons/Note";
 import {
   Button,
@@ -29,16 +28,7 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
 console.log("location: " + url);
 //
 
-const useStyles = makeStyles((theme) => ({
-  formControl: {
-    margin: theme.spacing(0),
-    minWidth: 120,
-  },
-}));
-
 export default function Study() {
-  const classes = useStyles();
-
   let is_started = false;
   let duration = 0;
   let starttime = new Date().getTime();
@@ -59,10 +49,10 @@ export default function Study() {
     g5 = localStorage.getItem("g5");
   }
 
-  const [started, setStarted] = React.useState(is_started);
-  const [open, setOpen] = React.useState(false);
-  const [altopen, setAlt] = React.useState(false);
-  const [state, setState] = React.useState({
+  const [started, setStarted] = useState(is_started);
+  const [open, setOpen] = useState(false);
+  const [altopen, setAlt] = useState(false);
+  const [state, setState] = useState({
     duration: duration,
     starttime: starttime,
     g1: g1,
@@ -74,27 +64,22 @@ export default function Study() {
 
   const handleTextChange1 = (event) => {
     setState({ ...state, g1: event.target.value });
-    console.log(state);
     localStorage.setItem("g1", event.target.value);
   };
   const handleTextChange2 = (event) => {
     setState({ ...state, g2: event.target.value });
-    console.log(state);
     localStorage.setItem("g2", event.target.value);
   };
   const handleTextChange3 = (event) => {
     setState({ ...state, g3: event.target.value });
-    console.log(state);
     localStorage.setItem("g3", event.target.value);
   };
   const handleTextChange4 = (event) => {
     setState({ ...state, g4: event.target.value });
-    console.log(state);
     localStorage.setItem("g4", event.target.value);
   };
   const handleTextChange5 = (event) => {
     setState({ ...state, g5: event.target.value });
-    console.log(state);
     localStorage.setItem("g5", event.target.value);
   };
 
@@ -134,7 +119,6 @@ export default function Study() {
     return (
       <FormControl style={{ marginBottom: 12, maxWidth: 80 }}>
         <TextField
-          id="outlined-basic"
           placeholder="hours"
           variant="outlined"
           onChange={handleDurChange}
@@ -147,7 +131,6 @@ export default function Study() {
     return (
       <FormControl fullWidth style={{ marginBottom: 12 }}>
         <TextField
-          id="outlined-multiline-static"
           multiline
           rows={2}
           placeholder="Goal 1"
@@ -162,7 +145,6 @@ export default function Study() {
     return (
       <FormControl fullWidth style={{ marginBottom: 12 }}>
         <TextField
-          id="outlined-multiline-static"
           multiline
           rows={2}
           placeholder="Goal 2"
@@ -177,7 +159,6 @@ export default function Study() {
     return (
       <FormControl fullWidth style={{ marginBottom: 12 }}>
         <TextField
-          id="outlined-multiline-static"
           multiline
           rows={2}
           placeholder="Goal 3"
@@ -192,7 +173,6 @@ export default function Study() {
     return (
       <FormControl fullWidth style={{ marginBottom: 12 }}>
         <TextField
-          id="outlined-multiline-static"
           multiline
           rows={2}
           placeholder="Goal 4"
@@ -207,7 +187,6 @@ export default function Study() {
     return (
       <FormControl fullWidth style={{ marginBottom: 12 }}>
         <TextField
-          id="outlined-multiline-static"
           multiline
           rows={2}
           placeholder="Goal 5"
@@ -263,17 +242,12 @@ export default function Study() {
 
   const altDialog = () => {
     var now = new Date().getTime();
-    console.log("now", now);
-    console.log("starttime duration", state.starttime, state.duration);
-
     var timeleft = state.starttime + state.duration * 60 * 60 * 1000 - now;
-
-    console.log("timeleft", timeleft);
-
     var hours = Math.floor(
       (timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
     );
     var minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
+
     return (
       <Dialog open={altopen} onClose={handleAltClose} fullWidth={true}>
         <DialogTitle> Current Study Session</DialogTitle>
@@ -302,7 +276,7 @@ export default function Study() {
   };
 
   return (
-    <div>
+    <Box>
       {drawButton()}
       {altDialog()}
       <Dialog open={open} onClose={handleClose} fullWidth={true}>
@@ -326,6 +300,6 @@ export default function Study() {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Box>
   );
 }

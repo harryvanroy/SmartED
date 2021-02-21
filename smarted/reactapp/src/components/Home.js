@@ -1,24 +1,26 @@
-import React from "react";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
+import React, { useState } from "react";
+import {
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogContentText,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Box,
+  ButtonBase,
+  Divider,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
 import VarkChart from "./VarkChart";
 import VarkBreakdown from "./VarkBreakdown";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Box from "@material-ui/core/Box";
-import ButtonBase from "@material-ui/core/ButtonBase";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,9 +33,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function checkDate(dateString) {
+const checkDate = (dateString) => {
   if (isNaN(parseInt(dateString[0]))) {
-    return new Date(2020, 10, 20); // assume middle of exam block
+    return null;
   }
 
   let splitStr =
@@ -59,23 +61,15 @@ function checkDate(dateString) {
   let month = months.indexOf(splitStr[1]);
   let year = parseInt("20" + splitStr[2]);
   return new Date(year, month, day);
-}
+};
 
 const Home = ({ assessment, courses, vark, announcements }) => {
   const classes = useStyles();
 
-  const [open, setOpen] = React.useState(false);
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [dialogAnn, setDialogAnn] = React.useState({});
-  const [altOpen, setAltOpen] = React.useState(false);
-
-  const handleVarkOpen = () => {
-    setOpen(true);
-  };
-
-  const handleVarkClose = () => {
-    setOpen(false);
-  };
+  const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogAnn, setDialogAnn] = useState({});
+  const [altOpen, setAltOpen] = useState(false);
 
   const handleOpenDialog = (ann) => {
     return function () {
@@ -84,26 +78,15 @@ const Home = ({ assessment, courses, vark, announcements }) => {
     };
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setDialogAnn({});
-  };
-
-  const handleAltOpen = () => {
-    setAltOpen(true);
-  };
-
-  const handleAltClose = () => {
-    setAltOpen(false);
-  };
-
   return (
-    <div>
+    <Box>
       <Dialog
         open={openDialog}
-        onClose={handleCloseDialog}
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">
+        onClose={() => {
+          setOpenDialog(false);
+          setDialogAnn({});
+        }}>
+        <DialogTitle>
           {dialogAnn.title}
           <Typography color="primary">
             Posted on {dialogAnn.dateAdded}
@@ -113,11 +96,8 @@ const Home = ({ assessment, courses, vark, announcements }) => {
           <Typography>{dialogAnn.content}</Typography>
         </DialogContent>
       </Dialog>
-      <Dialog
-        open={open}
-        onClose={handleVarkClose}
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">About VARK</DialogTitle>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>About VARK</DialogTitle>
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
             While there are several tools to study learning styles of students,
@@ -132,25 +112,26 @@ const Home = ({ assessment, courses, vark, announcements }) => {
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={altOpen}
-        onClose={handleAltClose}
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">VARK score breakdown</DialogTitle>
+      <Dialog open={altOpen} onClose={() => setAltOpen(false)}>
+        <DialogTitle>VARK score breakdown</DialogTitle>
         <DialogContent>
           <VarkBreakdown V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
         </DialogContent>
       </Dialog>
 
-      <Grid container justify="center" spacing={3}>
+      <Grid container justify="center" spacing={3} alignItems="stretch">
         <Grid item xs={12} md={8}>
           <Paper elevation={3} className={classes.paper}>
-            <div
+            <Box
               style={{ display: "flex", justifyContent: "center" }}
               className={classes.paperTitle}>
               <Typography variant="h5">Announcements</Typography>
-            </div>
-            <Box style={{ maxHeight: 760, overflow: "auto" }}>
+            </Box>
+            <Divider />
+            {announcements.length === 0 ? (
+              <Typography align="center">Please sync UQ data</Typography>
+            ) : null}
+            <Box>
               {announcements
                 .sort(
                   (a, b) => Date.parse(b.dateAdded) - Date.parse(a.dateAdded)
@@ -177,22 +158,24 @@ const Home = ({ assessment, courses, vark, announcements }) => {
                         }}>
                         {ann.title.slice(0, 25) + "..."}
                       </Typography>
-                      <Typography
-                        style={{
-                          margin: 10,
-                          color: "#51237a",
-                        }}>
-                        {
-                          courses.filter(
-                            (course) => course.id === ann.course
-                          )[0].name
-                        }
-                      </Typography>
-                      <Typography style={{ margin: 10 }}>
-                        {ann.dateAdded.slice(8, 10) +
-                          ann.dateAdded.slice(4, 8) +
-                          ann.dateAdded.slice(0, 4)}
-                      </Typography>
+                      <Box>
+                        <Typography
+                          style={{
+                            margin: 10,
+                            color: "#51237a",
+                          }}>
+                          {
+                            courses.filter(
+                              (course) => course.id === ann.course
+                            )[0]?.name
+                          }
+                        </Typography>
+                        <Typography variant="caption" style={{ margin: 10 }}>
+                          {ann.dateAdded.slice(8, 10) +
+                            ann.dateAdded.slice(4, 8) +
+                            ann.dateAdded.slice(0, 4)}
+                        </Typography>
+                      </Box>
                     </Paper>
                   </ButtonBase>
                 ))}
@@ -203,52 +186,49 @@ const Home = ({ assessment, courses, vark, announcements }) => {
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12} style={{ textAlign: "center" }}>
               <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
+                <Box className={classes.paperTitle}>
                   <Typography variant="h5">
                     VARK summary
                     <Button
                       style={{ marginLeft: 5 }}
                       color="primary"
-                      onClick={handleVarkOpen}>
+                      onClick={() => setOpen(true)}>
                       Read more
                     </Button>
                   </Typography>
-                </div>
+                </Box>
                 {isNaN(vark.V) ? (
                   <Typography align="center">
                     Please complete vark quiz
                   </Typography>
                 ) : (
-                  <div>
+                  <Box>
                     <VarkChart V={vark.V} A={vark.A} R={vark.R} K={vark.K} />
                     <Button
                       size="large"
                       variant="contained"
                       color="primary"
                       style={{ marginTop: 12 }}
-                      onClick={handleAltOpen}>
+                      onClick={() => setAltOpen(true)}>
                       My VARK Score
                     </Button>
-                  </div>
+                  </Box>
                 )}
               </Paper>
             </Grid>
             <Grid item xs={12}>
               <Paper elevation={3} className={classes.paper}>
-                <div className={classes.paperTitle}>
+                <Box className={classes.paperTitle}>
                   <Typography variant="h5">Upcoming assessment</Typography>
-                </div>
-                <Box
-                  style={{ maxHeight: 300, overflow: "auto" }}
-                  flex={1}
-                  flexDirection="column">
+                </Box>
+                <Box flex={1} flexDirection="column">
                   {courses.map((course) => (
                     <TableContainer
                       style={{ marginBottom: 20 }}
                       key={course.id}
                       component={Paper}
                       variant="outlined">
-                      <Table aria-label="simple table">
+                      <Table>
                         <TableHead>
                           <TableRow>
                             <TableCell align="center">{course.name}</TableCell>
@@ -279,7 +259,7 @@ const Home = ({ assessment, courses, vark, announcements }) => {
                                   ) ? (
                                     <TableCell>
                                       <Typography>
-                                        {assessCourse.name}{" "}
+                                        {assessCourse.name}
                                         <Button color="secondary">
                                           DUE SOON
                                         </Button>
@@ -305,7 +285,7 @@ const Home = ({ assessment, courses, vark, announcements }) => {
           </Grid>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 

@@ -1,12 +1,14 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormGroup from "@material-ui/core/FormGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import { Box, Typography } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import Snackbar from "@material-ui/core/Snackbar";
+import React, { useState } from "react";
+import {
+  Button,
+  Checkbox,
+  FormGroup,
+  FormControlLabel,
+  FormControl,
+  Box,
+  Typography,
+  Snackbar,
+} from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
 const Alert = (props) => {
@@ -172,8 +174,8 @@ const scoring = [
 ];
 
 export default function Vark(props) {
-  const [open, setOpen] = React.useState(false);
-  const [state, setState] = React.useState({
+  const [open, setOpen] = useState(false);
+  const [state, setState] = useState({
     checkedA0: false,
     checkedB0: false,
     checkedC0: false,

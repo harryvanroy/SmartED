@@ -21,9 +21,6 @@ import Paper from "@material-ui/core/Paper";
 import axios from "axios";
 import Cookies from "js-cookie";
 import DialogContentText from "@material-ui/core/DialogContentText";
-import Checkbox from "@material-ui/core/Checkbox";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
 
 // DETERMINE LOCATION
 var url;
@@ -34,7 +31,6 @@ if (typeof Cookies.get("EAIT_WEB") !== "undefined") {
   // console.log("ON LOCAL");
   url = "http://localhost:8000";
 }
-console.log("location: " + url);
 //
 
 const useStyles = makeStyles((theme) => ({
@@ -76,19 +72,15 @@ function Goals({ courses, assessment }) {
       let customGoalsToAdd = [];
 
       res.data["COURSEGRADE"].forEach((courseGradeGoal) => {
-        console.log(courseGradeGoal);
         courseGoalsToAdd.push(courseGradeGoal);
       });
       res.data["ASSESSMENTGRADE"].forEach((assGoal) => {
-        console.log(assGoal);
         assGoalsToAdd.push(assGoal);
       });
       res.data["STUDYWEEK"].forEach((studyGoal) => {
-        console.log(studyGoal);
         studyGoalsToAdd.push(studyGoal);
       });
       res.data["CUSTOM"].forEach((customGoal) => {
-        console.log(customGoal);
         customGoalsToAdd.push(customGoal);
       });
 
@@ -100,8 +92,6 @@ function Goals({ courses, assessment }) {
   }, []);
 
   const handleCourseChange = (event) => {
-    console.log("Handling course change ...");
-    console.log(event.target.value);
     setState({
       ...state,
       courseID: event.target.value.id,
@@ -131,7 +121,6 @@ function Goals({ courses, assessment }) {
   };
 
   const handleAssessmentChange = (event) => {
-    console.log(event.target.value);
     let assName = event.target.value.name;
     let assID = event.target.value.id;
     setState({ ...state, assName: assName, assID: assID });
@@ -163,7 +152,6 @@ function Goals({ courses, assessment }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(state);
     let postGoal = {};
     switch (state.type) {
       case "COURSEGRADE":
@@ -207,7 +195,7 @@ function Goals({ courses, assessment }) {
       method: "post",
       data: postGoal,
       withCredentials: true,
-    }).then((res) => {
+    }).then(() => {
       axios(url + "/Database/goals/", {
         method: "get",
         withCredentials: true,
@@ -218,19 +206,15 @@ function Goals({ courses, assessment }) {
         let customGoalsToAdd = [];
 
         res.data["COURSEGRADE"].forEach((courseGradeGoal) => {
-          console.log(courseGradeGoal);
           courseGoalsToAdd.push(courseGradeGoal);
         });
         res.data["ASSESSMENTGRADE"].forEach((assGoal) => {
-          console.log(assGoal);
           assGoalsToAdd.push(assGoal);
         });
         res.data["STUDYWEEK"].forEach((studyGoal) => {
-          console.log(studyGoal);
           studyGoalsToAdd.push(studyGoal);
         });
         res.data["CUSTOM"].forEach((customGoal) => {
-          console.log(customGoal);
           customGoalsToAdd.push(customGoal);
         });
 
@@ -352,7 +336,7 @@ function Goals({ courses, assessment }) {
     axios(url + `/Database/goals/?id=${id}`, {
       method: "delete",
       withCredentials: true,
-    }).then((res) => {
+    }).then(() => {
       switch (goalType) {
         case 0:
           setCustomGoals(customGoals.filter((goal) => goal.id !== id));
@@ -370,14 +354,10 @@ function Goals({ courses, assessment }) {
       }
     });
   };
-  console.log(studyGoals);
   return (
     <div>
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Custom goal</DialogTitle>
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Custom goal</DialogTitle>
         <DialogContent>
           <DialogContentText>{dialogText}</DialogContentText>
         </DialogContent>
@@ -393,23 +373,16 @@ function Goals({ courses, assessment }) {
             onClick={handleOpen}>
             ADD GOAL
           </Button>
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="form-dialog-title">
-            <DialogTitle id="form-dialog-title">Add Goal</DialogTitle>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Add Goal</DialogTitle>
             <DialogContent>
               <Box m={2}>
                 <FormControl
                   style={{ marginBottom: 12, marginRight: 6 }}
                   variant="outlined"
                   className={classes.formControl}>
-                  <InputLabel id="demo-simple-select-outlined-label">
-                    Course
-                  </InputLabel>
+                  <InputLabel>Course</InputLabel>
                   <Select
-                    labelId="demo-simple-select-outlined-label"
-                    id="demo-simple-select-outlined"
                     label="Course"
                     defaultValue=""
                     onChange={handleCourseChange}>
@@ -425,12 +398,8 @@ function Goals({ courses, assessment }) {
                   style={{ marginBottom: 12 }}
                   variant="outlined"
                   className={classes.formControl}>
-                  <InputLabel id="demo-simple-select-outlined-label">
-                    Goal type
-                  </InputLabel>
+                  <InputLabel>Goal type</InputLabel>
                   <Select
-                    labelId="demo-simple-select-outlined-label"
-                    id="demo-simple-select-outlined"
                     label="Course"
                     defaultValue=""
                     onChange={handleGoalChange}>
@@ -466,7 +435,7 @@ function Goals({ courses, assessment }) {
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
         component={Paper}>
-        <Table aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
@@ -501,7 +470,7 @@ function Goals({ courses, assessment }) {
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
         component={Paper}>
-        <Table aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
@@ -529,7 +498,7 @@ function Goals({ courses, assessment }) {
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
         component={Paper}>
-        <Table aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
@@ -557,7 +526,7 @@ function Goals({ courses, assessment }) {
       <TableContainer
         style={{ marginBottom: 10, marginTop: 10 }}
         component={Paper}>
-        <Table aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>Course</TableCell>
