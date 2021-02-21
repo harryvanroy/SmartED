@@ -16,7 +16,7 @@ from rest_framework.exceptions import ValidationError, ParseError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-is_local = True
+is_local = False
 FORCE_TEACHER = False
 
 
